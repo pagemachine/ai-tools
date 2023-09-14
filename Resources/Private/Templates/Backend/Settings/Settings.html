@@ -1,0 +1,43 @@
+<f:layout name="Default" />
+
+<f:section name="main">
+
+
+    <h1>AI-Tools Settings</h1>
+
+
+    <ul class="nav nav-tabs" id="tablist-settings" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="openai-tab" data-bs-toggle="tab" data-bs-target="#openaiTab" type="button" role="tab" aria-controls="openai" aria-selected="true">Open AI</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="aws-tab" data-bs-toggle="tab" data-bs-target="#awsTab" type="button" role="tab" aria-controls="aws" aria-selected="false">AWS</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="tabcontent-settings">
+        <div class="tab-pane fade show active" id="openaiTab" role="tabpanel" aria-labelledby="openai-tab">
+            <f:form enctype="multipart/form-data" id="settings_form" action="save" object="{settings}" name="settings" class="form-section">
+                <div class="form-group">
+                    <label for="openai_apikey">Open AI API Key:</label>
+                    <f:form.textfield name="openai_apikey" id="openai_apikey" value="{openai_apikey}" class="form-control" type="password" />
+                </div>
+                <f:form.submit value="Save" />
+            </f:form>
+        </div>
+        <div class="tab-pane fade" id="awsTab" role="tabpanel" aria-labelledby="aws-tab">
+            <f:form enctype="multipart/form-data" id="settings_form" action="save" object="{settings}" name="settings" class="form-section">
+                <div class="form-group">
+                    <label for="aws_region">AWS Region:</label>
+                    <f:form.textfield name="aws_region" id="aws_region" value="{aws_region}" class="form-control" />
+                    <label for="aws_access_key_id">AWS Access Key ID:</label>
+                    <f:form.textfield name="aws_access_key_id" id="aws_access_key_id" value="{aws_access_key_id}" class="form-control" type="password" />
+                    <label for="aws_secret_access_key">AWS Secret Access Key:</label>
+                    <f:form.textfield name="aws_secret_access_key" id="aws_secret_access_key" value="{aws_secret_access_key}" class="form-control" type="password" />
+                </div>
+                <f:form.submit value="Save" />
+            </f:form>
+        </div>
+    </div>
+
+
+</f:section>

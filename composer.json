@@ -1,0 +1,42 @@
+{
+    "name": "pagemachine/ai-tools",
+    "description": "Use A.I. Tools in the TYPO3 backend",
+    "type": "typo3-cms-extension",
+    "version": "dev-1.0.0",
+    "license": "proprietary",
+    "keywords": [
+        "typo3",
+        "extension",
+        "images",
+        "ai",
+        "backend"
+    ],
+    "authors": [
+        {
+            "name": "Mauricio Altamirano Silva",
+            "email": "maltamirano@pagemachine.de",
+            "homepage": "https://pagemachine.de",
+            "role": "Developer"
+        },
+        {
+            "name": "Sascha Löffler",
+            "email": "sloeffler@pagemachine.de",
+            "homepage": "https://pagemachine.de",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "typo3/cms-core": "^11.5",
+        "openai-php/client": "^0.6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Pagemachine\\AItools\\": "Classes"
+        }
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "ai_tools"
+        }
+    }
+}

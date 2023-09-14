@@ -1,0 +1,214 @@
+<?php
+
+declare(strict_types = 1);
+
+namespace Pagemachine\AItools\Controller\Backend;
+
+use OpenAI;
+use OpenAI\Client;
+use Pagemachine\AItools\Domain\Model\Aiimage;
+use Pagemachine\AItools\Service\SettingsService;
+use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Exception;
+use TYPO3\CMS\Core\Http\Response;
+use TYPO3\CMS\Core\Messaging\FlashMessage;
+use TYPO3\CMS\Core\Messaging\FlashMessageService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Http\ForwardResponse;
+
+class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
+{
+    private ?SettingsService $settingsService;
+
+    public function __construct(
+        SettingsService $settingsService,
+    )
+    {
+        $this->settingsService = $settingsService;
+    }
+
+    private function getOpenAIClient(): Client {
+        $openaiKey = (string)$this->settingsService->getSetting('openai_apikey');
+        return OpenAI::client($openaiKey);
+    }
+
+    public function showAction(): void
+    {
+        //This is the default action because is the first listed in packages/ai_image/ext_tables.php
+        //show form to generate image packages/ai_image/Resources/Private/Templates/Backend/Show.html
+        //echo "<h2>showAction - BackendController.php</h2>";
+    }
+
+
+    /**
+     * @param Aiimage $aiimage
+     * @return void
+     */
+    public function generateAction(Aiimage $aiimage): void
+    {
+        //Do the openai request to generate image
+        //echo "<h2>generateAction - BackendController.php</h2>";
+
+        //The object Aiimage and the name should be called the same in the form from Show.html
+        //to be passed to this function
+
+        // Define paths and set template
+        //setTemplateRootPaths not necessary you define the template paths in a Typoscript:
+        //ai_image/ext_typoscript_setup.typoscript, then you dont need to add it to every function.
+        //setTemplate should not be necessary as per default it uses the function name without action
+        //therefore the default template is Generate.html for generateAction
+        //$this->view->setTemplateRootPaths(['EXT:ai_image/Resources/Private/Templates']);
+        //$this->view->setTemplate('Generate');
+
+        //We get the object $aiimage from the Show.html form
+        $description = $aiimage->getDescription();
+        $imagesnumber = $aiimage->getImagesnumber();
+        $imagesnumber = intval($imagesnumber);
+        $resolution = $aiimage->getResolution();
+        $altText = str_replace(' ', '-', $description);
+
+        //Get the property description from the form
+        //$description = $generatedImageName['description']; //no Aiimage object
+        //We generate an image using the description
+        if (!empty($description)) {
+            $imageDescriptionUrlArray = $this->generateImage($description, $imagesnumber, $resolution);
+
+            $this->view->assignMultiple([
+                'descriptionImageLinksFluid' => $imageDescriptionUrlArray,
+                'imageDescription' => $altText,
+            ]);
+        }
+    }
+
+
+    /**
+     * @param Aiimage $aiimage
+     * @return void
+     */
+    public function variateAction(Aiimage $aiimage): void
+    {
+        $file = $aiimage->getFile();
+        $imagesnumber = $aiimage->getImagesnumber();
+        $imagesnumber = intval($imagesnumber);
+        $resolution = $aiimage->getResolution();
+
+        //We pass the temp path of the file to create a variation
+        if ($file['tmp_name']) {
+            $filePath = $file['tmp_name'];
+            $fileName = $file['name'];
+            $fileName = str_replace('.png','',$fileName);
+
+            $imageVariationUrlArray = $this->variationImage($filePath,$imagesnumber,$resolution);
+
+            $this->view->assignMultiple([
+                'variationImageLinksFluid' => $imageVariationUrlArray,
+                'variationImageFileFluid' => $fileName,
+            ]);
+        }
+    }
+
+    /**
+     * @param array $result_aiimage
+     * @return void
+     * @throws Exception
+     */
+    public function saveAction(array $result_aiimage): Response
+    {
+        //Save the file in fileadmin
+        $fileurl = $result_aiimage['fileurl'];
+        $filename = $result_aiimage['filename'];
+        $filename = $filename.'-'. uniqid() .'.png';
+
+        $saveTarget = '/var/www/html/web/fileadmin/fileadmin/'.$filename;
+        //Saving image from PHP URL
+        copy($fileurl, $saveTarget);
+
+        $this->addFlashMessage(
+            'The image has been saved in ' . $saveTarget,
+            'Image saved',
+            FlashMessage::INFO,
+            true
+        );
+
+        return GeneralUtility::makeInstance(ForwardResponse::class, 'show');
+    }
+
+    private function generateImage($text,$imagesnumber,$resolution): array
+    {
+        $client = $this->getOpenAIClient();
+
+        $returnUrlArray = [];
+
+        try {
+            $response = $client->images()->create([
+                'prompt' => $text,
+                'n' => $imagesnumber,
+                'size' => $resolution,
+                'response_format' => 'url',
+            ]);
+
+            foreach ($response->data as $data) {
+                $data->url; // 'https://oaidalleapiprodscus.blob.core.windows.net/private/...'
+                $data->b64_json; // null
+            }
+
+            $imageUrlArray = $response->toArray();
+
+            for ($i = 0; $i < count($imageUrlArray['data']); $i++) {
+                $imageUrl = $imageUrlArray['data'][$i]['url'];
+                array_push($returnUrlArray,$imageUrl);
+            }
+
+        } catch (\Exception $e) {
+            $exceptionMsg = $e->getMessage();
+
+            $this->addFlashMessage(
+                $exceptionMsg,
+                'Warning',
+                FlashMessage::WARNING,
+                true
+            );
+        }
+
+        return $returnUrlArray;
+    }
+
+    private function variationImage($image,$imagesnumber,$resolution): array
+    {
+        $client = $this->getOpenAIClient();
+        $returnUrlArray = [];
+
+        try {
+            $response = $client->images()->variation([
+                'image' => fopen($image, 'r'),
+                'n' => $imagesnumber,
+                'size' => $resolution,
+                'response_format' => 'url',
+            ]);
+
+            foreach ($response->data as $data) {
+                $data->url; // 'https://oaidalleapiprodscus.blob.core.windows.net/private/...'
+                $data->b64_json; // null
+            }
+
+            $imageUrlArray = $response->toArray();
+
+            for ($i = 0; $i < count($imageUrlArray['data']); $i++) {
+                $imageUrl = $imageUrlArray['data'][$i]['url'];
+                array_push($returnUrlArray,$imageUrl);
+            }
+        } catch (\Exception $e) {
+            $exceptionMsg = $e->getMessage();
+
+            $this->addFlashMessage(
+                $exceptionMsg,
+                'Warning',
+                FlashMessage::WARNING,
+                true
+            );
+        }
+
+        return $returnUrlArray;
+    }
+
+}
