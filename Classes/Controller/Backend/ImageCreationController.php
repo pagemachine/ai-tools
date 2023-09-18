@@ -8,11 +8,12 @@ use OpenAI;
 use OpenAI\Client;
 use Pagemachine\AItools\Domain\Model\Aiimage;
 use Pagemachine\AItools\Service\SettingsService;
-use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
-use TYPO3\CMS\Core\Messaging\FlashMessageService;
+use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Resource\Folder;
+use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Http\ForwardResponse;
 
@@ -114,21 +115,49 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
      */
     public function saveAction(array $result_aiimage): Response
     {
+        // get filestorage
+        $storageRepository = GeneralUtility::makeInstance(StorageRepository::class);
+        $defaultStorage = $storageRepository->getDefaultStorage();
+        /** @var Folder $folder **/
+        $folder = $defaultStorage->getRootLevelFolder();
+
         //Save the file in fileadmin
-        $fileurl = $result_aiimage['fileurl'];
+        $fileUrl = $result_aiimage['fileurl'];
         $filename = $result_aiimage['filename'];
         $filename = $filename.'-'. uniqid() .'.png';
 
-        $saveTarget = '/var/www/html/web/fileadmin/fileadmin/'.$filename;
-        //Saving image from PHP URL
-        copy($fileurl, $saveTarget);
-
-        $this->addFlashMessage(
-            'The image has been saved in ' . $saveTarget,
-            'Image saved',
-            FlashMessage::INFO,
-            true
+        // download generated file to temporary file
+        $fileContent = GeneralUtility::getUrl($fileUrl);
+        $temporaryFile = GeneralUtility::tempnam('temp/' . $filename);
+        GeneralUtility::writeFileToTypo3tempDir(
+            $temporaryFile,
+            $fileContent
         );
+
+        // add file to filestorage folder
+        $savedFile = $folder->addFile($temporaryFile, $filename);
+
+        // delete temporary file
+        GeneralUtility::unlink_tempfile($temporaryFile);
+
+        // check if $savedFile is an instance of \TYPO3\CMS\Core\Resource\File
+        if ($savedFile instanceof File) {
+            $saveTarget = $savedFile->getIdentifier();
+
+            $this->addFlashMessage(
+                'The image has been saved in ' . $saveTarget,
+                'Image saved',
+                FlashMessage::INFO,
+                true
+            );
+        } else {
+            $this->addFlashMessage(
+                'The image could not be saved',
+                'Image not saved',
+                FlashMessage::ERROR,
+                true
+            );
+        }
 
         return GeneralUtility::makeInstance(ForwardResponse::class, 'show');
     }
