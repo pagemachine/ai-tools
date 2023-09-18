@@ -7,6 +7,8 @@ namespace Pagemachine\AItools\Controller\Backend;
 
 use Pagemachine\AItools\Domain\Model\Aiimage;
 use Pagemachine\AItools\Service\AwsImageRecognizeService;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
@@ -24,10 +26,8 @@ class ImageRecognizeController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionC
 
     private ?AwsImageRecognizeService $awsImageRecognizeService;
 
-    public function __construct(
-        AwsImageRecognizeService $awsImageRecognizeService,
-    ) {
-        $this->awsImageRecognizeService = $awsImageRecognizeService;
+    public function __construct() {
+        $this->awsImageRecognizeService = GeneralUtility::makeInstance(AwsImageRecognizeService::class);
         $this->registry = GeneralUtility::makeInstance(Registry::class);
     }
 
@@ -98,40 +98,18 @@ class ImageRecognizeController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionC
         }
     }
 
-    /*private function openAIrequest($input): string
+    /**
+     * @todo
+     * @return ResponseInterface
+     * @throws \JsonException
+     */
+    public function ajaxMetaGenerateAction(): ResponseInterface
     {
-        $describeInput = "Describe a ".$input;
-
-        $openaiKey = getenv('OPENAI_API_KEY');
-        $client = OpenAI::client($openaiKey);
-
-        //What sampling temperature to use, between 0 and 2.
-        //Higher values like 0.8 will make the output more random,
-        //while lower values like 0.2 will make it more focused and deterministic.
-
-        try {
-            $result = $client->completions()->create([
-                'model' => 'text-davinci-003',
-                'prompt' => $describeInput,
-                'temperature' => 0,
-                'max_tokens' => 50
-            ]);
-        }
-            //Handle request errors like wrong API key
-        catch (\Exception $e) {
-            $exceptionMsg = $e->getMessage();
-        }
-
-        //Handle undefined array keys in $result
-        if(isset($result['choices'][0]['text'])){
-            $completedText = $result['choices'][0]['text'];
-        }
-        else{
-            $completedText = '';
-        }
-
-        return $completedText;
-    }*/
+        $response = $this->responseFactory->createResponse()
+            ->withHeader('Content-Type', 'application/json; charset=utf-8');
+        $response->getBody()->write(json_encode(['result' => []], JSON_THROW_ON_ERROR));
+        return $response;
+    }
 
     /**
      * describe an image
@@ -141,20 +119,20 @@ class ImageRecognizeController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionC
     public function describeAction(Aiimage $aiimage): void
     {
         $file = $aiimage->getFile();
-        DebuggerUtility::var_dump($aiimage);
-        DebuggerUtility::var_dump($file);
 
         if (!$this->hasAllAwsSettings()) {
+            $this->addMessageToFlashMessageQueue(
+                "AWS settings are not configured",
+                FlashMessage::ERROR
+            );
             return;
         }
         if ($file['tmp_name']) {
             $filePath = $file['tmp_name'];
-            $fileName = $file['name'];
-            $fileName = str_replace('.png', '', $fileName);
-            //$filePath = Environment::getPublicPath(). $file->getPublicUrl();
 
-            $extension = strtolower($file->getExtension());
-            $imageExtensions = ['jpg', 'png'];
+            $text = $this->awsImageRecognizeService->detectLabels($filePath);
+
+            $this->view->assign('text', $text);
 
         }
     }

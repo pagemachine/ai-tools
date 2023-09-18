@@ -15,13 +15,11 @@ class Aiimage extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
 
     /**
      * @var string $imagesnumber
-     * Validate("notEmpty")
      */
     protected $imagesnumber;
 
     /**
      * @var string $resolution
-     * @TYPO3\CMS\Extbase\Annotation\Validate("notEmpty")
      */
     protected $resolution;
 

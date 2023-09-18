@@ -11,6 +11,7 @@ use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 class AwsImageRecognizeService
 {
@@ -19,14 +20,16 @@ class AwsImageRecognizeService
 
     private LoggerInterface $logger;
 
-    public function __construct(ExtensionConfiguration $extensionConfiguration, SettingsService $settingsService)
+    public function __construct()
     {
-        $this->settingsService = $settingsService;
+        $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
 
         $options = [
             'region' => $this->settingsService->getSetting('aws_region'),
-            'key' => $this->settingsService->getSetting('aws_access_key_id'),
-            'secret' => $this->settingsService->getSetting('aws_secret_access_key'),
+            'credentials' => [
+                'key' => $this->settingsService->getSetting('aws_access_key_id'),
+                'secret' => $this->settingsService->getSetting('aws_secret_access_key'),
+            ],
             'version' => '2016-06-27',
         ];
         $this->rekognitionClient = new RekognitionClient($options);

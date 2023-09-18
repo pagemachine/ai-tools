@@ -11,6 +11,12 @@ define(function () {
    */
   var ContextMenuActions = {};
 
+
+  ContextMenuActions.getReturnUrl = function () {
+    return encodeURIComponent(top.list_frame.document.location.pathname + top.list_frame.document.location.search);
+  };
+
+
   /**
    * Generate AI Metadata for the given file.
    *
@@ -18,17 +24,19 @@ define(function () {
    * @param {int} uid of the page
    */
   ContextMenuActions.generateAIMetadata = function (table, uid) {
-    //if (table === 'sys_file_metadata') {
+    if (table === 'sys_file') {
       //If needed, you can access other 'data' attributes here from $(this).data('someKey')
       //see item provider getAdditionalAttributes method to see how to pass custom data attributes
 
-      const returnUrl = encodeURIComponent(top.list_frame.document.location.pathname + top.list_frame.document.location.search)
+      //top.TYPO3.Notification.info('Generated Metadata', 'Generated Metadata via A.I.', 5);
+      console.log(top.TYPO3.settings);
+      top.TYPO3.Notification.info('Generated Metadata', top.TYPO3.settings.ajaxUrls.aitools_ai_tools_images + '&target=' + encodeURIComponent(uid) + '&returnUrl=' + ContextMenuActions.getReturnUrl(), 5);
 
-      const t = (0, o.default)(this).data("metadata-uid");
-      t && top.TYPO3.Backend.ContentContainer.setUrl(top.TYPO3.settings.FormEngine.moduleUrl + "&edit[sys_file_metadata][" + parseInt(t, 10) + "]=edit&returnUrl=" + returnUrl)
+      top.TYPO3.Backend.ContentContainer.setUrl(
+        top.TYPO3.settings.ajaxUrls.aitools_ai_tools_images + '&target=' + encodeURIComponent(uid) + '&returnUrl=' + ContextMenuActions.getReturnUrl()
+      );
 
-      top.TYPO3.Notification.info('Generated Metadata', 'Generated Metadata via A.I.', 5);
-    //}
+    }
   };
 
   return ContextMenuActions;
