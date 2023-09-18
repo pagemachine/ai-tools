@@ -39,7 +39,7 @@ defined('TYPO3_MODE') || die('Access denied.');
         \Pagemachine\AItools\Controller\Backend\SettingsController::class => 'settings, save',
     ),
     array(
-        'access' => 'user,group',
+        'access' => 'admin',
         'icon' => 'EXT:ai_tools/Resources/Public/Icons/ext_icon.svg',
         'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf',
     )
