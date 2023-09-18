@@ -27,7 +27,8 @@
     ],
     "require": {
         "typo3/cms-core": "^11.5",
-        "openai-php/client": "^0.6.0"
+        "openai-php/client": "^0.6.0",
+        "aws/aws-sdk-php": "^3.0"
     },
     "autoload": {
         "psr-4": {
