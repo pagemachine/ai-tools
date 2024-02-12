@@ -89,11 +89,17 @@ class AiToolItemProvider extends AbstractProvider
      */
     protected function getAdditionalAttributes(string $itemName): array
     {
-        return [
+        $attributes = [
             // BEWARE!!! RequireJS MODULES MUST ALWAYS START WITH "TYPO3/CMS/" (and no "Vendor" segment here)
             'data-callback-module' => 'TYPO3/CMS/AiTools/ContextMenuActions',
             // Here you can also add any other useful "data-" attribute you'd like to use in your JavaScript (e.g. localized messages)
         ];
+        if ($itemName === 'generateAIMetadata') {
+            $attributes += [
+                'data-identifier' => htmlspecialchars($this->identifier),
+            ];
+        }
+        return $attributes;
     }
 
     /**

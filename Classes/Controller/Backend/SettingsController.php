@@ -14,7 +14,10 @@ class SettingsController extends ActionController
 {
     private ?SettingsService $settingsService;
 
-    private array $settingOptions = ['openai_apikey', 'aws_region', 'aws_access_key_id', 'aws_secret_access_key', 'aws_confidence'];
+    private array $settingOptions = [
+        'openai_apikey',
+        'custom_auth_token', 'custom_image_recognition_api_uri', 'custom_translation_api_uri',
+    ];
 
     public function __construct(
         SettingsService $settingsService,

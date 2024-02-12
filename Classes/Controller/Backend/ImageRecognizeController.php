@@ -4,138 +4,138 @@ declare(strict_types = 1);
 
 namespace Pagemachine\AItools\Controller\Backend;
 
-
-use Pagemachine\AItools\Domain\Model\Aiimage;
-use Pagemachine\AItools\Service\AwsImageRecognizeService;
+use Pagemachine\AItools\Service\ImageMetaDataService;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
-use TYPO3\CMS\Core\Registry;
-use TYPO3\CMS\Core\Resource\Event\AfterFileAddedEvent;
+use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\FileInterface;
-use TYPO3\CMS\Core\Resource\MetaDataAspect;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Core\Site\Entity\NullSite;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Fluid\View\StandaloneView;
+use TYPO3\CMS\Fluid\View\TemplatePaths;
 
-class ImageRecognizeController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
+class ImageRecognizeController extends ActionController
 {
-    private Registry $registry;
+    private ?ImageMetaDataService $imageMetaDataService;
 
-    private ?AwsImageRecognizeService $awsImageRecognizeService;
-
-    public function __construct() {
-        $this->awsImageRecognizeService = GeneralUtility::makeInstance(AwsImageRecognizeService::class);
-        $this->registry = GeneralUtility::makeInstance(Registry::class);
-    }
+    protected ResourceFactory $resourceFactory;
 
     /**
-     * @throws \TYPO3\CMS\Core\Exception
+     * @var string
      */
-    public function setMetadataAction($file): void
-    {
-        if (!$this->hasAllAwsSettings()) {
-            return;
-        }
-        $filePath = Environment::getPublicPath() . $file->getPublicUrl();
+    protected $templateRootPath = 'EXT:ai_tools/Resources/Private/Templates/Backend/ImageRecognize/';
 
-        $extension = strtolower($file->getExtension());
-        $imageExtensions = ['jpg', 'png'];
-        if (in_array($extension, $imageExtensions, true) && !empty($file->getPublicUrl())) {
-            /** @var MetaDataAspect $metaData */
-            $metaData = $file->getMetaData();
 
-            $keywords = $this->awsImageRecognizeService->detectLabels($filePath);
-            if (!empty($keywords)) {
-                $metaData->offsetSet('aws_labels', $keywords);
-            }
-            $detectedText = $this->awsImageRecognizeService->detectText($filePath);
-            if (!empty($detectedText)) {
-                $metaData->offsetSet('aws_text', $detectedText);
-            }
-
-            //Send only the first $maxWords to OpenAI
-            $strArrayLabels = explode (", ", $keywords);
-            $strArrayText = explode (", ", $detectedText);
-            $maxWords = 2;
-            if(count($strArrayLabels) >= $maxWords){
-                $maxLabels = $maxWords;
-            }
-            else {
-                $maxLabels = count($strArrayLabels);
-            }
-            if(count($strArrayText) >= $maxWords){
-                $maxTexts = $maxWords;
-            }
-            else {
-                $maxTexts = count($strArrayText);
-            }
-
-            //We put frist the recognised objects and then the recognised text for the OpenAI input
-            //$strArrayInputOpenAI = [];
-            //for ($x = 0; $x < $maxLabels; $x++) {
-            //    array_push($strArrayInputOpenAI,$strArrayLabels[$x]);
-            //}
-            //for ($x = 0; $x < $maxTexts; $x++) {
-            //    array_push($strArrayInputOpenAI,$strArrayText[$x]);
-            //}
-            //$strInputOpenAI = implode (", ", $strArrayInputOpenAI);
-//
-            ////We do the OpenAI request
-            //$openaiText = $this->openAIrequest($strInputOpenAI);
-            //if (!empty($openaiText)) {
-            //    $metaData->offsetSet('openai_text', $openaiText);
-            //}
-
-            $this->addMessageToFlashMessageQueue(
-                'Metadata updated via AWS Rekognition and OpenAI',
-                FlashMessage::INFO
-            );
-
-            $metaData->save();
-        }
+    public function __construct(ResourceFactory $resourceFactory) {
+        $this->imageMetaDataService = GeneralUtility::makeInstance(ImageMetaDataService::class);
+        $this->responseFactory = GeneralUtility::makeInstance(ResponseFactoryInterface::class);
+        $this->resourceFactory = $resourceFactory;
     }
 
     /**
-     * @todo
+     * Return custom Standalone View
+     * @internal
+     * @param string $templateName
+     * @return StandaloneView
+     */
+    protected function getView(string $templateName = 'Default'): StandaloneView
+    {
+        $templatePaths = new TemplatePaths($this->templateRootPath);
+        $view = GeneralUtility::makeInstance(StandaloneView::class);
+        $view->getRenderingContext()->setTemplatePaths($templatePaths);
+        $view->setTemplate($templateName);
+        $view->setFormat('html');
+        $view->setTemplatePathAndFilename($this->templateRootPath . $templateName . '.html');
+        $view->assign('settings', $this->settings);
+        return $view;
+    }
+
+    /**
+     * Gets the file object from the request target value (which is the file combined identifier)
+     * @param ServerRequestInterface $request
+     * @return FileInterface|null
+     * @throws ResourceDoesNotExistException
+     */
+    private function getFileObjectFromRequestTarget(ServerRequestInterface $request): ?FileInterface
+    {
+        $parsedBody = $request->getParsedBody();
+        $queryParams = $request->getQueryParams();
+        // Setting target, which must be a file reference to a file within the mounts.
+        $target = $parsedBody['target'] ?? $queryParams['target'] ?? '';
+        // create the file object
+        $fileObject = null;
+        if ($target) {
+            $fileObject = $this->resourceFactory->retrieveFileOrFolderObject($target);
+        }
+        return $fileObject;
+    }
+
+    /**
+     * Process the Image recognition request from Filelist (accessed by right click on file)
+     * @param ServerRequestInterface $request
      * @return ResponseInterface
      * @throws \JsonException
      */
-    public function ajaxMetaGenerateAction(): ResponseInterface
+    public function ajaxMetaGenerateAction(ServerRequestInterface $request, $altText = null): ResponseInterface
     {
-        $response = $this->responseFactory->createResponse()
-            ->withHeader('Content-Type', 'application/json; charset=utf-8');
-        $response->getBody()->write(json_encode(['result' => []], JSON_THROW_ON_ERROR));
-        return $response;
+        $parsedBody = $request->getParsedBody();
+        $queryParams = $request->getQueryParams();
+
+        $fileObject = $this->getFileObjectFromRequestTarget($request);
+
+        // Setting target, which must be a file reference to a file within the mounts.
+        $action = $parsedBody['action'] ?? $queryParams['action'] ?? '';
+        switch ($action) {
+            case 'saveMetaData':
+                $altText = $parsedBody['altText'] ?? $queryParams['altText'] ?? '';
+                $saved = $this->imageMetaDataService->saveMetaData($parsedBody['target'], $altText);
+                if ($saved) {
+                    $this->addMessageToFlashMessageQueue('Metadata saved', FlashMessage::OK);
+                } else {
+                    $this->addMessageToFlashMessageQueue('Metadata could not be saved', FlashMessage::ERROR);
+                }
+                break;
+            case 'generateMetaData':
+                $altText = $this->imageMetaDataService->generateImageDescription(fileObject: $fileObject, language: 'deu_Latn');
+                if (!empty($altText)) {
+                    $this->addMessageToFlashMessageQueue('Metadata generated. Check the description, make any necessary change and Press "Save".', FlashMessage::OK);
+                } else {
+                    $this->addMessageToFlashMessageQueue('failed to generate metadata', FlashMessage::ERROR);
+                }
+                break;
+        }
+
+        // @todo fetch all site languages to generate altText for all languages
+        // fetch languages
+        /** @var NullSite $site */
+        $site = $request->getAttribute('site');
+        /** @var SiteLanguage[] $siteLanguages */
+        $siteLanguages = $site->getLanguages();
+
+        // create custom fluid template html view
+        $view = $this->getView('AjaxMetaGenerate');
+
+        $view->assign('action', $action);
+        $view->assign('fileObject', $fileObject);
+
+        // fetch metadata from file if no new metaDataText is given
+        if (empty($altText) && $fileObject instanceof FileInterface) {
+            $altText = $fileObject->getMetaData()->offsetGet('alternative');
+        }
+        $view->assign('altText', $altText);
+
+        return $this->responseFactory->createResponse()
+            ->withHeader('Content-Type', 'text/html; charset=utf-8')
+            ->withBody($this->streamFactory->createStream((string)$view->render()));
     }
 
-    /**
-     * describe an image
-     * @param Aiimage $aiimage
-     * @return void
-     */
-    public function describeAction(Aiimage $aiimage): void
-    {
-        $file = $aiimage->getFile();
-
-        if (!$this->hasAllAwsSettings()) {
-            $this->addMessageToFlashMessageQueue(
-                "AWS settings are not configured",
-                FlashMessage::ERROR
-            );
-            return;
-        }
-        if ($file['tmp_name']) {
-            $filePath = $file['tmp_name'];
-
-            $text = $this->awsImageRecognizeService->detectLabels($filePath);
-
-            $this->view->assign('text', $text);
-
-        }
-    }
 
     /**
      * @param string $message
@@ -159,15 +159,8 @@ class ImageRecognizeController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionC
         );
 
         $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
-        $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
+        $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier('ai-tools.template.flashMessages');
         $defaultFlashMessageQueue->enqueue($flashMessage);
     }
 
-    private function hasAllAwsSettings(): bool
-    {
-        $aws_region = $this->registry->get('ai_tools', "aws_region");
-        $aws_access_key_id = $this->registry->get('ai_tools', "aws_access_key_id");
-        $aws_secret_access_key = $this->registry->get('ai_tools', "aws_secret_access_key");
-        return !empty($aws_region) && !empty($aws_access_key_id) && !empty($aws_secret_access_key);
-    }
 }

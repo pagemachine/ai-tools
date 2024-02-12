@@ -11,7 +11,7 @@
             <button class="nav-link active" id="openai-tab" data-bs-toggle="tab" data-bs-target="#openaiTab" type="button" role="tab" aria-controls="openai" aria-selected="true">Open AI</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="aws-tab" data-bs-toggle="tab" data-bs-target="#awsTab" type="button" role="tab" aria-controls="aws" aria-selected="false">AWS</button>
+            <button class="nav-link" id="custom-tab" data-bs-toggle="tab" data-bs-target="#customTab" type="button" role="tab" aria-controls="custom" aria-selected="false">Custom API</button>
         </li>
     </ul>
     <div class="tab-content" id="tabcontent-settings">
@@ -24,15 +24,15 @@
                 <f:form.submit value="Save" />
             </f:form>
         </div>
-        <div class="tab-pane fade" id="awsTab" role="tabpanel" aria-labelledby="aws-tab">
+        <div class="tab-pane fade" id="customTab" role="tabpanel" aria-labelledby="custom-tab">
             <f:form enctype="multipart/form-data" id="settings_form" action="save" object="{settings}" name="settings" class="form-section">
                 <div class="form-group">
-                    <label for="aws_region">AWS Region:</label>
-                    <f:form.textfield name="aws_region" id="aws_region" value="{aws_region}" class="form-control" />
-                    <label for="aws_access_key_id">AWS Access Key ID:</label>
-                    <f:form.textfield name="aws_access_key_id" id="aws_access_key_id" value="{aws_access_key_id}" class="form-control" type="password" />
-                    <label for="aws_secret_access_key">AWS Secret Access Key:</label>
-                    <f:form.textfield name="aws_secret_access_key" id="aws_secret_access_key" value="{aws_secret_access_key}" class="form-control" type="password" />
+                    <label for="custom_auth_token">Custom API Auth Token:</label>
+                    <f:form.textfield name="custom_auth_token" id="custom_auth_token" value="{custom_auth_token}" class="form-control" type="password" />
+                    <label for="custom_image_recognition_api_uri">Custom Image Recognition API URI:</label>
+                    <f:form.textfield name="custom_image_recognition_api_uri" id="custom_image_recognition_api_uri" value="{custom_image_recognition_api_uri}" class="form-control" />
+                    <label for="custom_translation_api_uri">Custom Translation API URI:</label>
+                    <f:form.textfield name="custom_translation_api_uri" id="custom_translation_api_uri" value="{custom_translation_api_uri}" class="form-control" />
                 </div>
                 <f:form.submit value="Save" />
             </f:form>

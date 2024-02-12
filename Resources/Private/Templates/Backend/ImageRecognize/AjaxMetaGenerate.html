@@ -1,0 +1,68 @@
+<style>
+    .columns {
+        display: flex;
+    }
+    .col {
+        flex: 1;
+        padding-right: 10px;
+    }
+
+    form {
+        display: flex;
+        position: relative;
+    }
+    .form-group {
+        flex: 1;
+        padding-right: 10px;
+    }
+    .form-group.bottom {
+        position: absolute;
+        bottom: 0;
+        right: -65px;
+    }
+
+    img {
+        margin-bottom: 10px;
+    }
+</style>
+
+<script>
+    // activate save button if altText was changed.
+    document.addEventListener('DOMContentLoaded', function() {
+        var altText = document.querySelector('textarea[name="altText"]');
+        var saveBtn = document.querySelector('.save-btn');
+        altText.addEventListener('input', function() {
+            saveBtn.disabled = false;
+        });
+        saveBtn.disabled = true;
+        <f:if condition="{action} == 'generateMetaData'">
+            saveBtn.disabled = false;
+        </f:if>
+    });
+</script>
+<h1>Describe Image - Save as Alt-Text</h1>
+<f:image image="{fileObject}" height="400" />
+
+<f:flashMessages queueIdentifier="ai-tools.template.flashMessages"/>
+
+<div class="columns">
+    <div class="col">
+    <f:form>
+        <div class="form-group">
+            <f:form.hidden name="action" value="saveMetaData" />
+            <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" />
+            <f:form.textarea rows="10" cols="80" name="altText" value="{altText}" />
+        </div>
+        <div class="form-group bottom">
+            <f:form.submit value="Save" class="save-btn" />
+        </div>
+    </f:form>
+    </div>
+    <div class="col">
+    <f:form>
+        <f:form.hidden name="action" value="generateMetaData" />
+        <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" />
+        <f:form.submit value="Generate" />
+    </f:form>
+    </div>
+</div>
