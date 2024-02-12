@@ -1,27 +1,33 @@
+<link rel="stylesheet" href="/typo3/sysext/backend/Resources/Public/Css/backend.css" />
+
 <style>
-    .columns {
+    .module-columns {
         display: flex;
+        flex-wrap: wrap;
+        margin-right: -15px;
+        margin-left: -15px;
     }
-    .col {
+    .module-column {
         flex: 1;
-        padding-right: 10px;
+        padding: 15px;
     }
 
-    form {
+    .module-form {
         display: flex;
-        position: relative;
+        flex-direction: column;
     }
     .form-group {
-        flex: 1;
-        padding-right: 10px;
+        margin-bottom: 1rem;
     }
     .form-group.bottom {
-        position: absolute;
-        bottom: 0;
-        right: -65px;
+        margin-top: auto;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
     }
 
-    img {
+    .module-img {
+        width: 100%;
+        height: auto;
         margin-bottom: 10px;
     }
 </style>
@@ -40,29 +46,71 @@
         </f:if>
     });
 </script>
-<h1>Describe Image - Save as Alt-Text</h1>
-<f:image image="{fileObject}" height="400" />
 
-<f:flashMessages queueIdentifier="ai-tools.template.flashMessages"/>
+<div class="module-body t3js-module-body">
+    <h1>Generate File Metadata "{fileObject.name}"</h1>
+    <f:flashMessages queueIdentifier="ai-tools.template.flashMessages"/>
 
-<div class="columns">
-    <div class="col">
-    <f:form>
-        <div class="form-group">
-            <f:form.hidden name="action" value="saveMetaData" />
-            <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" />
-            <f:form.textarea rows="10" cols="80" name="altText" value="{altText}" />
+    <div class="typo3-TCEforms">
+        <div role="tabpanel">
+            <ul class="nav nav-tabs t3js-tabs" role="tablist" id="tabs" data-store-last-tab="1">
+                <li role="presentation" class="t3js-tabmenu-item nav-item">
+                    <a href="#DTM-image-describing-ai" class="nav-link active" title="" role="tab" data-bs-toggle="tab" aria-selected="true">
+                        General
+                    </a>
+                </li>
+            </ul>
         </div>
-        <div class="form-group bottom">
-            <f:form.submit value="Save" class="save-btn" />
+
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="DTM-image-describing-ai">
+                <fieldset class="form-section">
+                    <div class="module-columns">
+                        <div class="module-column">
+                            <div class="form-group">
+                                <f:image image="{fileObject}" height="400" />
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="form-section">
+                    <div class="module-columns">
+                        <div class="module-column">
+                            <f:form class="module-form" id="generateMetaDataForm" style="display: none;">
+                                <f:form.hidden name="action" value="generateMetaData" />
+                                <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" />
+                            </f:form>
+                            <f:form class="module-form" id="saveMetaDataForm">
+                                <div class="form-group">
+                                    <f:form.hidden name="action" value="saveMetaData" />
+                                    <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" />
+                                    <f:render section="form-group-textarea" arguments="{label: 'Alternative Text', name: 'altText', value: altText}" />
+                                </div>
+                                <div class="form-group bottom">
+                                    <f:form.submit value="Save" additionalAttributes="{form: 'saveMetaDataForm'}" class="save-btn btn btn-primary" />
+                                    <f:form.submit value="Generate Image Description" additionalAttributes="{form: 'generateMetaDataForm'}" class="btn btn-secondary" />
+                                </div>
+                            </f:form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </f:form>
-    </div>
-    <div class="col">
-    <f:form>
-        <f:form.hidden name="action" value="generateMetaData" />
-        <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" />
-        <f:form.submit value="Generate" />
-    </f:form>
     </div>
 </div>
+
+
+<f:section name="form-group-textarea">
+    <div class="form-group t3js-formengine-validation-marker t3js-formengine-palette-field">
+        <label class="t3js-formengine-label">
+            {label}
+        </label>
+        <div class="formengine-field-item t3js-formengine-field-item"><div class="form-control-wrap" style="max-width: 636px">
+            <div class="form-wizards-wrap">
+                <div class="form-wizards-element">
+                    <f:form.textarea rows="3" additionalAttributes="{wrap:'virtual'}" name="{name}" value="{value}" class="form-control t3js-formengine-textarea formengine-textarea" style="max-height: 500px; overflow-wrap: break-word; height: 110px;" />
+                </div>
+            </div>
+        </div></div>
+    </div>
+</f:section>
