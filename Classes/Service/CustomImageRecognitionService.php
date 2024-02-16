@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace Pagemachine\AItools\Service;
 
 use TYPO3\CMS\Core\Http\RequestFactory;
-use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CustomImageRecognitionService
@@ -20,7 +20,7 @@ class CustomImageRecognitionService
         $this->requestFactory = GeneralUtility::makeInstance(RequestFactory::class);
     }
 
-    public function sendFileToApi(File $fileObject, string $textPrompt = ''): string
+    public function sendFileToApi(FileInterface $fileObject, string $textPrompt = ''): string
     {
         //$url = 'http://31.14.41.143:8012' . '/cogvlm_image_caption_file';
         $url = $this->settingsService->getSetting('custom_image_recognition_api_uri');

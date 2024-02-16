@@ -1,0 +1,22 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers" data-namespace-typo3-fluid="true">
+
+<be:moduleLayout>
+
+    <f:be.pageRenderer
+        pageTitle="AI Tools"
+        includeJsFiles="{0: 'EXT:ai_tools/Resources/Public/JavaScript/AjaxMetaGenerate.js'}"
+    />
+
+    <f:asset.script identifier="ajaxUrl_ai-tools" priority="1">
+        var ajaxUrl = "<f:uri.action></f:uri.action>";
+    </f:asset.script>
+
+    <div id="aiimage-backend">
+        <f:flashMessages />
+        <f:render section="Content"/>
+    </div>
+
+</be:moduleLayout>
+
+</html>

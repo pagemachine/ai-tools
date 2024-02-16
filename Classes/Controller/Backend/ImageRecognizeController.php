@@ -13,6 +13,7 @@ use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\FileInterface;
+use TYPO3\CMS\Core\Resource\FolderInterface;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Site\Entity\NullSite;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
@@ -31,6 +32,11 @@ class ImageRecognizeController extends ActionController
      * @var string
      */
     protected $templateRootPath = 'EXT:ai_tools/Resources/Private/Templates/Backend/ImageRecognize/';
+
+    /**
+     * @var string
+     */
+    protected $layoutRootPath = 'EXT:ai_tools/Resources/Private/Layouts/';
 
 
     public function __construct(ResourceFactory $resourceFactory) {
@@ -53,6 +59,7 @@ class ImageRecognizeController extends ActionController
         $view->setTemplate($templateName);
         $view->setFormat('html');
         $view->setTemplatePathAndFilename($this->templateRootPath . $templateName . '.html');
+        $view->setLayoutRootPaths([$this->layoutRootPath]);
         $view->assign('settings', $this->settings);
         return $view;
     }
@@ -60,21 +67,25 @@ class ImageRecognizeController extends ActionController
     /**
      * Gets the file object from the request target value (which is the file combined identifier)
      * @param ServerRequestInterface $request
-     * @return FileInterface|null
+     * @return FileInterface[]|null
      * @throws ResourceDoesNotExistException
      */
-    private function getFileObjectFromRequestTarget(ServerRequestInterface $request): ?FileInterface
+    private function getFileObjectFromRequestTarget(ServerRequestInterface $request)
     {
         $parsedBody = $request->getParsedBody();
         $queryParams = $request->getQueryParams();
         // Setting target, which must be a file reference to a file within the mounts.
         $target = $parsedBody['target'] ?? $queryParams['target'] ?? '';
         // create the file object
-        $fileObject = null;
         if ($target) {
             $fileObject = $this->resourceFactory->retrieveFileOrFolderObject($target);
+            if ($fileObject instanceof FileInterface) {
+                return [$fileObject];
+            } elseif ($fileObject instanceof FolderInterface) {
+                return $fileObject->getFiles();
+            }
         }
-        return $fileObject;
+        return null;
     }
 
     /**
@@ -88,29 +99,7 @@ class ImageRecognizeController extends ActionController
         $parsedBody = $request->getParsedBody();
         $queryParams = $request->getQueryParams();
 
-        $fileObject = $this->getFileObjectFromRequestTarget($request);
-
-        // Setting target, which must be a file reference to a file within the mounts.
-        $action = $parsedBody['action'] ?? $queryParams['action'] ?? '';
-        switch ($action) {
-            case 'saveMetaData':
-                $altText = $parsedBody['altText'] ?? $queryParams['altText'] ?? '';
-                $saved = $this->imageMetaDataService->saveMetaData($parsedBody['target'], $altText);
-                if ($saved) {
-                    $this->addMessageToFlashMessageQueue('Metadata saved', FlashMessage::OK);
-                } else {
-                    $this->addMessageToFlashMessageQueue('Metadata could not be saved', FlashMessage::ERROR);
-                }
-                break;
-            case 'generateMetaData':
-                $altText = $this->imageMetaDataService->generateImageDescription(fileObject: $fileObject, language: 'deu_Latn');
-                if (!empty($altText)) {
-                    $this->addMessageToFlashMessageQueue('Metadata generated. Check the description, make any necessary change and Press "Save".', FlashMessage::OK);
-                } else {
-                    $this->addMessageToFlashMessageQueue('failed to generate metadata', FlashMessage::ERROR);
-                }
-                break;
-        }
+        $fileObjects = $this->getFileObjectFromRequestTarget($request);
 
         // @todo fetch all site languages to generate altText for all languages
         // fetch languages
@@ -119,48 +108,33 @@ class ImageRecognizeController extends ActionController
         /** @var SiteLanguage[] $siteLanguages */
         $siteLanguages = $site->getLanguages();
 
-        // create custom fluid template html view
-        $view = $this->getView('AjaxMetaGenerate');
+        // Setting target, which must be a file reference to a file within the mounts.
+        $action = $parsedBody['action'] ?? $queryParams['action'] ?? '';
+        switch ($action) {
+            case 'saveMetaData':
+                $altText = $parsedBody['altText'] ?? $queryParams['altText'] ?? '';
+                $saved = $this->imageMetaDataService->saveMetaData($parsedBody['target'], $altText);
+                return $this->responseFactory->createResponse()
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withBody($this->streamFactory->createStream(json_encode($saved)));
 
-        $view->assign('action', $action);
-        $view->assign('fileObject', $fileObject);
+            case 'generateMetaData':
+                $altText = $this->imageMetaDataService->generateImageDescription(fileObject: $fileObjects[0], language: 'deu_Latn');
+                $data = ['alternative' => $altText];
+                return $this->responseFactory->createResponse()
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withBody($this->streamFactory->createStream(json_encode($data)));
 
-        // fetch metadata from file if no new metaDataText is given
-        if (empty($altText) && $fileObject instanceof FileInterface) {
-            $altText = $fileObject->getMetaData()->offsetGet('alternative');
+            default:
+                // create custom fluid template html view
+                $view = $this->getView('AjaxMetaGenerate');
+
+                $view->assign('action', $action);
+                $view->assign('fileObjects', $fileObjects ?? null);
+
+                return $this->responseFactory->createResponse()
+                    ->withHeader('Content-Type', 'text/html; charset=utf-8')
+                    ->withBody($this->streamFactory->createStream((string)$view->render()));
         }
-        $view->assign('altText', $altText);
-
-        return $this->responseFactory->createResponse()
-            ->withHeader('Content-Type', 'text/html; charset=utf-8')
-            ->withBody($this->streamFactory->createStream((string)$view->render()));
     }
-
-
-    /**
-     * @param string $message
-     * @param int $severity
-     *
-     * @return void
-     * @throws \TYPO3\CMS\Core\Exception
-     */
-    protected function addMessageToFlashMessageQueue(string $message, int $severity = FlashMessage::ERROR): void
-    {
-        if (Environment::isCli()) {
-            return;
-        }
-
-        $flashMessage = GeneralUtility::makeInstance(
-            FlashMessage::class,
-            $message,
-            'AI-Metadata Status',
-            $severity,
-            true
-        );
-
-        $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
-        $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier('ai-tools.template.flashMessages');
-        $defaultFlashMessageQueue->enqueue($flashMessage);
-    }
-
 }

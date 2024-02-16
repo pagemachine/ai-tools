@@ -23,22 +23,16 @@ class ImageMetaDataService
 
     /**
      * Process the Image recognition request
-     * @param File $fileObject
+     * @param FileInterface $fileObject
      * @param string $language
      * @return ResponseInterface
      * @throws \JsonException
      */
-    public function generateImageDescription(File $fileObject, string $language = 'deu_Latn'): string
+    public function generateImageDescription(FileInterface $fileObject, string $language = 'deu_Latn'): string
     {
-        $description = '';
-        return 'demo-alt-text';
+        $description = $this->customImageRecognitionService->sendFileToApi(fileObject: $fileObject);
 
-        // Is single file
-        if ($fileObject instanceof FileInterface) {
-            $description = $this->customImageRecognitionService->sendFileToApi(fileObject: $fileObject);
-
-            $description = $this->customImageRecognitionService->sendTranslationRequestToApi(text: $description, targetLang: $language);
-        }
+        $description = $this->customImageRecognitionService->sendTranslationRequestToApi(text: $description, targetLang: $language);
 
         return $description;
     }
