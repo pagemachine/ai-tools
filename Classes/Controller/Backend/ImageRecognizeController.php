@@ -20,6 +20,7 @@ use TYPO3\CMS\Core\Site\Entity\NullSite;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 use TYPO3\CMS\Fluid\View\TemplatePaths;
 
@@ -97,12 +98,14 @@ class ImageRecognizeController extends ActionController
      * @return ResponseInterface
      * @throws \JsonException
      */
-    public function ajaxMetaGenerateAction(ServerRequestInterface $request, $altText = null): ResponseInterface
+    public function ajaxMetaGenerateAction(ServerRequestInterface $request): ResponseInterface
     {
         $parsedBody = $request->getParsedBody();
         $queryParams = $request->getQueryParams();
 
         $fileObjects = $this->getFileObjectFromRequestTarget($request);
+
+        $imageRecognitionDefaultValue = LocalizationUtility::translate('LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:custom_image_recognition_prompt_default');
 
         // @todo fetch all site languages to generate altText for all languages
         // fetch languages
@@ -122,7 +125,7 @@ class ImageRecognizeController extends ActionController
                     ->withBody($this->streamFactory->createStream(json_encode($saved)));
 
             case 'generateMetaData':
-                $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?? $this->settingsService->getSetting('custom_image_recognition_prompt') ?? '';
+                $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($this->settingsService->getSetting('custom_image_recognition_prompt') ?: $imageRecognitionDefaultValue);
                 $altText = $this->imageMetaDataService->generateImageDescription(
                     fileObject: $fileObjects[0], language: 'deu_Latn', textPrompt: $textPrompt
                 );
@@ -137,7 +140,11 @@ class ImageRecognizeController extends ActionController
 
                 $view->assign('action', $action);
                 $view->assign('fileObjects', $fileObjects ?? null);
-                $view->assign('textPrompt', $this->settingsService->getSetting('custom_image_recognition_prompt'));
+
+                $view->assign(
+                    'textPrompt',
+                    $this->settingsService->getSetting('custom_image_recognition_prompt') ?: $imageRecognitionDefaultValue
+                );
 
                 return $this->responseFactory->createResponse()
                     ->withHeader('Content-Type', 'text/html; charset=utf-8')

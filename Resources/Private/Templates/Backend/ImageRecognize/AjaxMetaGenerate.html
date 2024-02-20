@@ -56,7 +56,7 @@
                                 <div class="form-group">
                                     <f:form.hidden name="action" value="generateMetaData" />
                                     <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" />
-                                    <f:render section="form-group-textfield" arguments="{label: 'AI Prompt', class: 'textPrompt-{fileObject.properties.identifier_hash}', name: 'textPrompt', placeholder: 'Describe the visual content of this image', value: textPrompt}" />
+                                    <f:render section="form-group-textfield" arguments="{label: 'AI Prompt', class: 'textPrompt-{fileObject.properties.identifier_hash}', name: 'textPrompt', placeholder: textPrompt, value: ''}" />
                                 </div>
                             </f:form>
                             <f:form class="module-form" id="saveMetaDataForm-{fileObject.properties.identifier_hash}">

@@ -34,7 +34,11 @@
                     <label for="custom_translation_api_uri">Custom Translation API URI:</label>
                     <f:form.textfield name="custom_translation_api_uri" id="custom_translation_api_uri" value="{custom_translation_api_uri}" class="form-control" />
                     <label for="custom_image_recognition_prompt">Custom Image Recognition Prompt:</label>
-                    <f:form.textfield name="custom_image_recognition_prompt" id="custom_image_recognition_prompt" value="{custom_image_recognition_prompt}" placeholder="Describe the visual content of this image" class="form-control" />
+                    <f:form.textfield name="custom_image_recognition_prompt"
+                                      id="custom_image_recognition_prompt"
+                                      value="{custom_image_recognition_prompt}"
+                                      placeholder="{f:translate(key: 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:custom_image_recognition_prompt_default')}"
+                                      class="form-control" />
                 </div>
                 <f:form.submit value="Save" />
             </f:form>
