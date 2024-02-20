@@ -14,9 +14,13 @@ class SettingsController extends ActionController
 {
     private ?SettingsService $settingsService;
 
+    /**
+     * List of settings that are saved in the registry
+     * @var array
+     */
     private array $settingOptions = [
         'openai_apikey',
-        'custom_auth_token', 'custom_image_recognition_api_uri', 'custom_translation_api_uri',
+        'custom_auth_token', 'custom_image_recognition_api_uri', 'custom_translation_api_uri', 'custom_image_recognition_prompt',
     ];
 
     public function __construct(

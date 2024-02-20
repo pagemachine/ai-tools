@@ -28,9 +28,9 @@ class ImageMetaDataService
      * @return ResponseInterface
      * @throws \JsonException
      */
-    public function generateImageDescription(FileInterface $fileObject, string $language = 'deu_Latn'): string
+    public function generateImageDescription(FileInterface $fileObject, string $language = 'deu_Latn', string $textPrompt = ''): string
     {
-        $description = $this->customImageRecognitionService->sendFileToApi(fileObject: $fileObject);
+        $description = $this->customImageRecognitionService->sendFileToApi(fileObject: $fileObject, textPrompt: $textPrompt);
 
         $description = $this->customImageRecognitionService->sendTranslationRequestToApi(text: $description, targetLang: $language);
 

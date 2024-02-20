@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Pagemachine\AItools\Controller\Backend;
 
 use Pagemachine\AItools\Service\ImageMetaDataService;
+use Pagemachine\AItools\Service\SettingsService;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -27,6 +28,7 @@ class ImageRecognizeController extends ActionController
     private ?ImageMetaDataService $imageMetaDataService;
 
     protected ResourceFactory $resourceFactory;
+    protected SettingsService $settingsService;
 
     /**
      * @var string
@@ -42,6 +44,7 @@ class ImageRecognizeController extends ActionController
     public function __construct(ResourceFactory $resourceFactory) {
         $this->imageMetaDataService = GeneralUtility::makeInstance(ImageMetaDataService::class);
         $this->responseFactory = GeneralUtility::makeInstance(ResponseFactoryInterface::class);
+        $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
         $this->resourceFactory = $resourceFactory;
     }
 
@@ -119,7 +122,10 @@ class ImageRecognizeController extends ActionController
                     ->withBody($this->streamFactory->createStream(json_encode($saved)));
 
             case 'generateMetaData':
-                $altText = $this->imageMetaDataService->generateImageDescription(fileObject: $fileObjects[0], language: 'deu_Latn');
+                $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?? $this->settingsService->getSetting('custom_image_recognition_prompt') ?? '';
+                $altText = $this->imageMetaDataService->generateImageDescription(
+                    fileObject: $fileObjects[0], language: 'deu_Latn', textPrompt: $textPrompt
+                );
                 $data = ['alternative' => $altText];
                 return $this->responseFactory->createResponse()
                     ->withHeader('Content-Type', 'application/json')
@@ -131,6 +137,7 @@ class ImageRecognizeController extends ActionController
 
                 $view->assign('action', $action);
                 $view->assign('fileObjects', $fileObjects ?? null);
+                $view->assign('textPrompt', $this->settingsService->getSetting('custom_image_recognition_prompt'));
 
                 return $this->responseFactory->createResponse()
                     ->withHeader('Content-Type', 'text/html; charset=utf-8')

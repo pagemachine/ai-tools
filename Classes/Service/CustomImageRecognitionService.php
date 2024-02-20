@@ -22,7 +22,6 @@ class CustomImageRecognitionService
 
     public function sendFileToApi(FileInterface $fileObject, string $textPrompt = ''): string
     {
-        //$url = 'http://31.14.41.143:8012' . '/cogvlm_image_caption_file';
         $url = $this->settingsService->getSetting('custom_image_recognition_api_uri');
 
         if (!empty($textPrompt)) {
@@ -56,7 +55,6 @@ class CustomImageRecognitionService
 
     public function sendTranslationRequestToApi(string $text, string $sourceLang = 'eng_Latn', string $targetLang = 'eng_Latn'): string
     {
-        //$url = 'http://31.14.41.143:8013' . '/translate';
         $url = $this->settingsService->getSetting('custom_translation_api_uri');
 
         $url .= '?text=' . urlencode($text) . '&source_lang=' . $sourceLang . '&target_lang=' . $targetLang;

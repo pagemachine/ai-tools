@@ -21,8 +21,9 @@ async function callAjaxMetaGenerateActionForAll(button) {
   button.disabled = false;
 }
 
-function callAjaxMetaGenerateAction(fileIdentifier, textarea, button) {
+function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, button) {
   var oldText = textarea.value;
+  var textPrompt = textPromptField.value;
   var originalButtonText = button.textContent;
   button.textContent = 'Generating...';
   button.disabled = true;
@@ -31,7 +32,7 @@ function callAjaxMetaGenerateAction(fileIdentifier, textarea, button) {
   top.TYPO3.Notification.info('Generating Metadata', 'Generating Metadata...', 5);
 
   var xhr = new XMLHttpRequest();
-  var params = 'action=generateMetaData&target=' + encodeURIComponent(fileIdentifier);
+  var params = 'action=generateMetaData&target=' + encodeURIComponent(fileIdentifier) + '&textPrompt=' + encodeURIComponent(textPrompt);
   xhr.open('POST', ajaxUrl, true);
   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   xhr.onreadystatechange = function() {
