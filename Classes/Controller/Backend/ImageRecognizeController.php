@@ -105,7 +105,7 @@ class ImageRecognizeController extends ActionController
 
         $fileObjects = $this->getFileObjectFromRequestTarget($request);
 
-        $imageRecognitionDefaultValue = LocalizationUtility::translate('LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:custom_image_recognition_prompt_default');
+        $imageRecognitionDefaultValue = LocalizationUtility::translate('LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:image_recognition_prompt_default');
 
         // @todo fetch all site languages to generate altText for all languages
         // fetch languages
@@ -125,7 +125,7 @@ class ImageRecognizeController extends ActionController
                     ->withBody($this->streamFactory->createStream(json_encode($saved)));
 
             case 'generateMetaData':
-                $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($this->settingsService->getSetting('custom_image_recognition_prompt') ?: $imageRecognitionDefaultValue);
+                $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($this->settingsService->getSetting('image_recognition_prompt') ?: $imageRecognitionDefaultValue);
                 $altText = $this->imageMetaDataService->generateImageDescription(
                     fileObject: $fileObjects[0], language: 'deu_Latn', textPrompt: $textPrompt
                 );
@@ -143,7 +143,7 @@ class ImageRecognizeController extends ActionController
 
                 $view->assign(
                     'textPrompt',
-                    $this->settingsService->getSetting('custom_image_recognition_prompt') ?: $imageRecognitionDefaultValue
+                    $this->settingsService->getSetting('image_recognition_prompt') ?: $imageRecognitionDefaultValue
                 );
 
                 return $this->responseFactory->createResponse()

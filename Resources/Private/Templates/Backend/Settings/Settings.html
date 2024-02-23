@@ -13,6 +13,9 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="custom-tab" data-bs-toggle="tab" data-bs-target="#customTab" type="button" role="tab" aria-controls="custom" aria-selected="false">Custom API</button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="usage-tab" data-bs-toggle="tab" data-bs-target="#usageTab" type="button" role="tab" aria-controls="usage" aria-selected="false">Image Recognition</button>
+        </li>
     </ul>
     <div class="tab-content" id="tabcontent-settings">
         <div class="tab-pane fade show active" id="openaiTab" role="tabpanel" aria-labelledby="openai-tab">
@@ -33,11 +36,23 @@
                     <f:form.textfield name="custom_image_recognition_api_uri" id="custom_image_recognition_api_uri" value="{custom_image_recognition_api_uri}" class="form-control" />
                     <label for="custom_translation_api_uri">Custom Translation API URI:</label>
                     <f:form.textfield name="custom_translation_api_uri" id="custom_translation_api_uri" value="{custom_translation_api_uri}" class="form-control" />
-                    <label for="custom_image_recognition_prompt">Custom Image Recognition Prompt:</label>
-                    <f:form.textfield name="custom_image_recognition_prompt"
-                                      id="custom_image_recognition_prompt"
-                                      value="{custom_image_recognition_prompt}"
-                                      placeholder="{f:translate(key: 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:custom_image_recognition_prompt_default')}"
+                </div>
+                <f:form.submit value="Save" />
+            </f:form>
+        </div>
+        <div class="tab-pane fade" id="usageTab" role="tabpanel" aria-labelledby="usage-tab">
+            <f:form enctype="multipart/form-data" id="settings_form" action="save" object="{settings}" name="settings" class="form-section">
+                <div class="form-group">
+                    <label for="image_recognition_service">Image Recognition Service:</label>
+                    <f:form.select name="image_recognition_service" id="image_recognition_service" value="{image_recognition_service}" class="form-control">
+                        <f:form.select.option value="custom">Custom</f:form.select.option>
+                        <f:form.select.option value="openai">Open AI</f:form.select.option>
+                    </f:form.select>
+                    <label for="image_recognition_prompt">Image Recognition Prompt:</label>
+                    <f:form.textfield name="image_recognition_prompt"
+                                      id="image_recognition_prompt"
+                                      value="{image_recognition_prompt}"
+                                      placeholder="{f:translate(key: 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:image_recognition_prompt_default')}"
                                       class="form-control" />
                 </div>
                 <f:form.submit value="Save" />

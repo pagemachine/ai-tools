@@ -4,6 +4,9 @@ declare(strict_types = 1);
 
 namespace Pagemachine\AItools\Service;
 
+use Pagemachine\AItools\Service\ImageRecognition\CustomImageRecognitionService;
+use Pagemachine\AItools\Service\ImageRecognition\OpenAiImageRecognitionService;
+use Pagemachine\AItools\Service\Translation\CustomTranslationService;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\FileInterface;
@@ -12,11 +15,17 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ImageMetaDataService
 {
+    protected $settingsService;
     private ?CustomImageRecognitionService $customImageRecognitionService;
+    private ?OpenAiImageRecognitionService $openAiImageRecognitionService;
+    private ?CustomTranslationService $customTranslationService;
     protected ResourceFactory $resourceFactory;
 
     public function __construct() {
+        $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
         $this->customImageRecognitionService = GeneralUtility::makeInstance(CustomImageRecognitionService::class);
+        $this->openAiImageRecognitionService = GeneralUtility::makeInstance(OpenAiImageRecognitionService::class);
+        $this->customTranslationService = GeneralUtility::makeInstance(CustomTranslationService::class);
         $this->resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);;
     }
 
@@ -29,9 +38,20 @@ class ImageMetaDataService
      */
     public function generateImageDescription(FileInterface $fileObject, string $language = 'deu_Latn', string $textPrompt = ''): string
     {
-        $description = $this->customImageRecognitionService->sendFileToApi(fileObject: $fileObject, textPrompt: $textPrompt);
+        $description = '';
+        $imageRecognitionService = $this->settingsService->getSetting('image_recognition_service');
+        switch ($imageRecognitionService) {
+            case 'openai':
+                $description = $this->openAiImageRecognitionService->sendFileToApi(fileObject: $fileObject, textPrompt: $textPrompt);
+                break;
+            case 'custom':
+                $description = $this->customImageRecognitionService->sendFileToApi(fileObject: $fileObject, textPrompt: $textPrompt);
+                break;
+            default:
+                throw new \Exception('No valid image recognition service configured');
+        }
 
-        $description = $this->customImageRecognitionService->sendTranslationRequestToApi(text: $description, targetLang: $language);
+        $description = $this->customTranslationService->sendTranslationRequestToApi(text: $description, targetLang: $language);
 
         return $description;
     }
