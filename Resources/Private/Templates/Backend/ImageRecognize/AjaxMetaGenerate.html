@@ -1,0 +1,109 @@
+<html
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    data-namespace-typo3-fluid="true">
+
+<f:layout name="DefaultAjax" />
+
+<f:section name="Content">
+    <f:if condition="{fileObjects -> f:count()} > 1">
+        <div class="row">
+            <div class="col-xs-12">
+                <button onclick="callAjaxMetaGenerateActionForAll(this)" class="btn btn-primary">Generate Meta-Data for all Images</button>
+                <progress value="0" max="{fileObjects -> f:count()}" id="progressBar" class="progressBar"></progress>
+            </div>
+        </div>
+        <div class="help-block">&nbsp;</div>
+    </f:if>
+
+    <f:for as="fileObject" each="{fileObjects}">
+        <f:render section="file-form-imagealt" arguments="{_all}" />
+        <div class="help-block">&nbsp;</div>
+    </f:for>
+</f:section>
+
+<f:section name="file-form-imagealt">
+    <h1>Generate File Metadata "{fileObject.name}"</h1>
+    <f:flashMessages queueIdentifier="ai-tools.template.flashMessages"/>
+
+    <div class="typo3-TCEforms">
+        <div role="tabpanel">
+            <ul class="nav nav-tabs t3js-tabs" role="tablist" id="tabs" data-store-last-tab="1">
+                <li role="presentation" class="t3js-tabmenu-item nav-item">
+                    <a href="#DTM-image-describing-ai-{fileObject.properties.identifier_hash}" class="nav-link active" title="" role="tab" data-bs-toggle="tab" aria-selected="true">
+                        General
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="DTM-image-describing-ai-{fileObject.properties.identifier_hash}">
+                <fieldset class="form-section">
+                    <div class="module-columns">
+                        <div class="module-column">
+                            <div class="form-group">
+                                <f:image image="{fileObject}" height="400" />
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="form-section">
+                    <div class="module-columns">
+                        <div class="module-column">
+                            <f:form class="module-form" id="generateMetaDataForm-{fileObject.properties.identifier_hash}">
+                                <div class="form-group">
+                                    <f:form.hidden name="action" value="generateMetaData" />
+                                    <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" />
+                                    <f:render section="form-group-textfield" arguments="{label: 'AI Prompt', class: 'textPrompt-{fileObject.properties.identifier_hash}', name: 'textPrompt', placeholder: textPrompt, value: ''}" />
+                                </div>
+                            </f:form>
+                            <f:form class="module-form" id="saveMetaDataForm-{fileObject.properties.identifier_hash}">
+                                <div class="form-group">
+                                    <f:form.hidden name="action" value="saveMetaData" />
+                                    <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" />
+                                    <f:render section="form-group-textarea" arguments="{label: 'Alternative Text', name: 'altText', fileObject: fileObject}" />
+                                </div>
+                            </f:form>
+                            <div class="form-group bottom">
+                                <button onclick="callAjaxMetaSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.altTextarea-{fileObject.properties.identifier_hash}')[0], this)" class="save-btn btn btn-primary">Save</button>
+                                <button onclick="callAjaxMetaGenerateAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.altTextarea-{fileObject.properties.identifier_hash}')[0], document.querySelectorAll('.textPrompt-{fileObject.properties.identifier_hash}')[0], this)" class="generate-btn btn btn-secondary">Generate Image Description</button>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+</f:section>
+
+<f:section name="form-group-textarea">
+    <div class="form-group t3js-formengine-validation-marker t3js-formengine-palette-field">
+        <label class="t3js-formengine-label">
+            {label}
+        </label>
+        <div class="formengine-field-item t3js-formengine-field-item"><div class="form-control-wrap" style="max-width: 636px">
+            <div class="form-wizards-wrap">
+                <div class="form-wizards-element">
+                    <f:form.textarea rows="3" additionalAttributes="{wrap:'virtual'}" name="{name}" value="{fileObject.metaData.alternative}" class="form-control t3js-formengine-textarea formengine-textarea altTextarea-{fileObject.properties.identifier_hash}" style="max-height: 500px; overflow-wrap: break-word; height: 110px;" />
+                </div>
+            </div>
+        </div></div>
+    </div>
+</f:section>
+
+<f:section name="form-group-textfield">
+    <div class="form-group t3js-formengine-validation-marker t3js-formengine-palette-field">
+        <label class="t3js-formengine-label">
+            {label}
+        </label>
+        <div class="formengine-field-item t3js-formengine-field-item"><div class="form-control-wrap" style="max-width: 636px">
+            <div class="form-wizards-wrap">
+                <div class="form-wizards-element">
+                    <f:form.textfield name="{name}" value="{value}" placeholder="{placeholder}" class="form-control t3js-clearable {class}" />
+                </div>
+            </div>
+        </div></div>
+    </div>
+</f:section>

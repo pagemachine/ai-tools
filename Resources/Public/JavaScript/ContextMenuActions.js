@@ -19,6 +19,7 @@ define(function () {
 
   /**
    * Generate AI Metadata for the given file.
+   * @TODO Update for TYPO3 v12 (https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Deprecation-98168-BindingContextMenuItemToThis.html)
    *
    * @param {string} table
    * @param {int} uid of the page
@@ -29,8 +30,8 @@ define(function () {
       //see item provider getAdditionalAttributes method to see how to pass custom data attributes
 
       //top.TYPO3.Notification.info('Generated Metadata', 'Generated Metadata via A.I.', 5);
-      console.log(top.TYPO3.settings);
-      top.TYPO3.Notification.info('Generated Metadata', top.TYPO3.settings.ajaxUrls.aitools_ai_tools_images + '&target=' + encodeURIComponent(uid) + '&returnUrl=' + ContextMenuActions.getReturnUrl(), 5);
+      //console.log(top.TYPO3.settings);
+      //top.TYPO3.Notification.info('Generated Metadata', top.TYPO3.settings.ajaxUrls.aitools_ai_tools_images + '&target=' + encodeURIComponent(uid) + '&returnUrl=' + ContextMenuActions.getReturnUrl(), 5);
 
       top.TYPO3.Backend.ContentContainer.setUrl(
         top.TYPO3.settings.ajaxUrls.aitools_ai_tools_images + '&target=' + encodeURIComponent(uid) + '&returnUrl=' + ContextMenuActions.getReturnUrl()
