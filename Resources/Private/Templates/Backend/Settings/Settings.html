@@ -1,35 +1,47 @@
 <f:layout name="Default" />
 
 <f:section name="Content">
-
+    <style>
+        .form-group > h3:first-of-type {
+            margin-top: 0;
+        }
+    </style>
 
     <h1>AI Tools Settings</h1>
 
 
     <ul class="nav nav-tabs" id="tablist-settings" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="openai-tab" data-bs-toggle="tab" data-bs-target="#openaiTab" type="button" role="tab" aria-controls="openai" aria-selected="true">Open AI</button>
+            <button class="nav-link active" id="services-tab" data-bs-toggle="tab" data-bs-target="#servicesTab" type="button" role="tab" aria-controls="services" aria-selected="true">API Integration Settings</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="custom-tab" data-bs-toggle="tab" data-bs-target="#customTab" type="button" role="tab" aria-controls="custom" aria-selected="false">Custom API</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="usage-tab" data-bs-toggle="tab" data-bs-target="#usageTab" type="button" role="tab" aria-controls="usage" aria-selected="false">Image Recognition</button>
+            <button class="nav-link" id="aiselect-tab" data-bs-toggle="tab" data-bs-target="#aiselectTab" type="button" role="tab" aria-controls="aiselect" aria-selected="false">API Selection & Customization</button>
         </li>
     </ul>
     <div class="tab-content" id="tabcontent-settings">
-        <div class="tab-pane fade show active" id="openaiTab" role="tabpanel" aria-labelledby="openai-tab">
+        <div class="tab-pane fade show active" id="servicesTab" role="tabpanel" aria-labelledby="services-tab">
             <f:form enctype="multipart/form-data" id="settings_form" action="save" object="{settings}" name="settings" class="form-section">
                 <div class="form-group">
+                    <h3>Open AI</h3>
                     <label for="openai_apikey">Open AI API Key:</label>
                     <f:form.textfield name="openai_apikey" id="openai_apikey" value="{openai_apikey}" class="form-control" type="password" />
-                </div>
-                <f:form.submit value="Save" />
-            </f:form>
-        </div>
-        <div class="tab-pane fade" id="customTab" role="tabpanel" aria-labelledby="custom-tab">
-            <f:form enctype="multipart/form-data" id="settings_form" action="save" object="{settings}" name="settings" class="form-section">
-                <div class="form-group">
+
+                    <h3>DeepL</h3>
+                    <label for="deepl_endpoint">DeepL Endpoint:</label>
+                    <f:form.select name="deepl_endpoint" id="deepl_endpoint" value="{deepl_endpoint}" class="form-control">
+                        <f:form.select.option value="free">Free</f:form.select.option>
+                        <f:form.select.option value="pro">Pro</f:form.select.option>
+                    </f:form.select>
+                    <label for="deepl_auth_key">DeepL Auth Key:</label>
+                    <f:form.textfield name="deepl_auth_key" id="deepl_auth_key" value="{deepl_auth_key}" class="form-control" type="password" />
+                    <label for="deepl_formality">Formality:</label>
+                    <f:form.select name="deepl_formality" id="deepl_formality" value="{deepl_formality}" class="form-control">
+                        <f:form.select.option value="">Default</f:form.select.option>
+                        <f:form.select.option value="prefer_more">More</f:form.select.option>
+                        <f:form.select.option value="prefer_less">Less</f:form.select.option>
+                    </f:form.select>
+
+                    <h3>Custom</h3>
                     <label for="custom_auth_token">Custom API Auth Token:</label>
                     <f:form.textfield name="custom_auth_token" id="custom_auth_token" value="{custom_auth_token}" class="form-control" type="password" />
                     <label for="custom_image_recognition_api_uri">Custom Image Recognition API URI:</label>
@@ -40,11 +52,13 @@
                 <f:form.submit value="Save" />
             </f:form>
         </div>
-        <div class="tab-pane fade" id="usageTab" role="tabpanel" aria-labelledby="usage-tab">
+        <div class="tab-pane fade" id="aiselectTab" role="tabpanel" aria-labelledby="aiselect-tab">
             <f:form enctype="multipart/form-data" id="settings_form" action="save" object="{settings}" name="settings" class="form-section">
                 <div class="form-group">
+                    <h3>Image Recognition</h3>
                     <label for="image_recognition_service">Image Recognition Service:</label>
                     <f:form.select name="image_recognition_service" id="image_recognition_service" value="{image_recognition_service}" class="form-control">
+                        <f:form.select.option value="">Select Service</f:form.select.option>
                         <f:form.select.option value="custom">Custom</f:form.select.option>
                         <f:form.select.option value="openai">Open AI</f:form.select.option>
                     </f:form.select>
@@ -54,6 +68,14 @@
                                       value="{image_recognition_prompt}"
                                       placeholder="{f:translate(key: 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:image_recognition_prompt_default')}"
                                       class="form-control" />
+
+                    <h3>Translation</h3>
+                    <label for="translation_service">Translation Service:</label>
+                    <f:form.select name="translation_service" id="translation_service" value="{translation_service}" class="form-control">
+                        <f:form.select.option value="">Select Service</f:form.select.option>
+                        <f:form.select.option value="custom">Custom</f:form.select.option>
+                        <f:form.select.option value="deepl">DeepL</f:form.select.option>
+                    </f:form.select>
                 </div>
                 <f:form.submit value="Save" />
             </f:form>

@@ -21,7 +21,9 @@ class SettingsController extends ActionController
     private array $settingOptions = [
         'openai_apikey',
         'custom_auth_token', 'custom_image_recognition_api_uri', 'custom_translation_api_uri', 'image_recognition_prompt',
-        'image_recognition_service'
+        'deepl_auth_key', 'deepl_endpoint', 'deepl_formality',
+        // used service selections
+        'image_recognition_service', 'translation_service',
     ];
 
     public function __construct(

@@ -21,9 +21,10 @@ async function callAjaxMetaGenerateActionForAll(button) {
   button.disabled = false;
 }
 
-function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, button) {
+function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, languageSelectField, button) {
   var oldText = textarea.value;
   var textPrompt = textPromptField.value;
+  var languageSelectValue = languageSelectField.value;
   var originalButtonText = button.textContent;
   button.textContent = 'Generating...';
   button.disabled = true;
@@ -32,7 +33,7 @@ function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, b
   top.TYPO3.Notification.info('Generating Metadata', 'Generating Metadata...', 5);
 
   var xhr = new XMLHttpRequest();
-  var params = 'action=generateMetaData&target=' + encodeURIComponent(fileIdentifier) + '&textPrompt=' + encodeURIComponent(textPrompt);
+  var params = 'action=generateMetaData&target=' + encodeURIComponent(fileIdentifier) + '&textPrompt=' + encodeURIComponent(textPrompt) + '&language=' + encodeURIComponent(languageSelectValue);
   xhr.open('POST', ajaxUrl, true);
   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   xhr.onreadystatechange = function() {
@@ -53,8 +54,9 @@ function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, b
   xhr.send(params);
 }
 
-function callAjaxMetaSaveAction(fileIdentifier, textarea, button) {
+function callAjaxMetaSaveAction(fileIdentifier, textarea, languageSelectField, button) {
   var originalButtonText = button.textContent;
+  var languageSelectValue = languageSelectField.value;
   button.textContent = 'Saving...';
   button.disabled = true;
 
