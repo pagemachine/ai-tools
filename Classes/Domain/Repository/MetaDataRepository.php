@@ -49,23 +49,6 @@ class MetaDataRepository extends \TYPO3\CMS\Core\Resource\Index\MetaDataReposito
             return [];
         }
         return $record;
-
-        //$overlaidMetaData = $this->findByFileUid($uid);
-        //$event = new EnrichFileMetaDataEvent($uid, (int)$overlaidMetaData['uid'], $overlaidMetaData);
-//
-        //$pageRepository = GeneralUtility::makeInstance(PageRepository::class);
-        //$pageRepository->versionOL('sys_file_metadata', $overlaidMetaData);
-        //$overlaidMetaData = $pageRepository
-        //    ->getLanguageOverlay(
-        //        'sys_file_metadata',
-        //        $overlaidMetaData
-        //    );
-        //if ($overlaidMetaData !== null) {
-        //    $event->setRecord($overlaidMetaData);
-        //}
-//
-        ////return $this->eventDispatcher->dispatch(new EnrichFileMetaDataEvent($uid, (int)$record['uid'], $record))->getRecord();
-        //return $this->eventDispatcher->dispatch($event)->getRecord();
     }
 
     public function updateMetaDataByFileUidAndLanguageUid(int $fileUid, int $languageUid, $fieldName = "alternative", $fieldValue = ""): string

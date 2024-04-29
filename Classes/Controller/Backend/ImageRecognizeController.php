@@ -6,6 +6,7 @@ namespace Pagemachine\AItools\Controller\Backend;
 
 use Pagemachine\AItools\Service\ImageMetaDataService;
 use Pagemachine\AItools\Service\SettingsService;
+use Pagemachine\AItools\Service\TranslationService;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -28,7 +29,8 @@ use TYPO3\CMS\Fluid\View\TemplatePaths;
 
 class ImageRecognizeController extends ActionController
 {
-    private ?ImageMetaDataService $imageMetaDataService;
+    protected ?ImageMetaDataService $imageMetaDataService;
+    protected ?TranslationService $translationService;
     protected ResourceFactory $resourceFactory;
     protected SiteFinder $siteFinder;
     protected SettingsService $settingsService;
@@ -46,6 +48,7 @@ class ImageRecognizeController extends ActionController
 
     public function __construct(ResourceFactory $resourceFactory) {
         $this->imageMetaDataService = GeneralUtility::makeInstance(ImageMetaDataService::class);
+        $this->translationService = GeneralUtility::makeInstance(TranslationService::class);
         $this->responseFactory = GeneralUtility::makeInstance(ResponseFactoryInterface::class);
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
         $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
@@ -138,40 +141,37 @@ class ImageRecognizeController extends ActionController
 
         $siteLanguages = $this->getAllSiteLanguages();
 
+        // get default language
+        $defaultLanguage = $this->getLanguageById(0);
+        $defaultTwoLetterIsoCode = $defaultLanguage->getTwoLetterIsoCode();
+
         // Setting target, which must be a file reference to a file within the mounts.
         $action = $parsedBody['action'] ?? $queryParams['action'] ?? '';
         switch ($action) {
             case 'saveMetaData':
                 $altText = $parsedBody['altText'] ?? $queryParams['altText'] ?? '';
+                $doTranslate = $parsedBody['translate'] ?? $queryParams['translate'] ?? false;
                 $saved = $this->imageMetaDataService->saveMetaData($parsedBody['target'], $altText);
+
+                if ($doTranslate) {
+                    // fetch all site languages and translate the altText
+                    foreach ($siteLanguages as $siteLanguage) {
+                        $altTextTranslated = $this->translationService->translateText($altText, $defaultTwoLetterIsoCode, $siteLanguage->getTwoLetterIsoCode());
+                        $this->imageMetaDataService->saveMetaData($parsedBody['target'], $altTextTranslated, $siteLanguage->getLanguageId());
+                    }
+                }
+
                 return $this->responseFactory->createResponse()
                     ->withHeader('Content-Type', 'application/json')
                     ->withBody($this->streamFactory->createStream(json_encode($saved)));
-            case 'saveMetaDataAndTranslate':
-                $altText = $parsedBody['altText'] ?? $queryParams['altText'] ?? '';
-                $saved = $this->imageMetaDataService->saveMetaData($parsedBody['target'], $altText);
-                $siteLanguages = $this->getAllSiteLanguages();
-                foreach ($siteLanguages as $siteLanguage) {
-                    $translationLanguage = match ($siteLanguage->getTwoLetterIsoCode()) {
-                        'de' => 'deu_Latn',
-                        'en' => 'eng_Latn',
-                        default => 'eng_Latn',
-                    };
-                    $this->imageMetaDataService->saveMetaData($parsedBody['target'], $altText, $siteLanguage->getLanguageId());
-                }
-
             case 'generateMetaData':
                 $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($this->settingsService->getSetting('image_recognition_prompt') ?: $imageRecognitionDefaultValue);
-                $language = $this->getLanguageById((int)($parsedBody['language'] ?? $queryParams['language']));
-                $twoLetterIsoCode = $language->getTwoLetterIsoCode();
-                //$translationLanguage = match ($language->getTwoLetterIsoCode()) {
-                //    'de' => 'deu_Latn',
-                //    'en' => 'eng_Latn',
-                //    default => 'eng_Latn',
-                //};
+                //$language = $this->getLanguageById((int)($parsedBody['language'] ?? $queryParams['language']));
                 $altText = $this->imageMetaDataService->generateImageDescription(
-                    fileObject: $fileObjects[0], language: $twoLetterIsoCode, textPrompt: $textPrompt
+                    fileObject: $fileObjects[0],
+                    textPrompt: $textPrompt,
                 );
+                $altText = $this->translationService->translateText($altText, 'en', $defaultTwoLetterIsoCode);
                 $data = ['alternative' => $altText];
                 return $this->responseFactory->createResponse()
                     ->withHeader('Content-Type', 'application/json')
@@ -184,8 +184,6 @@ class ImageRecognizeController extends ActionController
                 $view->assign('siteLanguages', $siteLanguages ?? null);
                 $view->assign('action', $action);
                 $view->assign('fileObjects', $fileObjects ?? null);
-
-                DebuggerUtility::var_dump($fileMetaData['alternative'] ?? null);
 
                 $view->assign(
                     'textPrompt',

@@ -54,14 +54,13 @@ function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, l
   xhr.send(params);
 }
 
-function callAjaxMetaSaveAction(fileIdentifier, textarea, languageSelectField, button) {
+function callAjaxMetaSaveAction(fileIdentifier, textarea, doTranslate, button) {
   var originalButtonText = button.textContent;
-  var languageSelectValue = languageSelectField.value;
   button.textContent = 'Saving...';
   button.disabled = true;
 
   var xhr = new XMLHttpRequest();
-  var params = 'action=saveMetaData&target=' + encodeURIComponent(fileIdentifier) + '&altText=' + encodeURIComponent(textarea.value);
+  var params = 'action=saveMetaData&target=' + encodeURIComponent(fileIdentifier) + '&altText=' + encodeURIComponent(textarea.value) + '&translate=' + (doTranslate ? '1' : '0');
   xhr.open('POST', ajaxUrl, true);
   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   xhr.onreadystatechange = function() {
