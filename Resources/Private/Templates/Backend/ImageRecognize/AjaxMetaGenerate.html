@@ -10,7 +10,8 @@
     <f:if condition="{fileObjects -> f:count()} > 1">
         <div class="row">
             <div class="col-xs-12">
-                <button onclick="callAjaxMetaGenerateActionForAll(this)" class="btn btn-primary">Generate Meta-Data for all Images</button>
+                <button onclick="callAjaxMetaGenerateActionForAll(this, false)" class="btn btn-primary">Generate Meta-Data for all Images</button>
+                <button onclick="callAjaxMetaGenerateActionForAll(this, true)" class="btn btn-primary">Generate, Save + Translate Meta-Data for all Images</button>
                 <progress value="0" max="{fileObjects -> f:count()}" id="progressBar" class="progressBar"></progress>
             </div>
         </div>
@@ -68,7 +69,7 @@
                             </f:form>
                             <div class="form-group bottom">
                                 <button onclick="callAjaxMetaSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.altTextarea-{fileObject.properties.identifier_hash}')[0], false, this)" class="save-btn btn btn-primary">Save</button>
-                                <button onclick="callAjaxMetaSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.altTextarea-{fileObject.properties.identifier_hash}')[0], true, this)" class="save-btn btn btn-secondary">Save and Translate</button>
+                                <button onclick="callAjaxMetaSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.altTextarea-{fileObject.properties.identifier_hash}')[0], true, this)" class="save-translate-btn btn btn-secondary">Save and Translate</button>
                                 <button onclick="callAjaxMetaGenerateAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.altTextarea-{fileObject.properties.identifier_hash}')[0], document.querySelectorAll('.textPrompt-{fileObject.properties.identifier_hash}')[0], document.querySelectorAll('.langSelect-{fileObject.properties.identifier_hash}')[0], this)" class="generate-btn btn btn-secondary">Generate Image Description</button>
                             </div>
                         </div>

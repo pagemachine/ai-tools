@@ -135,8 +135,6 @@ class ImageRecognizeController extends ActionController
 
         $fileObjects = $this->getFileObjectFromRequestTarget($request);
 
-        $fileMetaData = $this->imageMetaDataService->getMetaData($fileObjects[0]);
-
         $imageRecognitionDefaultValue = LocalizationUtility::translate('LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:image_recognition_prompt_default');
 
         $siteLanguages = $this->getAllSiteLanguages();
@@ -166,7 +164,6 @@ class ImageRecognizeController extends ActionController
                     ->withBody($this->streamFactory->createStream(json_encode($saved)));
             case 'generateMetaData':
                 $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($this->settingsService->getSetting('image_recognition_prompt') ?: $imageRecognitionDefaultValue);
-                //$language = $this->getLanguageById((int)($parsedBody['language'] ?? $queryParams['language']));
                 $altText = $this->imageMetaDataService->generateImageDescription(
                     fileObject: $fileObjects[0],
                     textPrompt: $textPrompt,
