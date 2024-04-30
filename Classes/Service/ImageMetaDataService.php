@@ -12,6 +12,7 @@ use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 class ImageMetaDataService
 {
@@ -89,11 +90,18 @@ class ImageMetaDataService
             $fileMetadata->save();
         } else {
             $fileObjectUid = $fileObject->getUid();
-            $updatedEntries = $this->metaDataRepository->updateMetaDataByFileUidAndLanguageUid(
-                $fileObjectUid, languageUid: $language, fieldName: 'alternative', fieldValue: $altText
-            );
-            // Create a new record if no record was updated
-            if ($updatedEntries === 0) {
+
+            // check if metadata for language already exists
+            $fileLanguageMetaData = $this->metaDataRepository->findWithOverlayByFileUid($fileObjectUid, $language);
+
+            if ($fileLanguageMetaData !== null) {
+                // Update the existing metadata language record
+                // (This does not return number of updated records. That's why findWithOverlayByFileUid is used to check if record exists)
+                $this->metaDataRepository->updateMetaDataByFileUidAndLanguageUid(
+                    $fileObjectUid, languageUid: $language, fieldName: 'alternative', fieldValue: $altText
+                );
+            } else {
+                // Create a new record if no record for language exists
                 $diffSourceJson = json_encode($fileObject->getProperties());
                 $this->metaDataRepository->createMetaDataRecord($fileObjectUid, [
                     'sys_language_uid' => $language,

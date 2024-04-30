@@ -19,11 +19,11 @@ class MetaDataRepository extends \TYPO3\CMS\Core\Resource\Index\MetaDataReposito
      *
      * @param int $fileUid
      * @param int $languageUid
-     * @return array
+     * @return array|null
      * @throws Exception
      * @throws InvalidUidException
      */
-    public function findWithOverlayByFileUid(int $fileUid, int $languageUid = 0)
+    public function findWithOverlayByFileUid(int $fileUid, int $languageUid = 0): ?array
     {
         if ($fileUid <= 0) {
             throw new InvalidUidException('Metadata can only be retrieved for indexed files. UID: "' . $fileUid . '"', 1381590731);
@@ -42,6 +42,10 @@ class MetaDataRepository extends \TYPO3\CMS\Core\Resource\Index\MetaDataReposito
             )
             ->executeQuery()
             ->fetchAssociative();
+
+        if ($record === false) {
+            return null;
+        }
 
         if (empty($record)) {
             return [];
