@@ -6,6 +6,7 @@ namespace Pagemachine\AItools\Controller\Backend;
 
 use Pagemachine\AItools\Service\ImageMetaDataService;
 use Pagemachine\AItools\Service\SettingsService;
+use Pagemachine\AItools\Service\TranslationService;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -18,17 +19,20 @@ use TYPO3\CMS\Core\Resource\FolderInterface;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Site\Entity\NullSite;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
+use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 use TYPO3\CMS\Fluid\View\TemplatePaths;
 
 class ImageRecognizeController extends ActionController
 {
-    private ?ImageMetaDataService $imageMetaDataService;
-
+    protected ?ImageMetaDataService $imageMetaDataService;
+    protected ?TranslationService $translationService;
     protected ResourceFactory $resourceFactory;
+    protected SiteFinder $siteFinder;
     protected SettingsService $settingsService;
 
     /**
@@ -44,8 +48,10 @@ class ImageRecognizeController extends ActionController
 
     public function __construct(ResourceFactory $resourceFactory) {
         $this->imageMetaDataService = GeneralUtility::makeInstance(ImageMetaDataService::class);
+        $this->translationService = GeneralUtility::makeInstance(TranslationService::class);
         $this->responseFactory = GeneralUtility::makeInstance(ResponseFactoryInterface::class);
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
+        $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
         $this->resourceFactory = $resourceFactory;
     }
 
@@ -93,6 +99,30 @@ class ImageRecognizeController extends ActionController
     }
 
     /**
+     * return all SiteLanguages
+     * @return SiteLanguage[]
+     */
+    private function getAllSiteLanguages() {
+        $sites = $this->siteFinder->getAllSites();
+        $languages = [];
+        foreach ($sites as $site) {
+            $languages = array_merge($languages, $site->getAllLanguages());
+        }
+        return $languages;
+    }
+    private function getLanguageById(int $languageId) {
+        $sites = $this->siteFinder->getAllSites();
+        foreach ($sites as $site) {
+            try {
+                return $site->getLanguageById($languageId);
+            } catch (\Exception $e) {
+                continue;
+            }
+        }
+        return Null;
+    }
+
+    /**
      * Process the Image recognition request from Filelist (accessed by right click on file)
      * @param ServerRequestInterface $request
      * @return ResponseInterface
@@ -107,28 +137,38 @@ class ImageRecognizeController extends ActionController
 
         $imageRecognitionDefaultValue = LocalizationUtility::translate('LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:image_recognition_prompt_default');
 
-        // @todo fetch all site languages to generate altText for all languages
-        // fetch languages
-        /** @var NullSite $site */
-        $site = $request->getAttribute('site');
-        /** @var SiteLanguage[] $siteLanguages */
-        $siteLanguages = $site->getLanguages();
+        $siteLanguages = $this->getAllSiteLanguages();
+
+        // get default language
+        $defaultLanguage = $this->getLanguageById(0);
+        $defaultTwoLetterIsoCode = $defaultLanguage->getTwoLetterIsoCode();
 
         // Setting target, which must be a file reference to a file within the mounts.
         $action = $parsedBody['action'] ?? $queryParams['action'] ?? '';
         switch ($action) {
             case 'saveMetaData':
                 $altText = $parsedBody['altText'] ?? $queryParams['altText'] ?? '';
+                $doTranslate = $parsedBody['translate'] ?? $queryParams['translate'] ?? false;
                 $saved = $this->imageMetaDataService->saveMetaData($parsedBody['target'], $altText);
+
+                if ($doTranslate) {
+                    // fetch all site languages and translate the altText
+                    foreach ($siteLanguages as $siteLanguage) {
+                        $altTextTranslated = $this->translationService->translateText($altText, $defaultTwoLetterIsoCode, $siteLanguage->getTwoLetterIsoCode());
+                        $this->imageMetaDataService->saveMetaData($parsedBody['target'], $altTextTranslated, $siteLanguage->getLanguageId());
+                    }
+                }
+
                 return $this->responseFactory->createResponse()
                     ->withHeader('Content-Type', 'application/json')
                     ->withBody($this->streamFactory->createStream(json_encode($saved)));
-
             case 'generateMetaData':
                 $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($this->settingsService->getSetting('image_recognition_prompt') ?: $imageRecognitionDefaultValue);
                 $altText = $this->imageMetaDataService->generateImageDescription(
-                    fileObject: $fileObjects[0], language: 'deu_Latn', textPrompt: $textPrompt
+                    fileObject: $fileObjects[0],
+                    textPrompt: $textPrompt,
                 );
+                $altText = $this->translationService->translateText($altText, 'en', $defaultTwoLetterIsoCode);
                 $data = ['alternative' => $altText];
                 return $this->responseFactory->createResponse()
                     ->withHeader('Content-Type', 'application/json')
@@ -138,6 +178,7 @@ class ImageRecognizeController extends ActionController
                 // create custom fluid template html view
                 $view = $this->getView('AjaxMetaGenerate');
 
+                $view->assign('siteLanguages', $siteLanguages ?? null);
                 $view->assign('action', $action);
                 $view->assign('fileObjects', $fileObjects ?? null);
 

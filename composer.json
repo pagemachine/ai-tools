@@ -2,7 +2,7 @@
     "name": "pagemachine/ai-tools",
     "description": "Use A.I. Tools in the TYPO3 backend",
     "type": "typo3-cms-extension",
-    "version": "dev-0.0.1",
+    "version": "dev-0.0.2",
     "license": "proprietary",
     "keywords": [
         "typo3",

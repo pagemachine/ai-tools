@@ -14,6 +14,8 @@ defined('TYPO3_MODE') || die('Access denied.');
     ]
 );
 
+/*
+Temporary disabled
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
     'AItools',
     'aitools',
@@ -29,6 +31,7 @@ defined('TYPO3_MODE') || die('Access denied.');
         'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_aiimage.xlf',
     )
 );
+*/
 
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
     'AItools',

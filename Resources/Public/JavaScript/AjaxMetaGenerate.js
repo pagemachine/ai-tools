@@ -1,27 +1,65 @@
-async function callAjaxMetaGenerateActionForAll(button) {
-  var progressBar = document.querySelectorAll('.progressBar');
+async function callAjaxMetaGenerateActionForAll(button, saveAndTranslate) {
+  var generateBtns = document.querySelectorAll('.generate-btn');
+  var progressBar = document.querySelectorAll('.progressBar')[0];
+  progressBar.max = generateBtns.length;
   progressBar.value = 0;
   button.disabled = true;
-  var generateBtns = document.querySelectorAll('.generate-btn');
   for (let button of generateBtns) {
-    button.click();
+    let buttonInitiallyDisabled = button.disabled; // Check initial state
+    console.log('Progress before:', progressBar.value);
     await new Promise((resolve, reject) => {
-      var observer = new MutationObserver((mutationsList, observer) => {
-        for(let mutation of mutationsList) {
-          if (mutation.type === 'attributes' && mutation.attributeName === 'disabled' && !button.disabled) {
-            observer.disconnect();
-            resolve();
+      let hasBeenDisabled = false; // Flag to track if the button has been disabled
+
+      const observer = new MutationObserver((mutationsList, observer) => {
+        for (let mutation of mutationsList) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'disabled') {
+            if (button.disabled) {
+              hasBeenDisabled = true; // Mark as disabled
+            } else if (!button.disabled && hasBeenDisabled) {
+              // Only resolve if the button was disabled and then re-enabled
+              observer.disconnect();
+              resolve();
+            }
           }
         }
       });
+
       observer.observe(button, { attributes: true });
+      if (!buttonInitiallyDisabled) {
+        button.click(); // Click the button if it wasn't already disabled
+      }
     });
+
+    if (saveAndTranslate) {
+      let saveAndTranslateButton = button.parentElement.querySelector('.save-translate-btn');
+      await new Promise((resolve, reject) => {
+        let hasBeenDisabled = false; // Reset flag for the next button
+
+        const observer = new MutationObserver((mutationsList, observer) => {
+          for (let mutation of mutationsList) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'disabled') {
+              if (saveAndTranslateButton.disabled) {
+                hasBeenDisabled = true; // Mark as disabled
+              } else if (!saveAndTranslateButton.disabled && hasBeenDisabled) {
+                // Only resolve if the button was disabled and then re-enabled
+                observer.disconnect();
+                resolve();
+              }
+            }
+          }
+        });
+
+        observer.observe(saveAndTranslateButton, { attributes: true });
+        saveAndTranslateButton.click(); // Click after setting up the observer
+      });
+    }
     progressBar.value += 1;
+    console.log('Progress after:', progressBar.value);
   }
   button.disabled = false;
 }
 
-function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, button) {
+function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, languageSelectField, button) {
   var oldText = textarea.value;
   var textPrompt = textPromptField.value;
   var originalButtonText = button.textContent;
@@ -53,13 +91,13 @@ function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, b
   xhr.send(params);
 }
 
-function callAjaxMetaSaveAction(fileIdentifier, textarea, button) {
+function callAjaxMetaSaveAction(fileIdentifier, textarea, doTranslate, button) {
   var originalButtonText = button.textContent;
   button.textContent = 'Saving...';
   button.disabled = true;
 
   var xhr = new XMLHttpRequest();
-  var params = 'action=saveMetaData&target=' + encodeURIComponent(fileIdentifier) + '&altText=' + encodeURIComponent(textarea.value);
+  var params = 'action=saveMetaData&target=' + encodeURIComponent(fileIdentifier) + '&altText=' + encodeURIComponent(textarea.value) + '&translate=' + (doTranslate ? '1' : '0');
   xhr.open('POST', ajaxUrl, true);
   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   xhr.onreadystatechange = function() {
