@@ -89,9 +89,22 @@ class ImageMetaDataService
             $fileMetadata->save();
         } else {
             $fileObjectUid = $fileObject->getUid();
-            $this->metaDataRepository->updateMetaDataByFileUidAndLanguageUid(
+            $updatedEntries = $this->metaDataRepository->updateMetaDataByFileUidAndLanguageUid(
                 $fileObjectUid, languageUid: $language, fieldName: 'alternative', fieldValue: $altText
             );
+            // Create a new record if no record was updated
+            if ($updatedEntries === 0) {
+                $diffSourceJson = json_encode($fileObject->getProperties());
+                $this->metaDataRepository->createMetaDataRecord($fileObjectUid, [
+                    'sys_language_uid' => $language,
+                    'l10n_parent' => $fileObjectUid,
+                    't3_origuid' => $fileObjectUid,
+                    'width' => $fileObject->getProperty('width'),
+                    'height' => $fileObject->getProperty('height'),
+                    'alternative' => $altText,
+                    'l10n_diffsource' => $diffSourceJson,
+                ]);
+            }
         }
 
         return true;
