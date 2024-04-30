@@ -20,6 +20,38 @@ class DeepLTranslationService
         'pro' => 'https://api.deepl.com/v2/translate',
     ];
 
+    private array $languages = [
+        'bg' => 'BG',
+        'cs' => 'CS',
+        'da' => 'DA',
+        'de' => 'DE',
+        'el' => 'EL',
+        'en' => 'EN',
+        'es' => 'ES',
+        'et' => 'ET',
+        'fi' => 'FI',
+        'fr' => 'FR',
+        'hu' => 'HU',
+        'id' => 'ID',
+        'it' => 'IT',
+        'ja' => 'JA',
+        'ko' => 'KO',
+        'lt' => 'LT',
+        'lv' => 'LV',
+        'nb' => 'NB',
+        'nl' => 'NL',
+        'pl' => 'PL',
+        'pt' => 'PT',
+        'ro' => 'RO',
+        'ru' => 'RU',
+        'sk' => 'SK',
+        'sl' => 'SL',
+        'sv' => 'SV',
+        'tr' => 'TR',
+        'uk' => 'UK',
+        'zh' => 'ZH'
+    ];
+
     public function __construct()
     {
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
@@ -28,8 +60,15 @@ class DeepLTranslationService
         $this->apiEndpointUri = $this->endpoints[(string)$this->settingsService->getSetting('deepl_endpoint')];
     }
 
-    public function sendTranslationRequestToApi(string $text, string $sourceLang = 'EN', string $targetLang = 'EN-GB'): string
+    private function getLanguageScript($code) {
+        return $this->languages[$code] ?? null;
+    }
+
+    public function sendTranslationRequestToApi(string $text, string $sourceLang = 'en', string $targetLang = 'en'): string
     {
+        $sourceLang = $this->getLanguageScript($sourceLang);
+        $targetLang = $this->getLanguageScript($targetLang);
+
         $formality = $this->settingsService->getSetting('deepl_formality');
 
         $authKey = $this->settingsService->getSetting('deepl_auth_key'); // Assuming the DeepL auth key is stored in settings
