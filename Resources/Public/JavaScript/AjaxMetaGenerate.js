@@ -1,10 +1,69 @@
+require(['TYPO3/CMS/Backend/Modal', 'TYPO3/CMS/Backend/Severity'], function(Modal, Severity) {
+  async function showModalConfirmation(message) {
+    return new Promise((resolve) => {
+      if (typeof Modal !== 'undefined' && Modal.confirm) {
+        Modal.confirm(
+          'Confirmation Required',
+          message,
+          Severity.warning,
+          [
+            {
+              text: 'Yes',
+              active: true,
+              btnClass: 'btn-warning',
+              name: 'yes',
+              trigger: function () {
+                resolve(true);
+                Modal.dismiss();
+              }
+            },
+            {
+              text: 'No',
+              name: 'no',
+              trigger: function () {
+                resolve(false);
+                Modal.dismiss();
+              }
+            }
+          ]
+        );
+      } else {
+        // Fallback if Modal.confirm is not available
+        resolve(confirm(message));
+      }
+    });
+  }
+
+  // Export the function to global scope
+  window.showModalConfirmation = showModalConfirmation;
+});
+
 async function callAjaxMetaGenerateActionForAll(button, saveAndTranslate) {
-  var generateBtns = document.querySelectorAll('.generate-btn');
+  var imageEntryBlocks = document.querySelectorAll('.imageEntry');
   var progressBar = document.querySelectorAll('.progressBar')[0];
-  progressBar.max = generateBtns.length;
+  var skipExistingDescriptions = document.querySelectorAll('.skipExistingDescriptions')[0];
+
+  // show confirmation dialog if skipExistingDescriptions is checked and saveAndTranslate is true
+  if (!skipExistingDescriptions.checked && saveAndTranslate) {
+    const userConfirmed = await showModalConfirmation('This will overwrite existing descriptions. Are you sure you want to continue?');
+    if (!userConfirmed) {
+      return;
+    }
+  }
+
+  progressBar.max = imageEntryBlocks.length;
   progressBar.value = 0;
   button.disabled = true;
-  for (let button of generateBtns) {
+  for (let imageEntry of imageEntryBlocks) {
+    let button = imageEntry.querySelector('.generate-btn');
+
+    // skip if altText is already filled and skipExistingDescriptions is checked
+    let altText = imageEntry.querySelector('.altText');
+    if (skipExistingDescriptions.checked && altText.value !== '') {
+      progressBar.value += 1;
+      continue;
+    }
+
     let buttonInitiallyDisabled = button.disabled; // Check initial state
     console.log('Progress before:', progressBar.value);
     await new Promise((resolve, reject) => {
@@ -31,7 +90,15 @@ async function callAjaxMetaGenerateActionForAll(button, saveAndTranslate) {
     });
 
     if (saveAndTranslate) {
-      let saveAndTranslateButton = button.parentElement.querySelector('.save-translate-btn');
+      //let saveAndTranslateButton = button.parentElement.querySelector('.save-translate-btn');
+      let saveAndTranslateButton = imageEntry.querySelector('.save-translate-btn');
+
+      // set altText to altTextSuggestion
+      let altText = imageEntry.querySelector('.textarea-altText');
+      let altTextSuggestion = imageEntry.querySelector('.textarea-altTextSuggestion');
+      altText.value = altTextSuggestion.value;
+      altText.dispatchEvent(new Event('input'));
+
       await new Promise((resolve, reject) => {
         let hasBeenDisabled = false; // Reset flag for the next button
 
@@ -129,3 +196,9 @@ document.addEventListener('DOMContentLoaded', function() {
     saveBtn.disabled = true;
   });
 });
+
+function takeSuggestionSaveAction(fileIdentifier, textareaSuggestion, textarea, button) {
+  textarea.value = textareaSuggestion.value;
+  textarea.dispatchEvent(new Event('input'));
+  callAjaxMetaSaveAction(fileIdentifier, textarea, false, button);
+}

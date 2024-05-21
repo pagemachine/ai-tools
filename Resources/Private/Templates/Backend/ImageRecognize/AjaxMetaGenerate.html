@@ -7,9 +7,20 @@
 <f:layout name="DefaultAjax" />
 
 <f:section name="Content">
+    <style>
+        .side-by-side {
+            display: flex;
+            justify-content: space-between;
+        }
+        .w5 {
+            width: 49%;
+        }
+    </style>
+
     <f:if condition="{fileObjects -> f:count()} > 1">
         <div class="row">
             <div class="col-xs-12">
+                <label for="skipExistingDescriptions">Skip existing descriptions <input type="checkbox" id="skipExistingDescriptions" name="skipExistingDescriptions" class="skipExistingDescriptions" value="1" checked /></label><br />
                 <button onclick="callAjaxMetaGenerateActionForAll(this, false)" class="btn btn-primary">Generate Meta-Data for all Images</button>
                 <button onclick="callAjaxMetaGenerateActionForAll(this, true)" class="btn btn-primary">Generate, Save + Translate Meta-Data for all Images</button>
                 <progress value="0" max="{fileObjects -> f:count()}" id="progressBar" class="progressBar"></progress>
@@ -28,7 +39,7 @@
     <h1>Generate File Metadata "{fileObject.name}"</h1>
     <f:flashMessages queueIdentifier="ai-tools.template.flashMessages"/>
 
-    <div class="typo3-TCEforms">
+    <div class="typo3-TCEforms imageEntry">
         <div role="tabpanel">
             <ul class="nav nav-tabs t3js-tabs" role="tablist" id="tabs" data-store-last-tab="1">
                 <li role="presentation" class="t3js-tabmenu-item nav-item">
@@ -57,20 +68,30 @@
                                 <div class="form-group">
                                     <f:form.hidden name="action" value="generateMetaData" />
                                     <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" />
-                                    <f:render section="form-group-textfield" arguments="{label: 'AI Prompt', class: 'textPrompt-{fileObject.properties.identifier_hash}', name: 'textPrompt', placeholder: textPrompt, value: ''}" />
+                                    <f:render section="form-group-select" arguments="{label: 'AI Prompt', class: 'textPrompt-{fileObject.properties.identifier_hash}', name: 'textPrompt', options: allTextPrompts, value: textPrompt.prompt, optionLabelField: 'description', optionValueField: 'prompt'}" />
                                 </div>
                             </f:form>
                             <f:form class="module-form" id="saveMetaDataForm-{fileObject.properties.identifier_hash}">
                                 <div class="form-group">
                                     <f:form.hidden name="action" value="saveMetaData" />
                                     <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" />
-                                    <f:render section="form-group-textarea" arguments="{label: 'Alternative Text', name: 'altText', fileObject: fileObject}" />
+                                    <div class="form-group">
+                                        <div class="side-by-side">
+                                            <div class="w5">
+                                                <f:render section="form-group-textarea" arguments="{label: 'Alternative Text', name: 'altText', fileObject: fileObject, value: fileObject.metaData.alternative, additionalClasses: 'altText'}" />
+                                            </div>
+                                            <div class="w5">
+                                                <f:render section="form-group-textarea" arguments="{label: 'Alternative Text Suggestion', name: 'altTextSuggestion', fileObject: fileObject, additionalClasses: 'altTextSuggestion'}" />
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </f:form>
                             <div class="form-group bottom">
-                                <button onclick="callAjaxMetaSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.altTextarea-{fileObject.properties.identifier_hash}')[0], false, this)" class="save-btn btn btn-primary">Save</button>
-                                <button onclick="callAjaxMetaSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.altTextarea-{fileObject.properties.identifier_hash}')[0], true, this)" class="save-translate-btn btn btn-secondary">Save and Translate</button>
-                                <button onclick="callAjaxMetaGenerateAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.altTextarea-{fileObject.properties.identifier_hash}')[0], document.querySelectorAll('.textPrompt-{fileObject.properties.identifier_hash}')[0], document.querySelectorAll('.langSelect-{fileObject.properties.identifier_hash}')[0], this)" class="generate-btn btn btn-secondary">Generate Image Description</button>
+                                <button onclick="callAjaxMetaSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altText-{fileObject.properties.identifier_hash}')[0], false, this)" class="save-btn btn btn-primary">Save</button>
+                                <button onclick="callAjaxMetaSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altText-{fileObject.properties.identifier_hash}')[0], true, this)" class="save-translate-btn btn btn-secondary">Save and Translate</button>
+                                <button onclick="callAjaxMetaGenerateAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altTextSuggestion-{fileObject.properties.identifier_hash}')[0], document.querySelectorAll('.textPrompt-{fileObject.properties.identifier_hash}')[0], document.querySelectorAll('.langSelect-{fileObject.properties.identifier_hash}')[0], this)" class="generate-btn btn btn-secondary">Generate Image Description</button>
+                                <button onclick="takeSuggestionSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altTextSuggestion-{fileObject.properties.identifier_hash}')[0], document.querySelectorAll('.textarea-altText-{fileObject.properties.identifier_hash}')[0], this)" class="generate-btn btn btn-secondary">Use Suggestion and Save</button>
                             </div>
                         </div>
                     </div>
@@ -88,7 +109,7 @@
         <div class="formengine-field-item t3js-formengine-field-item"><div class="form-control-wrap" style="max-width: 636px">
             <div class="form-wizards-wrap">
                 <div class="form-wizards-element">
-                    <f:form.textarea rows="3" additionalAttributes="{wrap:'virtual'}" name="{name}" value="{fileObject.metaData.alternative}" class="form-control t3js-formengine-textarea formengine-textarea altTextarea-{fileObject.properties.identifier_hash}" style="max-height: 500px; overflow-wrap: break-word; height: 110px;" />
+                    <f:form.textarea rows="3" additionalAttributes="{wrap:'virtual'}" name="{name}" value="{value}" class="form-control t3js-formengine-textarea formengine-textarea textarea-{name} textarea-{name}-{fileObject.properties.identifier_hash} {additionalClasses}" style="max-height: 500px; overflow-wrap: break-word; height: 110px;" />
                 </div>
             </div>
         </div></div>
@@ -118,7 +139,7 @@
         <div class="formengine-field-item t3js-formengine-field-item"><div class="form-control-wrap" style="max-width: 636px">
             <div class="form-wizards-wrap">
                 <div class="form-wizards-element">
-                    <f:form.select options="{options}" optionLabelField="{optionLabelField}" optionValueField="{optionValueField}" class="form-control form-select-sm t3-js-jumpMenuBox {class}" />
+                    <f:form.select options="{options}" optionLabelField="{optionLabelField}" optionValueField="{optionValueField}" class="form-control form-select-sm t3-js-jumpMenuBox {class}" value="{value}" />
                 </div>
             </div>
         </div></div>
