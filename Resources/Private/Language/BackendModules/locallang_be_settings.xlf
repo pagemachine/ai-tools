@@ -11,9 +11,6 @@
 			<trans-unit id="mlang_labels_tabdescr" resname="mlang_labels_tabdescr">
 				<source>This module allows you to configure settings for AI-Tools.</source>
 			</trans-unit>
-			<trans-unit id="image_recognition_prompt_default">
-				<source>Describe the visual content of this image</source>
-			</trans-unit>
 		</body>
 	</file>
 </xliff>

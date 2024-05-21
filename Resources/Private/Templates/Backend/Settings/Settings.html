@@ -9,77 +9,113 @@
 
     <h1>AI Tools Settings</h1>
 
-
     <ul class="nav nav-tabs" id="tablist-settings" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="services-tab" data-bs-toggle="tab" data-bs-target="#servicesTab" type="button" role="tab" aria-controls="services" aria-selected="true">API Integration Settings</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="aiselect-tab" data-bs-toggle="tab" data-bs-target="#aiselectTab" type="button" role="tab" aria-controls="aiselect" aria-selected="false">API Selection & Customization</button>
-        </li>
+        <f:if condition="{permissions.admin}">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="services-tab" data-bs-toggle="tab" data-bs-target="#servicesTab" type="button" role="tab" aria-controls="services" aria-selected="true">API Integration Settings</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="aiselect-tab" data-bs-toggle="tab" data-bs-target="#aiselectTab" type="button" role="tab" aria-controls="aiselect" aria-selected="false">API Selection & Customization</button>
+            </li>
+        </f:if>
+        <f:if condition="{permissions.promptManagement}">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {f:if(condition:'!{permissions.admin}', then:'active')}" id="promptManagement-tab" data-bs-toggle="tab" data-bs-target="#promptManagementTab" type="button" role="tab" aria-controls="promptManagement" aria-selected="false">Prompt Management</button>
+            </li>
+        </f:if>
     </ul>
     <div class="tab-content" id="tabcontent-settings">
-        <div class="tab-pane fade show active" id="servicesTab" role="tabpanel" aria-labelledby="services-tab">
-            <f:form enctype="multipart/form-data" id="settings_form" action="save" object="{settings}" name="settings" class="form-section">
-                <div class="form-group">
-                    <h3>Open AI</h3>
-                    <label for="openai_apikey">Open AI API Key:</label>
-                    <f:form.textfield name="openai_apikey" id="openai_apikey" value="{openai_apikey}" class="form-control" type="password" />
+        <f:if condition="{permissions.admin}">
+            <div class="tab-pane fade show active" id="servicesTab" role="tabpanel" aria-labelledby="services-tab">
+                <f:form enctype="multipart/form-data" id="settings_form" action="save" object="{settings}" name="settings" class="form-section">
+                    <div class="form-group">
+                        <h3>Open AI</h3>
+                        <label for="openai_apikey">Open AI API Key:</label>
+                        <f:form.textfield name="openai_apikey" id="openai_apikey" value="{openai_apikey}" class="form-control" type="password" />
 
-                    <h3>DeepL</h3>
-                    <label for="deepl_endpoint">DeepL Endpoint:</label>
-                    <f:form.select name="deepl_endpoint" id="deepl_endpoint" value="{deepl_endpoint}" class="form-control">
-                        <f:form.select.option value="free">Free</f:form.select.option>
-                        <f:form.select.option value="pro">Pro</f:form.select.option>
-                    </f:form.select>
-                    <label for="deepl_auth_key">DeepL Auth Key:</label>
-                    <f:form.textfield name="deepl_auth_key" id="deepl_auth_key" value="{deepl_auth_key}" class="form-control" type="password" />
-                    <label for="deepl_formality">Formality:</label>
-                    <f:form.select name="deepl_formality" id="deepl_formality" value="{deepl_formality}" class="form-control">
-                        <f:form.select.option value="">Default</f:form.select.option>
-                        <f:form.select.option value="prefer_more">More</f:form.select.option>
-                        <f:form.select.option value="prefer_less">Less</f:form.select.option>
-                    </f:form.select>
+                        <h3>DeepL</h3>
+                        <label for="deepl_endpoint">DeepL Endpoint:</label>
+                        <f:form.select name="deepl_endpoint" id="deepl_endpoint" value="{deepl_endpoint}" class="form-control">
+                            <f:form.select.option value="free">Free</f:form.select.option>
+                            <f:form.select.option value="pro">Pro</f:form.select.option>
+                        </f:form.select>
+                        <label for="deepl_auth_key">DeepL Auth Key:</label>
+                        <f:form.textfield name="deepl_auth_key" id="deepl_auth_key" value="{deepl_auth_key}" class="form-control" type="password" />
+                        <label for="deepl_formality">Formality:</label>
+                        <f:form.select name="deepl_formality" id="deepl_formality" value="{deepl_formality}" class="form-control">
+                            <f:form.select.option value="">Default</f:form.select.option>
+                            <f:form.select.option value="prefer_more">More</f:form.select.option>
+                            <f:form.select.option value="prefer_less">Less</f:form.select.option>
+                        </f:form.select>
 
-                    <h3>Custom</h3>
-                    <label for="custom_auth_token">Custom API Auth Token:</label>
-                    <f:form.textfield name="custom_auth_token" id="custom_auth_token" value="{custom_auth_token}" class="form-control" type="password" />
-                    <label for="custom_image_recognition_api_uri">Custom Image Recognition API URI:</label>
-                    <f:form.textfield name="custom_image_recognition_api_uri" id="custom_image_recognition_api_uri" value="{custom_image_recognition_api_uri}" class="form-control" />
-                    <label for="custom_translation_api_uri">Custom Translation API URI:</label>
-                    <f:form.textfield name="custom_translation_api_uri" id="custom_translation_api_uri" value="{custom_translation_api_uri}" class="form-control" />
-                </div>
-                <f:form.submit value="Save" />
-            </f:form>
-        </div>
-        <div class="tab-pane fade" id="aiselectTab" role="tabpanel" aria-labelledby="aiselect-tab">
-            <f:form enctype="multipart/form-data" id="settings_form" action="save" object="{settings}" name="settings" class="form-section">
-                <div class="form-group">
-                    <h3>Image Recognition</h3>
-                    <label for="image_recognition_service">Image Recognition Service:</label>
-                    <f:form.select name="image_recognition_service" id="image_recognition_service" value="{image_recognition_service}" class="form-control">
-                        <f:form.select.option value="">Select Service</f:form.select.option>
-                        <f:form.select.option value="custom">Custom</f:form.select.option>
-                        <f:form.select.option value="openai">Open AI</f:form.select.option>
-                    </f:form.select>
-                    <label for="image_recognition_prompt">Image Recognition Prompt:</label>
-                    <f:form.textfield name="image_recognition_prompt"
-                                      id="image_recognition_prompt"
-                                      value="{image_recognition_prompt}"
-                                      placeholder="{f:translate(key: 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:image_recognition_prompt_default')}"
-                                      class="form-control" />
+                        <h3>Custom</h3>
+                        <label for="custom_auth_token">Custom API Auth Token:</label>
+                        <f:form.textfield name="custom_auth_token" id="custom_auth_token" value="{custom_auth_token}" class="form-control" type="password" />
+                        <label for="custom_image_recognition_api_uri">Custom Image Recognition API URI:</label>
+                        <f:form.textfield name="custom_image_recognition_api_uri" id="custom_image_recognition_api_uri" value="{custom_image_recognition_api_uri}" class="form-control" />
+                        <label for="custom_translation_api_uri">Custom Translation API URI:</label>
+                        <f:form.textfield name="custom_translation_api_uri" id="custom_translation_api_uri" value="{custom_translation_api_uri}" class="form-control" />
+                    </div>
+                    <f:form.submit value="Save" />
+                </f:form>
+            </div>
+            <div class="tab-pane fade" id="aiselectTab" role="tabpanel" aria-labelledby="aiselect-tab">
+                <f:form enctype="multipart/form-data" id="settings_form" action="save" object="{settings}" name="settings" class="form-section">
+                    <div class="form-group">
+                        <h3>Image Recognition</h3>
+                        <label for="image_recognition_service">Image Recognition Service:</label>
+                        <f:form.select name="image_recognition_service" id="image_recognition_service" value="{image_recognition_service}" class="form-control">
+                            <f:form.select.option value="">Select Service</f:form.select.option>
+                            <f:form.select.option value="custom">Custom</f:form.select.option>
+                            <f:form.select.option value="openai">Open AI</f:form.select.option>
+                        </f:form.select>
 
-                    <h3>Translation</h3>
-                    <label for="translation_service">Translation Service:</label>
-                    <f:form.select name="translation_service" id="translation_service" value="{translation_service}" class="form-control">
-                        <f:form.select.option value="">Select Service</f:form.select.option>
-                        <f:form.select.option value="custom">Custom</f:form.select.option>
-                        <f:form.select.option value="deepl">DeepL</f:form.select.option>
-                    </f:form.select>
-                </div>
-                <f:form.submit value="Save" />
-            </f:form>
-        </div>
+                        <h3>Translation</h3>
+                        <label for="translation_service">Translation Service:</label>
+                        <f:form.select name="translation_service" id="translation_service" value="{translation_service}" class="form-control">
+                            <f:form.select.option value="">Select Service</f:form.select.option>
+                            <f:form.select.option value="custom">Custom</f:form.select.option>
+                            <f:form.select.option value="deepl">DeepL</f:form.select.option>
+                        </f:form.select>
+                    </div>
+                    <f:form.submit value="Save" />
+                </f:form>
+            </div>
+        </f:if>
+        <f:if condition="{permissions.promptManagement}">
+            <div class="tab-pane fade {f:if(condition:'!{permissions.admin}', then:'show active')}" id="promptManagementTab" role="tabpanel" aria-labelledby="promptManagement-tab">
+                    <f:form enctype="multipart/form-data" id="settings_form" action="saveDefaultPrompt" name="settings" class="form-section">
+                        <div class="form-group">
+                            <h3>Default Prompt</h3>
+                            <label for="defaultPrompt">Default Prompt:</label>
+                            <f:form.select name="defaultPrompt" id="defaultPrompt" value="{defaultPrompt}" class="form-control" options="{prompts}" optionValueField="uid" optionLabelField="description">
+                                <f:if condition="!{defaultPrompt}">
+                                    <f:form.select.option value="">Select Prompt</f:form.select.option>
+                                </f:if>
+                            </f:form.select>
+                            <label for="deletePrompt">Delete selected prompt:
+                                <f:form.checkbox id="deletePrompt" name="deletePrompt" value="1" />
+                            </label>
+                            <br>
+                            <f:form.button value="save">Save Default</f:form.button>
+                        </div>
+                    </f:form>
+                    <f:form enctype="multipart/form-data" id="settings_form" action="addPrompt" name="settings" class="form-section">
+                        <div class="form-group">
+                            <h3>Add new Prompt</h3>
+                            <label for="description">Prompt Description:</label>
+                            <f:form.textfield name="description" class="form-control" />
+                            <label for="prompt">Prompt:</label>
+                            <f:form.textarea name="prompt"
+                                              id="prompt"
+                                              class="form-control" cols="50" rows="5" />
+
+                            <f:form.hidden name="type" value="img2txt" />
+                            <f:form.button value="add">Add Prompt</f:form.button>
+                        </div>
+                    </f:form>
+            </div>
+        </f:if>
     </div>
 
 

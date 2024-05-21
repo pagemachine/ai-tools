@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Pagemachine\AItools\Controller\Backend;
 
+use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Pagemachine\AItools\Service\ImageMetaDataService;
 use Pagemachine\AItools\Service\SettingsService;
 use Pagemachine\AItools\Service\TranslationService;
@@ -34,6 +35,7 @@ class ImageRecognizeController extends ActionController
     protected ResourceFactory $resourceFactory;
     protected SiteFinder $siteFinder;
     protected SettingsService $settingsService;
+    protected PromptRepository $promptRepository;
 
     /**
      * @var string
@@ -52,6 +54,7 @@ class ImageRecognizeController extends ActionController
         $this->responseFactory = GeneralUtility::makeInstance(ResponseFactoryInterface::class);
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
         $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
+        $this->promptRepository = GeneralUtility::makeInstance(PromptRepository::class);;
         $this->resourceFactory = $resourceFactory;
     }
 
@@ -102,7 +105,8 @@ class ImageRecognizeController extends ActionController
      * return all SiteLanguages
      * @return SiteLanguage[]
      */
-    private function getAllSiteLanguages() {
+    private function getAllSiteLanguages(): array
+    {
         $sites = $this->siteFinder->getAllSites();
         $languages = [];
         foreach ($sites as $site) {
@@ -135,7 +139,8 @@ class ImageRecognizeController extends ActionController
 
         $fileObjects = $this->getFileObjectFromRequestTarget($request);
 
-        $imageRecognitionDefaultValue = LocalizationUtility::translate('LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:image_recognition_prompt_default');
+        $allPrompts = $this->promptRepository->findAll();
+        $defaultPrompt = $this->promptRepository->findOneByDefault(true);
 
         $siteLanguages = $this->getAllSiteLanguages();
 
@@ -163,7 +168,7 @@ class ImageRecognizeController extends ActionController
                     ->withHeader('Content-Type', 'application/json')
                     ->withBody($this->streamFactory->createStream(json_encode($saved)));
             case 'generateMetaData':
-                $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($this->settingsService->getSetting('image_recognition_prompt') ?: $imageRecognitionDefaultValue);
+                $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt ? $defaultPrompt->getPrompt() : '');
                 $altText = $this->imageMetaDataService->generateImageDescription(
                     fileObject: $fileObjects[0],
                     textPrompt: $textPrompt,
@@ -184,7 +189,11 @@ class ImageRecognizeController extends ActionController
 
                 $view->assign(
                     'textPrompt',
-                    $this->settingsService->getSetting('image_recognition_prompt') ?: $imageRecognitionDefaultValue
+                    $defaultPrompt
+                );
+                $view->assign(
+                    'allTextPrompts',
+                    $allPrompts
                 );
 
                 return $this->responseFactory->createResponse()
