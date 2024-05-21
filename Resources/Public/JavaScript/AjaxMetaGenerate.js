@@ -185,15 +185,25 @@ function callAjaxMetaSaveAction(fileIdentifier, textarea, doTranslate, button) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  var altTexts = document.querySelectorAll('textarea[name="altText"]');
-  var saveBtns = document.querySelectorAll('.save-btn');
+  var imageEntryBlocks = document.querySelectorAll('.imageEntry');
 
-  altTexts.forEach((altText, index) => {
-    var saveBtn = saveBtns[index];
+  imageEntryBlocks.forEach((imageEntry) => {
+    let saveBtn = imageEntry.querySelector('.save-btn');
+    let altText = imageEntry.querySelector('textarea[name="altText"]');
     altText.addEventListener('input', function() {
       saveBtn.disabled = false;
     });
     saveBtn.disabled = true;
+  });
+
+  // set all alTexts fields to globalTextPrompt if globalTextPrompt was changed
+  var globalTextPromptField = document.querySelector('.globalTextPrompt');
+  globalTextPromptField.addEventListener('input', function() {
+    var textPrompts = document.querySelectorAll('.textPrompt');
+    textPrompts.forEach((textPrompt) => {
+      textPrompt.value = globalTextPromptField.value;
+      textPrompt.dispatchEvent(new Event('input'));
+    });
   });
 });
 

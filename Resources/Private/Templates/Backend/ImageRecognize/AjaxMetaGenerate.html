@@ -20,6 +20,8 @@
     <f:if condition="{fileObjects -> f:count()} > 1">
         <div class="row">
             <div class="col-xs-12">
+                <f:render section="form-group-select" arguments="{label: 'Global AI Prompt', class: 'globalTextPrompt', name: 'globalTextPrompt', options: allTextPrompts, value: textPrompt.prompt, optionLabelField: 'description', optionValueField: 'prompt'}" />
+
                 <label for="skipExistingDescriptions">Skip existing descriptions <input type="checkbox" id="skipExistingDescriptions" name="skipExistingDescriptions" class="skipExistingDescriptions" value="1" checked /></label><br />
                 <button onclick="callAjaxMetaGenerateActionForAll(this, false)" class="btn btn-primary">Generate Meta-Data for all Images</button>
                 <button onclick="callAjaxMetaGenerateActionForAll(this, true)" class="btn btn-primary">Generate, Save + Translate Meta-Data for all Images</button>
@@ -68,7 +70,7 @@
                                 <div class="form-group">
                                     <f:form.hidden name="action" value="generateMetaData" />
                                     <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" />
-                                    <f:render section="form-group-select" arguments="{label: 'AI Prompt', class: 'textPrompt-{fileObject.properties.identifier_hash}', name: 'textPrompt', options: allTextPrompts, value: textPrompt.prompt, optionLabelField: 'description', optionValueField: 'prompt'}" />
+                                    <f:render section="form-group-select" arguments="{label: 'AI Prompt', class: 'textPrompt textPrompt-{fileObject.properties.identifier_hash}', name: 'textPrompt', options: allTextPrompts, value: textPrompt.prompt, optionLabelField: 'description', optionValueField: 'prompt'}" />
                                 </div>
                             </f:form>
                             <f:form class="module-form" id="saveMetaDataForm-{fileObject.properties.identifier_hash}">
