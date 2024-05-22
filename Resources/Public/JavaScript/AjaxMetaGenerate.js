@@ -184,9 +184,16 @@ function callAjaxMetaSaveAction(fileIdentifier, textarea, doTranslate, button) {
   xhr.send(params);
 }
 
+function takeSuggestionSaveAction(fileIdentifier, textareaSuggestion, textarea, button) {
+  textarea.value = textareaSuggestion.value;
+  textarea.dispatchEvent(new Event('input'));
+  callAjaxMetaSaveAction(fileIdentifier, textarea, false, button);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   var imageEntryBlocks = document.querySelectorAll('.imageEntry');
 
+  // set save button to disabled if altText is not changed
   imageEntryBlocks.forEach((imageEntry) => {
     let saveBtn = imageEntry.querySelector('.save-btn');
     let altText = imageEntry.querySelector('textarea[name="altText"]');
@@ -206,9 +213,3 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
-
-function takeSuggestionSaveAction(fileIdentifier, textareaSuggestion, textarea, button) {
-  textarea.value = textareaSuggestion.value;
-  textarea.dispatchEvent(new Event('input'));
-  callAjaxMetaSaveAction(fileIdentifier, textarea, false, button);
-}
