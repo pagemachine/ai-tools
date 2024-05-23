@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Pagemachine\AItools\Controller\ContextMenu;
+namespace Pagemachine\AItools\ContextMenu;
 
 use TYPO3\CMS\Backend\ContextMenu\ItemProviders\AbstractProvider;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
@@ -10,7 +10,6 @@ use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use function TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 class AiToolItemProvider extends AbstractProvider
 {
@@ -32,13 +31,9 @@ class AiToolItemProvider extends AbstractProvider
         ]
     ];
 
-    public function __construct(string $table, string $identifier, string $context = '')
+    public function __construct()
     {
-        parent::__construct($table, $identifier, $context);
-
-        $this->table = $table;
-        $this->identifier = $identifier;
-        $this->backendUser = $GLOBALS['BE_USER'];
+        parent::__construct();
     }
 
 
@@ -90,9 +85,7 @@ class AiToolItemProvider extends AbstractProvider
     protected function getAdditionalAttributes(string $itemName): array
     {
         $attributes = [
-            // BEWARE!!! RequireJS MODULES MUST ALWAYS START WITH "TYPO3/CMS/" (and no "Vendor" segment here)
-            'data-callback-module' => 'TYPO3/CMS/AiTools/ContextMenuActions',
-            // Here you can also add any other useful "data-" attribute you'd like to use in your JavaScript (e.g. localized messages)
+            'data-callback-module' => '@pagemachine/aitools/context-menu-actions',
         ];
         if ($itemName === 'generateAIMetadata') {
             $attributes += [

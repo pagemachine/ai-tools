@@ -7,10 +7,11 @@ namespace Pagemachine\AItools\Controller\Backend;
 use Pagemachine\AItools\Domain\Model\Prompt;
 use Pagemachine\AItools\Service\SettingsService;
 use Pagemachine\AItools\Domain\Repository\PromptRepository;
+use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Http\RedirectResponse;
-use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Http\ForwardResponse;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
@@ -18,19 +19,9 @@ use TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException;
 use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
 use TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException;
 use TYPO3\CMS\Extbase\Persistence\PersistenceManagerInterface;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 class SettingsController extends ActionController
 {
-    private ?SettingsService $settingsService;
-
-    private PromptRepository $promptRepository;
-
-    /**
-     * @var \TYPO3\CMS\Extbase\Persistence\PersistenceManagerInterface
-     */
-    protected $persistenceManager;
-
     /**
      * List of settings that are saved in the registry
      * @var array
@@ -44,14 +35,12 @@ class SettingsController extends ActionController
     ];
 
     public function __construct(
-        SettingsService $settingsService,
-        PromptRepository $promptRepository,
-        PersistenceManagerInterface $persistenceManager,
+        private readonly SettingsService             $settingsService,
+        private readonly PromptRepository            $promptRepository,
+        private readonly PersistenceManagerInterface $persistenceManager,
+        private readonly ModuleTemplateFactory       $moduleTemplateFactory
     )
     {
-        $this->settingsService = $settingsService;
-        $this->promptRepository = $promptRepository;
-        $this->persistenceManager = $persistenceManager;
     }
 
     /**
@@ -71,8 +60,10 @@ class SettingsController extends ActionController
     /**
      * Show settings form
      */
-    public function settingsAction(): void
+    public function settingsAction(): ResponseInterface
     {
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
+
         foreach ($this->settingOptions as $option) {
             $this->view->assign($option, $this->settingsService->getSetting($option));
         }
@@ -88,16 +79,17 @@ class SettingsController extends ActionController
             'admin' => $GLOBALS['BE_USER']->isAdmin(),
             'promptManagement' => $this->checkPermission('prompt_management'),
         ]);
-
+        $moduleTemplate->setContent($this->view->render());
+        return $this->htmlResponse($moduleTemplate->renderContent());
     }
 
     /**
      * Save settings
      *
-     * @return Response
+     * @return ResponseInterface
      * @throws NoSuchArgumentException
      */
-    public function saveAction(): Response
+    public function saveAction(): ResponseInterface
     {
         foreach ($this->settingOptions as $option) {
             if ($this->request->hasArgument($option)) {
@@ -111,15 +103,15 @@ class SettingsController extends ActionController
     /**
      * Add a new prompt
      *
-     * @return Response
+     * @return ResponseInterface
      * @throws RouteNotFoundException
      * @throws NoSuchArgumentException
      * @throws IllegalObjectTypeException
      */
-    public function addPromptAction(): Response
+    public function addPromptAction(): ResponseInterface
     {
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-        $uri = (string)$uriBuilder->buildUriFromRoute('AItoolsAitools_AItoolsSettings', ['tx_aitools_settings' => ['controller' => 'Settings', 'action' => 'settings']]);
+        $uri = (string)$uriBuilder->buildUriFromRoute('aitools_AItoolsSettings', ['tx_aitools_settings' => ['controller' => 'Settings', 'action' => 'settings']]);
 
         if (!$this->checkPermission('prompt_management')) {
             return GeneralUtility::makeInstance(RedirectResponse::class, $uri);
@@ -138,16 +130,16 @@ class SettingsController extends ActionController
     /**
      * Save default prompt
      *
-     * @return Response
+     * @return ResponseInterface
      * @throws IllegalObjectTypeException
      * @throws UnknownObjectException
      * @throws RouteNotFoundException
      * @throws NoSuchArgumentException
      */
-    public function saveDefaultPromptAction(): Response
+    public function saveDefaultPromptAction(): ResponseInterface
     {
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-        $uri = (string)$uriBuilder->buildUriFromRoute('AItoolsAitools_AItoolsSettings', ['tx_aitools_settings' => ['controller' => 'Settings', 'action' => 'settings']]);
+        $uri = (string)$uriBuilder->buildUriFromRoute('aitools_AItoolsSettings', ['tx_aitools_settings' => ['controller' => 'Settings', 'action' => 'settings']]);
 
         if (!$this->checkPermission('prompt_management')) {
             return GeneralUtility::makeInstance(RedirectResponse::class, $uri);
