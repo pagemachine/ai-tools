@@ -3,7 +3,7 @@
 return [
     'aitools' => [
         'position' => ['after' => 'web'],
-        'iconIdentifier' => 'EXT:ai_tools/Resources/Public/Icons/ext_icon.svg',
+        'iconIdentifier' => 'tx-aitools-svgicon',
         'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_mainmodule.xlf',
     ],
     /*'aitools_AItoolsImages' => [
@@ -32,7 +32,7 @@ return [
         'position' => ['before' => '*'],
         'access' => 'user,group',
         'workspaces' => 'live',
-        'iconIdentifier' => 'EXT:ai_tools/Resources/Public/Icons/ext_icon.svg',
+        'iconIdentifier' => 'tx-aitools-svgicon',
         'path' => '/module/aitools/AItoolsSettings',
         'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf',
         'extensionName' => 'AItools',

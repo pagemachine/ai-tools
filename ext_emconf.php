@@ -7,10 +7,10 @@ $EM_CONF[$_EXTKEY] = [
     'author_email' => 'sloeffler@pagemachine.de',
     'author_company' => 'Pagemachine AG',
     'state' => 'alpha',
-    'version' => '0.0.3',
+    'version' => '0.0.4',
     'constraints' => [
         'depends' => [
-            'typo3' => '11.0.0-11.5.99',
+            'typo3' => '12.0.0-12.4.99',
         ],
         'conflicts' => [
         ],
