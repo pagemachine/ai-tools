@@ -9,7 +9,7 @@ return [
     /*'aitools_AItoolsImages' => [
         'parent' => 'aitools',
         'position' => ['before' => '*'],
-        'access' => 'user,group',
+        'access' => 'user',
         'workspaces' => 'live',
         'iconIdentifier' => 'EXT:ai_tools/Resources/Public/Icons/ext_icon.svg',
         'path' => '/module/aitools/AItoolsImages',
@@ -30,7 +30,7 @@ return [
     'aitools_AItoolsSettings' => [
         'parent' => 'aitools',
         'position' => ['before' => '*'],
-        'access' => 'user,group',
+        'access' => 'user',
         'workspaces' => 'live',
         'iconIdentifier' => 'tx-aitools-svgicon',
         'path' => '/module/aitools/AItoolsSettings',
