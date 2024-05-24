@@ -55,78 +55,47 @@ async function callAjaxMetaGenerateActionForAll(button, saveAndTranslate) {
   progressBar.value = 0;
   button.disabled = true;
   for (let imageEntry of imageEntryBlocks) {
-    let button = imageEntry.querySelector('.generate-btn');
+    let textPromptField = imageEntry.querySelector('.textPrompt');
+    let genButton = imageEntry.querySelector('.generate-btn');
+    let saveAndTranslateButton = imageEntry.querySelector('.save-translate-btn');
+    let altTextSuggestion = imageEntry.querySelector('.textarea-altTextSuggestion');
+    let fileIdentifierField = imageEntry.querySelector('.fileIdentifierField');
 
     // skip if altText is already filled and skipExistingDescriptions is checked
-    let altText = imageEntry.querySelector('.altText');
+    let altText = imageEntry.querySelector('.textarea-altText');
     if (skipExistingDescriptions.checked && altText.value !== '') {
       progressBar.value += 1;
       continue;
     }
 
-    let buttonInitiallyDisabled = button.disabled; // Check initial state
+    let buttonInitiallyDisabled = genButton.disabled; // Check initial state
     console.log('Progress before:', progressBar.value);
-    await new Promise((resolve, reject) => {
-      let hasBeenDisabled = false; // Flag to track if the button has been disabled
-
-      const observer = new MutationObserver((mutationsList, observer) => {
-        for (let mutation of mutationsList) {
-          if (mutation.type === 'attributes' && mutation.attributeName === 'disabled') {
-            if (button.disabled) {
-              hasBeenDisabled = true; // Mark as disabled
-            } else if (!button.disabled && hasBeenDisabled) {
-              // Only resolve if the button was disabled and then re-enabled
-              observer.disconnect();
-              resolve();
-            }
-          }
-        }
-      });
-
-      observer.observe(button, { attributes: true });
-      if (!buttonInitiallyDisabled) {
-        button.click(); // Click the button if it wasn't already disabled
-      }
-    });
 
     if (saveAndTranslate) {
-      //let saveAndTranslateButton = button.parentElement.querySelector('.save-translate-btn');
-      let saveAndTranslateButton = imageEntry.querySelector('.save-translate-btn');
-
-      // set altText to altTextSuggestion
-      let altText = imageEntry.querySelector('.textarea-altText');
-      let altTextSuggestion = imageEntry.querySelector('.textarea-altTextSuggestion');
-      altText.value = altTextSuggestion.value;
-      altText.dispatchEvent(new Event('input'));
-
-      await new Promise((resolve, reject) => {
-        let hasBeenDisabled = false; // Reset flag for the next button
-
-        const observer = new MutationObserver((mutationsList, observer) => {
-          for (let mutation of mutationsList) {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'disabled') {
-              if (saveAndTranslateButton.disabled) {
-                hasBeenDisabled = true; // Mark as disabled
-              } else if (!saveAndTranslateButton.disabled && hasBeenDisabled) {
-                // Only resolve if the button was disabled and then re-enabled
-                observer.disconnect();
-                resolve();
-              }
-            }
-          }
-        });
-
-        observer.observe(saveAndTranslateButton, { attributes: true });
-        saveAndTranslateButton.click(); // Click after setting up the observer
+      // generate, save and translate alt-text directly.
+      await new Promise((resolve) => {
+        genButton.addEventListener('ajaxComplete', resolve, { once: true });
+        callAjaxMetaGenerateAction(fileIdentifierField.value, altText, textPromptField, genButton)
+      });
+      await new Promise((resolve) => {
+        saveAndTranslateButton.addEventListener('ajaxComplete', resolve, { once: true });
+        callAjaxMetaSaveAction(fileIdentifierField.value, altText, true, saveAndTranslateButton)
+      });
+    } else {
+      // only generate alt-text and write into suggestion field.
+      await new Promise((resolve) => {
+        genButton.addEventListener('ajaxComplete', resolve, { once: true });
+        callAjaxMetaGenerateAction(fileIdentifierField.value, altTextSuggestion, textPromptField, genButton)
       });
     }
+
     progressBar.value += 1;
     console.log('Progress after:', progressBar.value);
   }
   button.disabled = false;
 }
 
-function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, languageSelectField, button) {
+function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, button) {
   var oldText = textarea.value;
   var textPrompt = textPromptField.value;
   var originalButtonText = button.textContent;
@@ -154,6 +123,7 @@ function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, l
     }
     button.textContent = originalButtonText;
     button.disabled = false;
+    button.dispatchEvent(new CustomEvent('ajaxComplete'));
   }
   xhr.send(params);
 }
@@ -180,6 +150,7 @@ function callAjaxMetaSaveAction(fileIdentifier, textarea, doTranslate, button) {
     }
     button.textContent = originalButtonText;
     button.disabled = false;
+    button.dispatchEvent(new CustomEvent('ajaxComplete'));
   }
   xhr.send(params);
 }

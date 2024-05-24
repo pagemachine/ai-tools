@@ -69,7 +69,7 @@
                             <f:form class="module-form" id="generateMetaDataForm-{fileObject.properties.identifier_hash}">
                                 <div class="form-group">
                                     <f:form.hidden name="action" value="generateMetaData" />
-                                    <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" />
+                                    <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" class="fileIdentifierField" />
                                     <f:render section="form-group-select" arguments="{label: 'AI Prompt', class: 'textPrompt textPrompt-{fileObject.properties.identifier_hash}', name: 'textPrompt', options: allTextPrompts, value: textPrompt.prompt, optionLabelField: 'description', optionValueField: 'prompt'}" />
                                 </div>
                             </f:form>
@@ -92,7 +92,7 @@
                             <div class="form-group bottom">
                                 <button onclick="callAjaxMetaSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altText-{fileObject.properties.identifier_hash}')[0], false, this)" class="save-btn btn btn-primary">Save</button>
                                 <button onclick="callAjaxMetaSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altText-{fileObject.properties.identifier_hash}')[0], true, this)" class="save-translate-btn btn btn-secondary">Save and Translate</button>
-                                <button onclick="callAjaxMetaGenerateAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altTextSuggestion-{fileObject.properties.identifier_hash}')[0], document.querySelectorAll('.textPrompt-{fileObject.properties.identifier_hash}')[0], document.querySelectorAll('.langSelect-{fileObject.properties.identifier_hash}')[0], this)" class="generate-btn btn btn-secondary">Generate Image Description</button>
+                                <button onclick="callAjaxMetaGenerateAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altTextSuggestion-{fileObject.properties.identifier_hash}')[0], document.querySelectorAll('.textPrompt-{fileObject.properties.identifier_hash}')[0], this)" class="generate-btn btn btn-secondary">Generate Image Description</button>
                                 <button onclick="takeSuggestionSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altTextSuggestion-{fileObject.properties.identifier_hash}')[0], document.querySelectorAll('.textarea-altText-{fileObject.properties.identifier_hash}')[0], this)" class="generate-btn btn btn-secondary">Use Suggestion and Save</button>
                             </div>
                         </div>
