@@ -55,78 +55,54 @@ async function callAjaxMetaGenerateActionForAll(button, saveAndTranslate) {
   progressBar.value = 0;
   button.disabled = true;
   for (let imageEntry of imageEntryBlocks) {
-    let button = imageEntry.querySelector('.generate-btn');
+    let textPromptField = imageEntry.querySelector('.textPrompt');
+    let genButton = imageEntry.querySelector('.generate-btn');
+    let saveAndTranslateButton = imageEntry.querySelector('.save-translate-btn');
+    let altTextSuggestion = imageEntry.querySelector('.textarea-altTextSuggestion');
+    let fileIdentifierField = imageEntry.querySelector('.fileIdentifierField');
 
     // skip if altText is already filled and skipExistingDescriptions is checked
-    let altText = imageEntry.querySelector('.altText');
+    let altText = imageEntry.querySelector('.textarea-altText');
     if (skipExistingDescriptions.checked && altText.value !== '') {
       progressBar.value += 1;
       continue;
     }
 
-    let buttonInitiallyDisabled = button.disabled; // Check initial state
     console.log('Progress before:', progressBar.value);
-    await new Promise((resolve, reject) => {
-      let hasBeenDisabled = false; // Flag to track if the button has been disabled
 
-      const observer = new MutationObserver((mutationsList, observer) => {
-        for (let mutation of mutationsList) {
-          if (mutation.type === 'attributes' && mutation.attributeName === 'disabled') {
-            if (button.disabled) {
-              hasBeenDisabled = true; // Mark as disabled
-            } else if (!button.disabled && hasBeenDisabled) {
-              // Only resolve if the button was disabled and then re-enabled
-              observer.disconnect();
-              resolve();
-            }
-          }
-        }
-      });
-
-      observer.observe(button, { attributes: true });
-      if (!buttonInitiallyDisabled) {
-        button.click(); // Click the button if it wasn't already disabled
-      }
-    });
-
-    if (saveAndTranslate) {
-      //let saveAndTranslateButton = button.parentElement.querySelector('.save-translate-btn');
-      let saveAndTranslateButton = imageEntry.querySelector('.save-translate-btn');
-
-      // set altText to altTextSuggestion
-      let altText = imageEntry.querySelector('.textarea-altText');
-      let altTextSuggestion = imageEntry.querySelector('.textarea-altTextSuggestion');
-      altText.value = altTextSuggestion.value;
-      altText.dispatchEvent(new Event('input'));
-
-      await new Promise((resolve, reject) => {
-        let hasBeenDisabled = false; // Reset flag for the next button
-
-        const observer = new MutationObserver((mutationsList, observer) => {
-          for (let mutation of mutationsList) {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'disabled') {
-              if (saveAndTranslateButton.disabled) {
-                hasBeenDisabled = true; // Mark as disabled
-              } else if (!saveAndTranslateButton.disabled && hasBeenDisabled) {
-                // Only resolve if the button was disabled and then re-enabled
-                observer.disconnect();
-                resolve();
-              }
-            }
-          }
+    try {
+      if (saveAndTranslate) {
+        // generate, save and translate alt-text directly.
+        await new Promise((resolve, reject) => {
+          genButton.addEventListener('ajaxComplete', resolve, {once: true});
+          genButton.addEventListener('ajaxError', reject, {once: true});
+          callAjaxMetaGenerateAction(fileIdentifierField.value, altText, textPromptField, genButton)
         });
-
-        observer.observe(saveAndTranslateButton, { attributes: true });
-        saveAndTranslateButton.click(); // Click after setting up the observer
-      });
+        await new Promise((resolve, reject) => {
+          saveAndTranslateButton.addEventListener('ajaxComplete', resolve, {once: true});
+          genButton.addEventListener('ajaxError', reject, {once: true});
+          callAjaxMetaSaveAction(fileIdentifierField.value, altText, true, saveAndTranslateButton)
+        });
+      } else {
+        // only generate alt-text and write into suggestion field.
+        await new Promise((resolve, reject) => {
+          genButton.addEventListener('ajaxComplete', resolve, {once: true});
+          genButton.addEventListener('ajaxError', reject, {once: true});
+          callAjaxMetaGenerateAction(fileIdentifierField.value, altTextSuggestion, textPromptField, genButton)
+        });
+      }
+    } catch (error) {
+      console.error('Error handling AJAX request:', error);
+      top.TYPO3.Notification.error('Error', 'Error while generating Metadata', 5);
     }
+
     progressBar.value += 1;
     console.log('Progress after:', progressBar.value);
   }
   button.disabled = false;
 }
 
-function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, languageSelectField, button) {
+function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, button) {
   var oldText = textarea.value;
   var textPrompt = textPromptField.value;
   var originalButtonText = button.textContent;
@@ -143,14 +119,19 @@ function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, l
   xhr.onreadystatechange = function() {
     if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
       var response = JSON.parse(this.responseText);
-      if (response.alternative !== '' && response.alternative !== oldText) {
+      if (response) {
         textarea.value = response.alternative;
         textarea.dispatchEvent(new Event('input'));
         top.TYPO3.Notification.success('Generated Metadata', 'Generated Metadata successful', 5);
         savedSuccess = true;
+        button.dispatchEvent(new CustomEvent('ajaxComplete'));
+      } else {
+        top.TYPO3.Notification.error('Error', 'Error while saving Metadata (empty response)', 5);
+        button.dispatchEvent(new CustomEvent('ajaxError'));
       }
     } else if (this.status !== 200) {
-      top.TYPO3.Notification.error('Error', 'Error while generating Metadata', 5);
+      top.TYPO3.Notification.error('Error', 'Error while generating Metadata (status:'+ this.status + ')', 5);
+      button.dispatchEvent(new CustomEvent('ajaxError'));
     }
     button.textContent = originalButtonText;
     button.disabled = false;
@@ -172,11 +153,14 @@ function callAjaxMetaSaveAction(fileIdentifier, textarea, doTranslate, button) {
       var response = JSON.parse(this.responseText);
       if (response) {
         top.TYPO3.Notification.success('Saved Metadata', 'Saved Metadata successful', 5);
+        button.dispatchEvent(new CustomEvent('ajaxComplete'));
       } else {
-        top.TYPO3.Notification.error('Error', 'Error while saving Metadata', 5);
+        top.TYPO3.Notification.error('Error', 'Error while saving Metadata (empty response)', 5);
+        button.dispatchEvent(new CustomEvent('ajaxError'));
       }
     } else if (this.status !== 200) {
-      top.TYPO3.Notification.error('Error', 'Error while saving Metadata', 5);
+      top.TYPO3.Notification.error('Error', 'Error while saving Metadata (status:'+ this.status + ')', 5);
+      button.dispatchEvent(new CustomEvent('ajaxError'));
     }
     button.textContent = originalButtonText;
     button.disabled = false;
