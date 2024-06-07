@@ -68,25 +68,32 @@ async function callAjaxMetaGenerateActionForAll(button, saveAndTranslate) {
       continue;
     }
 
-    let buttonInitiallyDisabled = genButton.disabled; // Check initial state
     console.log('Progress before:', progressBar.value);
 
-    if (saveAndTranslate) {
-      // generate, save and translate alt-text directly.
-      await new Promise((resolve) => {
-        genButton.addEventListener('ajaxComplete', resolve, { once: true });
-        callAjaxMetaGenerateAction(fileIdentifierField.value, altText, textPromptField, genButton)
-      });
-      await new Promise((resolve) => {
-        saveAndTranslateButton.addEventListener('ajaxComplete', resolve, { once: true });
-        callAjaxMetaSaveAction(fileIdentifierField.value, altText, true, saveAndTranslateButton)
-      });
-    } else {
-      // only generate alt-text and write into suggestion field.
-      await new Promise((resolve) => {
-        genButton.addEventListener('ajaxComplete', resolve, { once: true });
-        callAjaxMetaGenerateAction(fileIdentifierField.value, altTextSuggestion, textPromptField, genButton)
-      });
+    try {
+      if (saveAndTranslate) {
+        // generate, save and translate alt-text directly.
+        await new Promise((resolve, reject) => {
+          genButton.addEventListener('ajaxComplete', resolve, {once: true});
+          genButton.addEventListener('ajaxError', reject, {once: true});
+          callAjaxMetaGenerateAction(fileIdentifierField.value, altText, textPromptField, genButton)
+        });
+        await new Promise((resolve, reject) => {
+          saveAndTranslateButton.addEventListener('ajaxComplete', resolve, {once: true});
+          genButton.addEventListener('ajaxError', reject, {once: true});
+          callAjaxMetaSaveAction(fileIdentifierField.value, altText, true, saveAndTranslateButton)
+        });
+      } else {
+        // only generate alt-text and write into suggestion field.
+        await new Promise((resolve, reject) => {
+          genButton.addEventListener('ajaxComplete', resolve, {once: true});
+          genButton.addEventListener('ajaxError', reject, {once: true});
+          callAjaxMetaGenerateAction(fileIdentifierField.value, altTextSuggestion, textPromptField, genButton)
+        });
+      }
+    } catch (error) {
+      console.error('Error handling AJAX request:', error);
+      top.TYPO3.Notification.error('Error', 'Error while generating Metadata', 5);
     }
 
     progressBar.value += 1;
@@ -112,18 +119,22 @@ function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, b
   xhr.onreadystatechange = function() {
     if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
       var response = JSON.parse(this.responseText);
-      if (response.alternative !== '' && response.alternative !== oldText) {
+      if (response) {
         textarea.value = response.alternative;
         textarea.dispatchEvent(new Event('input'));
         top.TYPO3.Notification.success('Generated Metadata', 'Generated Metadata successful', 5);
         savedSuccess = true;
+        button.dispatchEvent(new CustomEvent('ajaxComplete'));
+      } else {
+        top.TYPO3.Notification.error('Error', 'Error while saving Metadata (empty response)', 5);
+        button.dispatchEvent(new CustomEvent('ajaxError'));
       }
     } else if (this.status !== 200) {
-      top.TYPO3.Notification.error('Error', 'Error while generating Metadata', 5);
+      top.TYPO3.Notification.error('Error', 'Error while generating Metadata (status:'+ this.status + ')', 5);
+      button.dispatchEvent(new CustomEvent('ajaxError'));
     }
     button.textContent = originalButtonText;
     button.disabled = false;
-    button.dispatchEvent(new CustomEvent('ajaxComplete'));
   }
   xhr.send(params);
 }
@@ -142,15 +153,17 @@ function callAjaxMetaSaveAction(fileIdentifier, textarea, doTranslate, button) {
       var response = JSON.parse(this.responseText);
       if (response) {
         top.TYPO3.Notification.success('Saved Metadata', 'Saved Metadata successful', 5);
+        button.dispatchEvent(new CustomEvent('ajaxComplete'));
       } else {
-        top.TYPO3.Notification.error('Error', 'Error while saving Metadata', 5);
+        top.TYPO3.Notification.error('Error', 'Error while saving Metadata (empty response)', 5);
+        button.dispatchEvent(new CustomEvent('ajaxError'));
       }
     } else if (this.status !== 200) {
-      top.TYPO3.Notification.error('Error', 'Error while saving Metadata', 5);
+      top.TYPO3.Notification.error('Error', 'Error while saving Metadata (status:'+ this.status + ')', 5);
+      button.dispatchEvent(new CustomEvent('ajaxError'));
     }
     button.textContent = originalButtonText;
     button.disabled = false;
-    button.dispatchEvent(new CustomEvent('ajaxComplete'));
   }
   xhr.send(params);
 }
