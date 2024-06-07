@@ -27,8 +27,11 @@ class SettingsController extends ActionController
      * @var array
      */
     private array $settingOptions = [
+        // openAI settings
         'openai_apikey',
-        'custom_auth_token', 'custom_image_recognition_api_uri', 'custom_translation_api_uri',
+        // custom API settings
+        'custom_auth_token', 'custom_api_username', 'custom_api_password', 'custom_image_recognition_api_uri', 'custom_translation_api_uri',
+        // deepl settings
         'deepl_auth_key', 'deepl_endpoint', 'deepl_formality',
         // used service selections
         'image_recognition_service', 'translation_service',
