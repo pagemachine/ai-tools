@@ -12,7 +12,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class CustomImageRecognitionService
 {
     protected $requestFactory;
-    protected string $authToken;
+    protected string $authToken = '';
+    protected string $basicAuth = '';
     protected $settingsService;
 
     public function __construct()
@@ -20,6 +21,12 @@ class CustomImageRecognitionService
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
         $this->requestFactory = GeneralUtility::makeInstance(RequestFactory::class);
         $this->authToken = $this->settingsService->getSetting('custom_auth_token');
+        // Retrieve the username and password from settings
+        $username = $this->settingsService->getSetting('custom_api_username');
+        $password = $this->settingsService->getSetting('custom_api_password');
+        if (!empty($username) && !empty($password)) {
+            $this->basicAuth = base64_encode($username.':'.$password);
+        }
     }
 
     public function sendFileToApi(FileInterface $fileObject, string $textPrompt = ''): string
@@ -45,7 +52,10 @@ class CustomImageRecognitionService
         ];
 
         $response = $this->requestFactory->request($url, 'POST', [
-            'headers' => ['X-Auth-Token' => $this->authToken],
+            'headers' => [
+                'X-Auth-Token' => $this->authToken,
+                'Authorization' => "Basic ".$this->basicAuth
+            ],
             'multipart' => $multipartBody
         ]);
 

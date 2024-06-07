@@ -11,7 +11,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class CustomTranslationService
 {
     protected $requestFactory;
-    protected $authToken;
+    protected string $authToken = '';
+    protected string $basicAuth = '';
     protected $settingsService;
 
     private array $languages = [
@@ -216,8 +217,14 @@ class CustomTranslationService
     public function __construct()
     {
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
-        $this->authToken = $this->settingsService->getSetting('custom_auth_token');
         $this->requestFactory = GeneralUtility::makeInstance(RequestFactory::class);
+        $this->authToken = $this->settingsService->getSetting('custom_auth_token');
+        // Retrieve the username and password from settings
+        $username = $this->settingsService->getSetting('custom_api_username');
+        $password = $this->settingsService->getSetting('custom_api_password');
+        if (!empty($username) && !empty($password)) {
+            $this->basicAuth = base64_encode($username.':'.$password);
+        }
     }
 
     private function getLanguageScript($code) {
@@ -241,6 +248,7 @@ class CustomTranslationService
         $response = $this->requestFactory->request($url, 'POST', [
             'headers' => [
                 'X-Auth-Token' => $this->authToken,
+                'Authorization' => "Basic ".$this->basicAuth,
                 'Content-Type' => 'application/x-www-form-urlencoded'
             ],
             'body' => $formData

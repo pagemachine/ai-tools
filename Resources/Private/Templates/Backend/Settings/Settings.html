@@ -5,6 +5,19 @@
         .form-group > h3:first-of-type {
             margin-top: 0;
         }
+        .form-group .form-control-wrap {
+            margin-top: 0.1rem;
+        }
+        .form-group label {
+            margin-top: 0.8rem;
+            margin-bottom: 0.2rem;
+        }
+        .form-group h3 + label {
+            margin-top: 0.2rem;
+        }
+        .form-group .form-control-wrap label {
+            margin-top: 0.1rem;
+        }
     </style>
 
     <h1>AI Tools Settings</h1>
@@ -51,6 +64,26 @@
                         <h3>Custom</h3>
                         <label for="custom_auth_token">Custom API Auth Token:</label>
                         <f:form.textfield name="custom_auth_token" id="custom_auth_token" value="{custom_auth_token}" class="form-control" type="password" />
+
+                        <label>Custom API Basic Auth:</label>
+                        <div class="row">
+                            <div class="form-group t3js-formengine-validation-marker t3js-formengine-palette-field col col-sm-6"><div class="formengine-field-item t3js-formengine-field-item">
+                                <div class="form-control-wrap" style="max-width: 480px">
+                                    <label class="t3js-formengine-label">
+                                        <span class="help-link"><abbr>Username</abbr></span>
+                                    </label>
+                                    <f:form.textfield name="custom_api_username" id="custom_api_username" value="{custom_api_username}" class="form-control" type="text" placeholder="Username" />
+                                </div>
+                            </div></div>
+                            <div class="form-group t3js-formengine-validation-marker t3js-formengine-palette-field col col-sm-6"><div class="formengine-field-item t3js-formengine-field-item">
+                                <div class="form-control-wrap" style="max-width: 480px">
+                                    <label class="t3js-formengine-label">
+                                        <span class="help-link"><abbr>Password</abbr></span>
+                                    </label>
+                                    <f:form.textfield name="custom_api_password" id="custom_api_password" value="{custom_api_password}" class="form-control" type="password" placeholder="Password" />
+                                </div>
+                            </div></div>
+                        </div>
                         <label for="custom_image_recognition_api_uri">Custom Image Recognition API URI:</label>
                         <f:form.textfield name="custom_image_recognition_api_uri" id="custom_image_recognition_api_uri" value="{custom_image_recognition_api_uri}" class="form-control" />
                         <label for="custom_translation_api_uri">Custom Translation API URI:</label>
