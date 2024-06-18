@@ -145,6 +145,7 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
                 ContextualFeedbackSeverity::INFO,
                 true
             );
+            /** @phpstan-ignore-next-line Else branch is unreachable because previous condition is always true. */
         } else {
             $this->addFlashMessage(
                 'The image could not be saved',
@@ -170,11 +171,6 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
                 'size' => $resolution,
                 'response_format' => 'url',
             ]);
-
-            foreach ($response->data as $data) {
-                $data->url; // 'https://oaidalleapiprodscus.blob.core.windows.net/private/...'
-                $data->b64_json; // null
-            }
 
             $imageUrlArray = $response->toArray();
 
@@ -209,11 +205,6 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
                 'size' => $resolution,
                 'response_format' => 'url',
             ]);
-
-            foreach ($response->data as $data) {
-                $data->url; // 'https://oaidalleapiprodscus.blob.core.windows.net/private/...'
-                $data->b64_json; // null
-            }
 
             $imageUrlArray = $response->toArray();
 

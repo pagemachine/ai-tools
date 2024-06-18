@@ -172,10 +172,5 @@ class AiToolItemProvider extends AbstractProvider
     protected function canEditMetadata(): bool
     {
         return true;
-        return $this->isFile()
-            && $this->record->isIndexed()
-            && $this->record->checkActionPermission('editMeta')
-            && $this->record->getMetaData()->offsetExists('uid')
-            && $this->backendUser->check('tables_modify', 'sys_file_metadata');
     }
 }

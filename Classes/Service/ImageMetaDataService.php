@@ -59,23 +59,6 @@ class ImageMetaDataService
     }
 
     /**
-     * Retrieve MetaData for this File
-     * @param FileInterface $fileObject
-     * @param int $language
-     * @return array|null
-     * @throws InvalidUidException
-     */
-    public function getMetaData(FileInterface $fileObject, int $language = 0): ?array
-    {
-        $fileObjectUid = $fileObject->getUid();
-        $fileMetaData = $this->metaDataRepository->findWithOverlayByFileUid($fileObjectUid, $language);
-        if (empty($fileMetaData)) {
-            return null;
-        }
-        return $fileMetaData;
-    }
-
-    /**
      * generate MetaData for this File and redirect back to ajaxMetaGenerate
      * @param string $target
      * @param string|null $altText

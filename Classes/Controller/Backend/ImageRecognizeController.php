@@ -191,7 +191,7 @@ class ImageRecognizeController extends ActionController
                 // create custom fluid template html view
                 $view = $this->getView('AjaxMetaGenerate', $request);
 
-                $view->assign('siteLanguages', $siteLanguages ?? null);
+                $view->assign('siteLanguages', $siteLanguages);
                 $view->assign('action', $action);
                 $view->assign('fileObjects', $fileObjects ?? null);
 

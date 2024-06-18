@@ -49,7 +49,7 @@ class Aiimage extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     }
 
     /**
-     * @param string $description
+     * @param string $imagesnumber
      */
     public function setImagesnumber(string $imagesnumber)
     {
