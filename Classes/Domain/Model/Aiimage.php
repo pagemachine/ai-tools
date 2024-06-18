@@ -1,10 +1,8 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Pagemachine\AItools\Domain\Model;
-
-use TYPO3\CMS\Extbase\Annotation\Validate;
 
 class Aiimage extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
 {
@@ -36,7 +34,6 @@ class Aiimage extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
 
     /**
      * @param string $description
-     * @return void
      */
     public function setDescription(string $description)
     {
@@ -53,7 +50,6 @@ class Aiimage extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
 
     /**
      * @param string $description
-     * @return void
      */
     public function setImagesnumber(string $imagesnumber)
     {
@@ -70,13 +66,11 @@ class Aiimage extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
 
     /**
      * @param string $resolution
-     * @return void
      */
     public function setResolution(string $resolution)
     {
         $this->resolution = $resolution;
     }
-
 
     /**
      * @return array
@@ -88,7 +82,6 @@ class Aiimage extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
 
     /**
      * @param array $file
-     * @return void
      */
     public function setFile(array $file)
     {

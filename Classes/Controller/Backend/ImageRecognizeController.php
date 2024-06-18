@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Pagemachine\AItools\Controller\Backend;
 
@@ -42,7 +42,6 @@ class ImageRecognizeController extends ActionController
      * @var string
      */
     protected $layoutRootPath = 'EXT:ai_tools/Resources/Private/Layouts/';
-
 
     public function __construct(
         private readonly ResourceFactory $resourceFactory,
@@ -100,7 +99,8 @@ class ImageRecognizeController extends ActionController
             $fileObject = $this->resourceFactory->retrieveFileOrFolderObject($target);
             if ($fileObject instanceof FileInterface) {
                 return [$fileObject];
-            } elseif ($fileObject instanceof FolderInterface) {
+            }
+            if ($fileObject instanceof FolderInterface) {
                 return $fileObject->getFiles();
             }
         }
@@ -120,7 +120,8 @@ class ImageRecognizeController extends ActionController
         }
         return $languages;
     }
-    private function getLanguageById(int $languageId) {
+    private function getLanguageById(int $languageId)
+    {
         $sites = $this->siteFinder->getAllSites();
         foreach ($sites as $site) {
             try {
@@ -129,7 +130,7 @@ class ImageRecognizeController extends ActionController
                 continue;
             }
         }
-        return Null;
+        return null;
     }
 
     /**
@@ -202,7 +203,6 @@ class ImageRecognizeController extends ActionController
                     'allTextPrompts',
                     $allPrompts
                 );
-
 
                 $moduleTemplate->setContent($view->render());
 

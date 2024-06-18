@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Pagemachine\AItools\Domain\Model;
 
@@ -50,7 +50,7 @@ class Prompt extends AbstractEntity
 
     public function getDescriptionPrompt(): string
     {
-        return $this->description. ' (' . $this->prompt . ')';
+        return $this->description . ' (' . $this->prompt . ')';
     }
 
     public function getType(): string

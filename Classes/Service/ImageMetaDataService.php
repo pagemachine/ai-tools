@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Pagemachine\AItools\Service;
 
@@ -28,7 +28,8 @@ class ImageMetaDataService
     protected ResourceFactory $resourceFactory;
     protected PersistenceManagerInterface $persistenceManager;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
 
         $this->customImageRecognitionService = GeneralUtility::makeInstance(CustomImageRecognitionService::class);
@@ -151,7 +152,10 @@ class ImageMetaDataService
                 } else {
                     // Otherwise update file variant meta data
                     $this->metaDataRepository->updateMetaDataByFileUidAndLanguageUid(
-                        $translatedFile, languageUid: $language, fieldName: 'alternative', fieldValue: $altText
+                        $translatedFile,
+                        languageUid: $language,
+                        fieldName: 'alternative',
+                        fieldValue: $altText
                     );
                 }
 
@@ -165,7 +169,10 @@ class ImageMetaDataService
                 // Update the existing metadata language record
                 // (This does not return number of updated records. That's why findWithOverlayByFileUid is used to check if record exists)
                 $this->metaDataRepository->updateMetaDataByFileUidAndLanguageUid(
-                    $fileObjectUid, languageUid: $language, fieldName: 'alternative', fieldValue: $altText
+                    $fileObjectUid,
+                    languageUid: $language,
+                    fieldName: 'alternative',
+                    fieldValue: $altText
                 );
             } else {
                 // Create a new record if no record for language exists

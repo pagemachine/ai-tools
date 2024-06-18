@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Pagemachine\AItools\Domain\Repository;
 
@@ -10,7 +10,6 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\RootLevelRestriction;
 use TYPO3\CMS\Core\Resource\Exception\InvalidUidException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-
 
 class MetaDataRepository extends \TYPO3\CMS\Core\Resource\Index\MetaDataRepository
 {
@@ -64,7 +63,7 @@ class MetaDataRepository extends \TYPO3\CMS\Core\Resource\Index\MetaDataReposito
      * @throws Exception
      * @throws InvalidUidException
      */
-    public function updateMetaDataByFileUidAndLanguageUid(int $fileUid, int $languageUid, string $fieldName = "alternative", string $fieldValue = ""): int
+    public function updateMetaDataByFileUidAndLanguageUid(int $fileUid, int $languageUid, string $fieldName = 'alternative', string $fieldValue = ''): int
     {
         if ($fileUid <= 0) {
             throw new InvalidUidException('Metadata can only be updated for indexed files. UID: "' . $fileUid . '"', 1381590731);

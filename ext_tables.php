@@ -29,14 +29,14 @@ if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0',
         'aitools',
         'settings',
         '',
-        array(
+        [
             \Pagemachine\AItools\Controller\Backend\SettingsController::class => 'settings, save, addPrompt, saveDefaultPrompt',
-        ),
-        array(
+        ],
+        [
             'access' => 'user, group',
             'icon' => 'EXT:ai_tools/Resources/Public/Icons/ext_icon.svg',
             'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf',
-        )
+        ]
     );
 }
 

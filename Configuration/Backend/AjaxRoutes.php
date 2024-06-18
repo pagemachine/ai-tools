@@ -14,6 +14,6 @@ return [
     //
     'aitools_ai_tools_images' => [
         'path' => '/aitoolsimages/metagen',
-        'target' => \Pagemachine\AItools\Controller\Backend\ImageRecognizeController::class . '::ajaxMetaGenerateAction'
+        'target' => \Pagemachine\AItools\Controller\Backend\ImageRecognizeController::class . '::ajaxMetaGenerateAction',
     ],
 ];

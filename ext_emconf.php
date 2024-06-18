@@ -1,4 +1,5 @@
 <?php
+
 $EM_CONF[$_EXTKEY] = [
     'title' => 'AI Tools',
     'description' => 'Use A.I. Tools in the TYPO3 backend. Generate Images, Image Variants and Describe Images.',

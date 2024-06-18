@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Pagemachine\AItools\Service\Translation;
 
@@ -49,7 +49,7 @@ class DeepLTranslationService
         'sv' => 'SV',
         'tr' => 'TR',
         'uk' => 'UK',
-        'zh' => 'ZH'
+        'zh' => 'ZH',
     ];
 
     public function __construct()
@@ -60,7 +60,8 @@ class DeepLTranslationService
         $this->apiEndpointUri = $this->endpoints[(string)$this->settingsService->getSetting('deepl_endpoint')];
     }
 
-    private function getLanguageScript($code) {
+    private function getLanguageScript($code)
+    {
         return $this->languages[$code] ?? null;
     }
 

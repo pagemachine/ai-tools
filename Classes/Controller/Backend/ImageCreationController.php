@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Pagemachine\AItools\Controller\Backend;
 
@@ -10,7 +10,6 @@ use Pagemachine\AItools\Domain\Model\Aiimage;
 use Pagemachine\AItools\Service\SettingsService;
 use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Http\Response;
-use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\StorageRepository;
@@ -24,14 +23,14 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
 
     public function __construct(
         SettingsService $settingsService,
-    )
-    {
+    ) {
         $this->settingsService = $settingsService;
     }
 
-    private function getOpenAIClient(): Client {
+    private function getOpenAIClient(): Client
+    {
         $openaiKey = (string)$this->settingsService->getSetting('openai_apikey');
-        return OpenAI::client($openaiKey);
+        return \OpenAI::client($openaiKey);
     }
 
     public function showAction(): void
@@ -41,10 +40,8 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
         //echo "<h2>showAction - BackendController.php</h2>";
     }
 
-
     /**
      * @param Aiimage $aiimage
-     * @return void
      */
     public function generateAction(Aiimage $aiimage): void
     {
@@ -65,7 +62,7 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
         //We get the object $aiimage from the Show.html form
         $description = $aiimage->getDescription();
         $imagesnumber = $aiimage->getImagesnumber();
-        $imagesnumber = intval($imagesnumber);
+        $imagesnumber = (int)$imagesnumber;
         $resolution = $aiimage->getResolution();
         $altText = str_replace(' ', '-', $description);
 
@@ -82,25 +79,23 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
         }
     }
 
-
     /**
      * @param Aiimage $aiimage
-     * @return void
      */
     public function variateAction(Aiimage $aiimage): void
     {
         $file = $aiimage->getFile();
         $imagesnumber = $aiimage->getImagesnumber();
-        $imagesnumber = intval($imagesnumber);
+        $imagesnumber = (int)$imagesnumber;
         $resolution = $aiimage->getResolution();
 
         //We pass the temp path of the file to create a variation
         if ($file['tmp_name']) {
             $filePath = $file['tmp_name'];
             $fileName = $file['name'];
-            $fileName = str_replace('.png','',$fileName);
+            $fileName = str_replace('.png', '', $fileName);
 
-            $imageVariationUrlArray = $this->variationImage($filePath,$imagesnumber,$resolution);
+            $imageVariationUrlArray = $this->variationImage($filePath, $imagesnumber, $resolution);
 
             $this->view->assignMultiple([
                 'variationImageLinksFluid' => $imageVariationUrlArray,
@@ -111,7 +106,6 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
 
     /**
      * @param array $result_aiimage
-     * @return void
      * @throws Exception
      */
     public function saveAction(array $result_aiimage): Response
@@ -125,7 +119,7 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
         //Save the file in fileadmin
         $fileUrl = $result_aiimage['fileurl'];
         $filename = $result_aiimage['filename'];
-        $filename = $filename.'-'. uniqid() .'.png';
+        $filename = $filename . '-' . uniqid() . '.png';
 
         // download generated file to temporary file
         $fileContent = GeneralUtility::getUrl($fileUrl);
@@ -163,7 +157,7 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
         return GeneralUtility::makeInstance(ForwardResponse::class, 'show');
     }
 
-    private function generateImage($text,$imagesnumber,$resolution): array
+    private function generateImage($text, $imagesnumber, $resolution): array
     {
         $client = $this->getOpenAIClient();
 
@@ -186,7 +180,7 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
 
             for ($i = 0; $i < count($imageUrlArray['data']); $i++) {
                 $imageUrl = $imageUrlArray['data'][$i]['url'];
-                array_push($returnUrlArray,$imageUrl);
+                array_push($returnUrlArray, $imageUrl);
             }
 
         } catch (\Exception $e) {
@@ -203,7 +197,7 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
         return $returnUrlArray;
     }
 
-    private function variationImage($image,$imagesnumber,$resolution): array
+    private function variationImage($image, $imagesnumber, $resolution): array
     {
         $client = $this->getOpenAIClient();
         $returnUrlArray = [];
@@ -225,7 +219,7 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
 
             for ($i = 0; $i < count($imageUrlArray['data']); $i++) {
                 $imageUrl = $imageUrlArray['data'][$i]['url'];
-                array_push($returnUrlArray,$imageUrl);
+                array_push($returnUrlArray, $imageUrl);
             }
         } catch (\Exception $e) {
             $exceptionMsg = $e->getMessage();

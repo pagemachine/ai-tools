@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Pagemachine\AItools\Service\ImageRecognition;
 
@@ -25,7 +25,7 @@ class CustomImageRecognitionService
         $username = $this->settingsService->getSetting('custom_api_username');
         $password = $this->settingsService->getSetting('custom_api_password');
         if (!empty($username) && !empty($password)) {
-            $this->basicAuth = base64_encode($username.':'.$password);
+            $this->basicAuth = base64_encode($username . ':' . $password);
         }
     }
 
@@ -47,16 +47,16 @@ class CustomImageRecognitionService
                 'name'     => 'image_file',
                 'contents' => fopen($filePath, 'r'),
                 'filename' => $fileName,
-                'headers'  => ['Content-Type' => $fileType]
-            ]
+                'headers'  => ['Content-Type' => $fileType],
+            ],
         ];
 
         $response = $this->requestFactory->request($url, 'POST', [
             'headers' => [
                 'X-Auth-Token' => $this->authToken,
-                'Authorization' => "Basic ".$this->basicAuth
+                'Authorization' => 'Basic ' . $this->basicAuth,
             ],
-            'multipart' => $multipartBody
+            'multipart' => $multipartBody,
         ]);
 
         if ($response->getStatusCode() === 200) {

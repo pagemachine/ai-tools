@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Pagemachine\AItools\Service;
 
@@ -13,7 +13,8 @@ class SettingsService
 
     private string $namespace = 'ai_tools';
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->registry = GeneralUtility::makeInstance(Registry::class);
     }
 
@@ -23,7 +24,8 @@ class SettingsService
      * @param string $key
      * @return mixed|null
      */
-    public function getSetting(string $key): mixed {
+    public function getSetting(string $key): mixed
+    {
         return $this->registry->get($this->namespace, $key);
     }
 
@@ -33,7 +35,8 @@ class SettingsService
      * @param string $key
      * @param mixed $value
      */
-    public function setSetting(string $key, mixed $value): void {
+    public function setSetting(string $key, mixed $value): void
+    {
         $this->registry->set($this->namespace, $key, $value);
     }
 

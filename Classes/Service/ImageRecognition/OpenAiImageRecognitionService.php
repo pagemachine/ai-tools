@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Pagemachine\AItools\Service\ImageRecognition;
 
@@ -38,37 +38,37 @@ class OpenAiImageRecognitionService
         $fileContentBase64 = base64_encode($fileObject->getContents());
 
         $payload = [
-            "model" => "gpt-4-vision-preview",
-            "messages" => [
+            'model' => 'gpt-4-vision-preview',
+            'messages' => [
                 [
-                    "role" => "user",
-                    "content" => [
+                    'role' => 'user',
+                    'content' => [
                         [
-                            "type" => "text",
-                            "text" => $textPrompt
+                            'type' => 'text',
+                            'text' => $textPrompt,
                         ],
                         [
-                            "type" => "image_url",
-                            "image_url" => [
-                                "url" => "data:".$fileType.";base64," . $fileContentBase64
-                            ]
-                        ]
-                    ]
-                ]
+                            'type' => 'image_url',
+                            'image_url' => [
+                                'url' => 'data:' . $fileType . ';base64,' . $fileContentBase64,
+                            ],
+                        ],
+                    ],
+                ],
             ],
-            "max_tokens" => 300
+            'max_tokens' => 300,
         ];
 
         $jsonPayload = json_encode($payload);
 
         $headers = [
             'Authorization' => 'Bearer ' . $this->apikey,
-            'Content-Type' => 'application/json'
+            'Content-Type' => 'application/json',
         ];
 
         $response = $this->requestFactory->request($this->apiUri, 'POST', [
             'headers' => $headers,
-            'body' => $jsonPayload
+            'body' => $jsonPayload,
         ]);
 
         if ($response->getStatusCode() === 200) {

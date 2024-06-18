@@ -28,15 +28,14 @@ class AiToolItemProvider extends AbstractProvider
             'type' => 'item',
             'label' => 'Generate A.I. Metadata', // you can use "LLL:" syntax here
             'iconIdentifier' => 'actions-document-info',
-            'callbackAction' => 'generateAIMetadata' //name of the function in the JS file
-        ]
+            'callbackAction' => 'generateAIMetadata', //name of the function in the JS file
+        ],
     ];
 
     public function __construct()
     {
         parent::__construct();
     }
-
 
     /**
      * @return bool
@@ -125,7 +124,7 @@ class AiToolItemProvider extends AbstractProvider
             $position = array_search('info', array_keys($items), true);
 
             //slices array into two parts
-            $beginning = array_slice($items, 0, $position+1, true);
+            $beginning = array_slice($items, 0, $position + 1, true);
             $end = array_slice($items, $position, null, true);
 
             // adds custom item in the correct position

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Pagemachine\AItools\Service\Translation;
 
@@ -223,11 +223,12 @@ class CustomTranslationService
         $username = $this->settingsService->getSetting('custom_api_username');
         $password = $this->settingsService->getSetting('custom_api_password');
         if (!empty($username) && !empty($password)) {
-            $this->basicAuth = base64_encode($username.':'.$password);
+            $this->basicAuth = base64_encode($username . ':' . $password);
         }
     }
 
-    private function getLanguageScript($code) {
+    private function getLanguageScript($code)
+    {
         return $this->languages[$code] ?? null;
     }
 
@@ -242,16 +243,16 @@ class CustomTranslationService
 
         // Prepare the form data
         $formData = http_build_query([
-            'text' => $text
+            'text' => $text,
         ]);
 
         $response = $this->requestFactory->request($url, 'POST', [
             'headers' => [
                 'X-Auth-Token' => $this->authToken,
-                'Authorization' => "Basic ".$this->basicAuth,
-                'Content-Type' => 'application/x-www-form-urlencoded'
+                'Authorization' => 'Basic ' . $this->basicAuth,
+                'Content-Type' => 'application/x-www-form-urlencoded',
             ],
-            'body' => $formData
+            'body' => $formData,
         ]);
 
         if ($response->getStatusCode() === 200) {

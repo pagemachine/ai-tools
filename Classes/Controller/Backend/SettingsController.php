@@ -1,12 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Pagemachine\AItools\Controller\Backend;
 
 use Pagemachine\AItools\Domain\Model\Prompt;
-use Pagemachine\AItools\Service\SettingsService;
 use Pagemachine\AItools\Domain\Repository\PromptRepository;
+use Pagemachine\AItools\Service\SettingsService;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
@@ -38,13 +38,11 @@ class SettingsController extends ActionController
     ];
 
     public function __construct(
-        private readonly SettingsService             $settingsService,
-        private readonly PromptRepository            $promptRepository,
+        private readonly SettingsService $settingsService,
+        private readonly PromptRepository $promptRepository,
         private readonly PersistenceManagerInterface $persistenceManager,
-        private readonly ModuleTemplateFactory       $moduleTemplateFactory
-    )
-    {
-    }
+        private readonly ModuleTemplateFactory $moduleTemplateFactory
+    ) {}
 
     /**
      * Check if the current user has the permission to manage prompts

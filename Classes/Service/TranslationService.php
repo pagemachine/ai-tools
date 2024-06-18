@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Pagemachine\AItools\Service;
 
@@ -14,7 +14,8 @@ class TranslationService
     private ?CustomTranslationService $customTranslationService;
     private ?DeepLTranslationService $deeplTranslationService;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
 
         $this->customTranslationService = GeneralUtility::makeInstance(CustomTranslationService::class);
