@@ -79,6 +79,9 @@ class ImageMetaDataService
     {
         if (!empty($target)) {
             $fileObject = $this->resourceFactory->retrieveFileOrFolderObject($target);
+            if (empty($fileObject)) {
+                return false;
+            }
         } else {
             return false;
         }

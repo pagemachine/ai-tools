@@ -121,7 +121,7 @@
                         <div class="form-group">
                             <h3>Default Prompt</h3>
                             <label for="defaultPrompt">Default Prompt:</label>
-                            <f:form.select name="defaultPrompt" id="defaultPrompt" value="{defaultPrompt}" class="form-control" options="{prompts}" optionValueField="uid" optionLabelField="description">
+                            <f:form.select name="defaultPrompt" id="defaultPrompt" value="{defaultPrompt}" class="form-control" options="{prompts}" optionValueField="uid" optionLabelField="descriptionPrompt">
                                 <f:if condition="!{defaultPrompt}">
                                     <f:form.select.option value="">Select Prompt</f:form.select.option>
                                 </f:if>

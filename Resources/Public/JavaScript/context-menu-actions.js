@@ -1,6 +1,8 @@
 /**
  * Module: TYPO3/CMS/AiTools/ContextMenuActions
  *
+ * Used in TYPO3 >= v12
+ *
  */
 class ContextMenuActions {
 

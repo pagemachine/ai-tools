@@ -48,6 +48,11 @@ class Prompt extends AbstractEntity
         $this->description = $description;
     }
 
+    public function getDescriptionPrompt(): string
+    {
+        return $this->description. ' (' . $this->prompt . ')';
+    }
+
     public function getType(): string
     {
         return $this->type;

@@ -10,6 +10,7 @@ use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 class AiToolItemProvider extends AbstractProvider
 {
@@ -84,9 +85,19 @@ class AiToolItemProvider extends AbstractProvider
      */
     protected function getAdditionalAttributes(string $itemName): array
     {
+        // TYPO3 version check
+        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
+
         $attributes = [
             'data-callback-module' => '@pagemachine/aitools/context-menu-actions',
         ];
+        if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0', '<')) {
+            // for TYPO3 v11
+            $attributes = [
+                'data-callback-module' => 'TYPO3/CMS/AiTools/ContextMenuActions',
+            ];
+        }
+
         if ($itemName === 'generateAIMetadata') {
             $attributes += [
                 'data-identifier' => htmlspecialchars($this->identifier),
