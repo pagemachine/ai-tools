@@ -11,20 +11,17 @@ use Pagemachine\AItools\Service\TranslationService;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use TYPO3\CMS\Core\Core\Environment;
-use TYPO3\CMS\Core\Messaging\FlashMessage;
-use TYPO3\CMS\Core\Messaging\FlashMessageService;
+use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\FolderInterface;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
-use TYPO3\CMS\Core\Site\Entity\NullSite;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
-use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
+use TYPO3\CMS\Extbase\Mvc\Request;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 use TYPO3\CMS\Fluid\View\TemplatePaths;
 
@@ -32,7 +29,6 @@ class ImageRecognizeController extends ActionController
 {
     protected ?ImageMetaDataService $imageMetaDataService;
     protected ?TranslationService $translationService;
-    protected ResourceFactory $resourceFactory;
     protected SiteFinder $siteFinder;
     protected SettingsService $settingsService;
     protected PromptRepository $promptRepository;
@@ -48,14 +44,16 @@ class ImageRecognizeController extends ActionController
     protected $layoutRootPath = 'EXT:ai_tools/Resources/Private/Layouts/';
 
 
-    public function __construct(ResourceFactory $resourceFactory) {
+    public function __construct(
+        private readonly ResourceFactory $resourceFactory,
+        private readonly ModuleTemplateFactory $moduleTemplateFactory
+    ) {
         $this->imageMetaDataService = GeneralUtility::makeInstance(ImageMetaDataService::class);
         $this->translationService = GeneralUtility::makeInstance(TranslationService::class);
         $this->responseFactory = GeneralUtility::makeInstance(ResponseFactoryInterface::class);
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
         $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
-        $this->promptRepository = GeneralUtility::makeInstance(PromptRepository::class);;
-        $this->resourceFactory = $resourceFactory;
+        $this->promptRepository = GeneralUtility::makeInstance(PromptRepository::class);
     }
 
     /**
@@ -64,10 +62,18 @@ class ImageRecognizeController extends ActionController
      * @param string $templateName
      * @return StandaloneView
      */
-    protected function getView(string $templateName = 'Default'): StandaloneView
+    protected function getView(string $templateName = 'Default', $request = null): StandaloneView
     {
         $templatePaths = new TemplatePaths($this->templateRootPath);
         $view = GeneralUtility::makeInstance(StandaloneView::class);
+        if ($request !== null) {
+            // needed in TYPO3 v12 see https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Breaking-98377-FluidStandaloneViewDoesNotCreateAnExtbaseRequestAnymore.html
+            $attribute = new ExtbaseRequestParameters(ImageRecognizeController::class);
+            $request = $request->withAttribute('extbase', $attribute);
+            $extbaseRequest = GeneralUtility::makeInstance(Request::class, $request);
+            $view->setRequest($extbaseRequest);
+        }
+
         $view->getRenderingContext()->setTemplatePaths($templatePaths);
         $view->setTemplate($templateName);
         $view->setFormat('html');
@@ -146,7 +152,7 @@ class ImageRecognizeController extends ActionController
 
         // get default language
         $defaultLanguage = $this->getLanguageById(0);
-        $defaultTwoLetterIsoCode = $defaultLanguage->getTwoLetterIsoCode();
+        $defaultTwoLetterIsoCode = $defaultLanguage->getLocale()->getLanguageCode();
 
         // Setting target, which must be a file reference to a file within the mounts.
         $action = $parsedBody['action'] ?? $queryParams['action'] ?? '';
@@ -159,7 +165,7 @@ class ImageRecognizeController extends ActionController
                 if ($doTranslate) {
                     // fetch all site languages and translate the altText
                     foreach ($siteLanguages as $siteLanguage) {
-                        $altTextTranslated = $this->translationService->translateText($altText, $defaultTwoLetterIsoCode, $siteLanguage->getTwoLetterIsoCode());
+                        $altTextTranslated = $this->translationService->translateText($altText, $defaultTwoLetterIsoCode, $siteLanguage->getLocale()->getLanguageCode());
                         $this->imageMetaDataService->saveMetaData($parsedBody['target'], $altTextTranslated, $siteLanguage->getLanguageId());
                     }
                 }
@@ -180,8 +186,9 @@ class ImageRecognizeController extends ActionController
                     ->withBody($this->streamFactory->createStream(json_encode($data)));
 
             default:
+                $moduleTemplate = $this->moduleTemplateFactory->create($request);
                 // create custom fluid template html view
-                $view = $this->getView('AjaxMetaGenerate');
+                $view = $this->getView('AjaxMetaGenerate', $request);
 
                 $view->assign('siteLanguages', $siteLanguages ?? null);
                 $view->assign('action', $action);
@@ -196,9 +203,12 @@ class ImageRecognizeController extends ActionController
                     $allPrompts
                 );
 
+
+                $moduleTemplate->setContent($view->render());
+
                 return $this->responseFactory->createResponse()
                     ->withHeader('Content-Type', 'text/html; charset=utf-8')
-                    ->withBody($this->streamFactory->createStream((string)$view->render()));
+                    ->withBody($this->streamFactory->createStream($moduleTemplate->renderContent()));
         }
     }
 }

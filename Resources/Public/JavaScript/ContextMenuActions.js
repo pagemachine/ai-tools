@@ -1,6 +1,8 @@
 /**
  * Module: TYPO3/CMS/AiTools/ContextMenuActions
  *
+ * Used in TYPO3 <= v11
+ *
  * @exports TYPO3/CMS/AiTools/ContextMenuActions
  */
 define(function () {
@@ -19,8 +21,6 @@ define(function () {
 
   /**
    * Generate AI Metadata for the given file.
-   * @TODO Update for TYPO3 v12 (https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Deprecation-98168-BindingContextMenuItemToThis.html)
-   *
    * @param {string} table
    * @param {int} uid of the page
    */

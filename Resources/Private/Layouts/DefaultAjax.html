@@ -1,8 +1,6 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
       xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers" data-namespace-typo3-fluid="true">
 
-<be:moduleLayout>
-
     <f:be.pageRenderer
         pageTitle="AI Tools"
         includeRequireJsModules="{0: 'TYPO3/CMS/Backend/Modal', 1: 'TYPO3/CMS/Backend/Severity'}"
@@ -10,14 +8,12 @@
     />
 
     <f:asset.script identifier="ajaxUrl_ai-tools" priority="1">
-        var ajaxUrl = "<f:uri.action></f:uri.action>";
+        var ajaxUrl = "<f:be.uri route="ajax_aitools_ai_tools_images"></f:be.uri>";
     </f:asset.script>
 
     <div id="aiimage-backend">
-        <f:flashMessages />
+        <f:flashMessages queueIdentifier="aitoolsBackend" />
         <f:render section="Content"/>
     </div>
-
-</be:moduleLayout>
 
 </html>

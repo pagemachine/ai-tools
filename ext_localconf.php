@@ -2,8 +2,14 @@
 
 declare(strict_types=1);
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
+
 defined('TYPO3') or die();
 
-$GLOBALS['TYPO3_CONF_VARS']['BE']['ContextMenu']['ItemProviders'][1693997897] = \Pagemachine\AItools\Controller\ContextMenu\AiToolItemProvider::class;
+$version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
 
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/backend.php']['constructPostProcess'][] = \Pagemachine\AItools\Hooks\BackendControllerHook::class . '->addJavaScript';
+if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0', '<')) {
+    // for TYPO3 v11
+    $GLOBALS['TYPO3_CONF_VARS']['BE']['ContextMenu']['ItemProviders'][1693997897] = \Pagemachine\AItools\ContextMenu\AiToolItemProvider::class;
+}
