@@ -16,6 +16,8 @@ class CustomImageRecognitionService
     protected string $basicAuth = '';
     protected $settingsService;
 
+    static private string $cleanUpRegex = '/^The image (shows|displays|depicts|showcases|features)/';
+
     public function __construct()
     {
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
@@ -60,7 +62,13 @@ class CustomImageRecognitionService
         ]);
 
         if ($response->getStatusCode() === 200) {
-            return $response->getBody()->getContents();
+            $text = $response->getBody()->getContents();
+
+            // cleanup text from "The image depicts" introduction text.
+            $text = preg_replace(self::$cleanUpRegex, '', $text);
+            $text = trim($text);
+            $text[0] = strtoupper($text[0]);
+            return $text;
         }
 
         throw new \Exception('API request failed');
