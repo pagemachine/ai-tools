@@ -40,6 +40,7 @@
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^1.11",
         "saschaegerer/phpstan-typo3": "^1.10",
+        "sclable/xml-lint": "^0.7.0",
         "slevomat/coding-standard": "^8.15",
         "squizlabs/php_codesniffer": "^3.10"
     },
@@ -85,11 +86,13 @@
             "@composer:lint",
             "@php:syntax:lint",
             "@php:style:lint",
-            "@php:static:lint"
+            "@php:static:lint",
+            "@xml:lint"
         ],
         "php:static:lint": "phpstan analyse --ansi --no-progress --configuration=phpstan.neon",
         "php:style:fix": "phpcbf",
         "php:style:lint": "phpcs",
-        "php:syntax:lint": "parallel-lint --show-deprecated --exclude bin --exclude vendor --exclude web ."
+        "php:syntax:lint": "parallel-lint --show-deprecated --exclude bin --exclude vendor --exclude web .",
+        "xml:lint": "xmllint --pattern '*.xlf,*.svg' Resources --ansi"
     }
 }
