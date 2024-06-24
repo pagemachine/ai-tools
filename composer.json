@@ -39,5 +39,17 @@
         "typo3/cms": {
             "extension-key": "ai_tools"
         }
+    },
+    "scripts": {
+        "build": [
+            "@composer require --no-progress --ansi --update-with-dependencies typo3/cms-core $TYPO3_VERSION"
+        ]
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "typo3/cms-composer-installers": true,
+            "typo3/class-alias-loader": true
+        }
     }
 }
