@@ -42,14 +42,26 @@
     },
     "scripts": {
         "build": [
-            "@composer require --no-progress --ansi --update-with-dependencies typo3/cms-core $TYPO3_VERSION"
+            "@composer require --no-progress --ansi --update-with-dependencies typo3/cms-core $TYPO3_VERSION",
+            "@lint"
+        ],
+        "lint": [
+            "@composer:lint"
+        ],
+        "composer:lint": [
+            "@composer validate --ansi",
+            "@composer normalize --no-update-lock --dry-run"
         ]
     },
     "config": {
         "allow-plugins": {
             "php-http/discovery": true,
             "typo3/cms-composer-installers": true,
-            "typo3/class-alias-loader": true
+            "typo3/class-alias-loader": true,
+            "ergebnis/composer-normalize": true
         }
+    },
+    "require-dev": {
+        "ergebnis/composer-normalize": "^2.43"
     }
 }
