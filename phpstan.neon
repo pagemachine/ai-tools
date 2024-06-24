@@ -10,5 +10,7 @@ parameters:
   ignoreErrors:
     - message: '#Variable \$_EXTKEY might not be defined.#'
       path: ext_emconf.php
+    - message: '#T3G\\AgencyPack\\FileVariants\\Service\\ResourcesService#'
+      path: Classes/Service/ImageMetaDataService.php
 
   reportUnmatchedIgnoredErrors: false
