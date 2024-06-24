@@ -26,6 +26,7 @@
         }
     ],
     "require": {
+        "php": "^8.1",
         "aws/aws-sdk-php": "^3.0",
         "openai-php/client": "^0.6.0",
         "typo3/cms-backend": "^11.5 || ^12.4",
@@ -39,10 +40,12 @@
         "php-parallel-lint/php-parallel-lint": "^1.4",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^1.11",
+        "rector/rector": "^1.1",
         "saschaegerer/phpstan-typo3": "^1.10",
         "sclable/xml-lint": "^0.7.0",
         "slevomat/coding-standard": "^8.15",
-        "squizlabs/php_codesniffer": "^3.10"
+        "squizlabs/php_codesniffer": "^3.10",
+        "ssch/typo3-rector": "^2.6"
     },
     "autoload": {
         "psr-4": {
@@ -80,15 +83,19 @@
         ],
         "fix": [
             "@composer normalize",
-            "@php:style:fix"
+            "@php:style:fix",
+            "@php:rector:fix"
         ],
         "lint": [
             "@composer:lint",
             "@php:syntax:lint",
             "@php:style:lint",
             "@php:static:lint",
-            "@xml:lint"
+            "@xml:lint",
+            "@php:rector:lint"
         ],
+        "php:rector:fix": "rector",
+        "php:rector:lint": "rector --dry-run --no-progress-bar",
         "php:static:lint": "phpstan analyse --ansi --no-progress --configuration=phpstan.neon",
         "php:style:fix": "phpcbf",
         "php:style:lint": "phpcs",
