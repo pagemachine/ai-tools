@@ -31,7 +31,9 @@
         "typo3/cms-core": "^11.0 || ^12.0"
     },
     "require-dev": {
-        "ergebnis/composer-normalize": "^2.43"
+        "ergebnis/composer-normalize": "^2.43",
+        "php-parallel-lint/php-console-highlighter": "^1.0",
+        "php-parallel-lint/php-parallel-lint": "^1.4"
     },
     "autoload": {
         "psr-4": {
@@ -61,7 +63,9 @@
             "@composer normalize --no-update-lock --dry-run"
         ],
         "lint": [
-            "@composer:lint"
-        ]
+            "@composer:lint",
+            "@php:syntax:lint"
+        ],
+        "php:syntax:lint": "parallel-lint --show-deprecated --exclude bin --exclude vendor --exclude web ."
     }
 }
