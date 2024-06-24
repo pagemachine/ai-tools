@@ -1,9 +1,9 @@
 {
     "name": "pagemachine/ai-tools",
     "description": "Use A.I. Tools in the TYPO3 backend",
+    "license": "proprietary",
     "type": "typo3-cms-extension",
     "version": "dev-0.0.5",
-    "license": "proprietary",
     "keywords": [
         "typo3",
         "extension",
@@ -26,13 +26,24 @@
         }
     ],
     "require": {
-        "typo3/cms-core": "^11.0 || ^12.0",
+        "aws/aws-sdk-php": "^3.0",
         "openai-php/client": "^0.6.0",
-        "aws/aws-sdk-php": "^3.0"
+        "typo3/cms-core": "^11.0 || ^12.0"
+    },
+    "require-dev": {
+        "ergebnis/composer-normalize": "^2.43"
     },
     "autoload": {
         "psr-4": {
             "Pagemachine\\AItools\\": "Classes"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true,
+            "php-http/discovery": true,
+            "typo3/class-alias-loader": true,
+            "typo3/cms-composer-installers": true
         }
     },
     "extra": {
@@ -45,23 +56,12 @@
             "@composer require --no-progress --ansi --update-with-dependencies typo3/cms-core $TYPO3_VERSION",
             "@lint"
         ],
-        "lint": [
-            "@composer:lint"
-        ],
         "composer:lint": [
             "@composer validate --ansi",
             "@composer normalize --no-update-lock --dry-run"
+        ],
+        "lint": [
+            "@composer:lint"
         ]
-    },
-    "config": {
-        "allow-plugins": {
-            "php-http/discovery": true,
-            "typo3/cms-composer-installers": true,
-            "typo3/class-alias-loader": true,
-            "ergebnis/composer-normalize": true
-        }
-    },
-    "require-dev": {
-        "ergebnis/composer-normalize": "^2.43"
     }
 }
