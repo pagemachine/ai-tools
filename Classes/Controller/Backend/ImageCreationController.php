@@ -10,10 +10,10 @@ use Pagemachine\AItools\Domain\Model\Aiimage;
 use Pagemachine\AItools\Service\SettingsService;
 use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Http\Response;
+use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\StorageRepository;
-use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Http\ForwardResponse;
 
@@ -142,7 +142,7 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
             $this->addFlashMessage(
                 'The image has been saved in ' . $saveTarget,
                 'Image saved',
-                ContextualFeedbackSeverity::INFO,
+                FlashMessage::INFO,
                 true
             );
             /** @phpstan-ignore-next-line Else branch is unreachable because previous condition is always true. */
@@ -150,7 +150,7 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
             $this->addFlashMessage(
                 'The image could not be saved',
                 'Image not saved',
-                ContextualFeedbackSeverity::ERROR,
+                FlashMessage::ERROR,
                 true
             );
         }
@@ -185,7 +185,7 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
             $this->addFlashMessage(
                 $exceptionMsg,
                 'Warning',
-                ContextualFeedbackSeverity::WARNING,
+                FlashMessage::WARNING,
                 true
             );
         }
@@ -218,7 +218,7 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
             $this->addFlashMessage(
                 $exceptionMsg,
                 'Warning',
-                ContextualFeedbackSeverity::WARNING,
+                FlashMessage::WARNING,
                 true
             );
         }
