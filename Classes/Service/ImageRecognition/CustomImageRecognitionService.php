@@ -16,7 +16,7 @@ class CustomImageRecognitionService
     protected string $basicAuth = '';
     protected $settingsService;
 
-    static private string $cleanUpRegex = '/^The image (shows|displays|depicts|showcases|features)/';
+    private static string $cleanUpRegex = '/^The image (shows|displays|depicts|showcases|features)/';
 
     public function __construct()
     {

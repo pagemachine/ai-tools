@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Controller\Backend;
 
-use OpenAI;
 use OpenAI\Client;
 use Pagemachine\AItools\Domain\Model\Aiimage;
 use Pagemachine\AItools\Service\SettingsService;
+use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
@@ -16,15 +16,12 @@ use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Http\ForwardResponse;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
-class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
+class ImageCreationController extends ActionController
 {
-    private ?SettingsService $settingsService;
-
-    public function __construct(
-        SettingsService $settingsService,
-    ) {
-        $this->settingsService = $settingsService;
+    public function __construct(private readonly ?SettingsService $settingsService)
+    {
     }
 
     private function getOpenAIClient(): Client
@@ -33,17 +30,18 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
         return \OpenAI::client($openaiKey);
     }
 
-    public function showAction(): void
+    public function showAction(): ResponseInterface
     {
         //This is the default action because is the first listed in packages/ai_image/ext_tables.php
         //show form to generate image packages/ai_image/Resources/Private/Templates/Backend/Show.html
         //echo "<h2>showAction - BackendController.php</h2>";
+        return $this->htmlResponse();
     }
 
     /**
      * @param Aiimage $aiimage
      */
-    public function generateAction(Aiimage $aiimage): void
+    public function generateAction(Aiimage $aiimage): ResponseInterface
     {
         //Do the openai request to generate image
         //echo "<h2>generateAction - BackendController.php</h2>";
@@ -77,12 +75,13 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
                 'imageDescription' => $altText,
             ]);
         }
+        return $this->htmlResponse();
     }
 
     /**
      * @param Aiimage $aiimage
      */
-    public function variateAction(Aiimage $aiimage): void
+    public function variateAction(Aiimage $aiimage): ResponseInterface
     {
         $file = $aiimage->getFile();
         $imagesnumber = $aiimage->getImagesnumber();
@@ -102,6 +101,7 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
                 'variationImageFileFluid' => $fileName,
             ]);
         }
+        return $this->htmlResponse();
     }
 
     /**
@@ -178,7 +178,6 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
                 $imageUrl = $imageUrlArray['data'][$i]['url'];
                 array_push($returnUrlArray, $imageUrl);
             }
-
         } catch (\Exception $e) {
             $exceptionMsg = $e->getMessage();
 
@@ -225,5 +224,4 @@ class ImageCreationController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCo
 
         return $returnUrlArray;
     }
-
 }

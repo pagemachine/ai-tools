@@ -8,6 +8,7 @@ use Doctrine\DBAL\Driver\Exception;
 use Pagemachine\AItools\Domain\Repository\MetaDataRepository;
 use Pagemachine\AItools\Service\ImageRecognition\CustomImageRecognitionService;
 use Pagemachine\AItools\Service\ImageRecognition\OpenAiImageRecognitionService;
+use T3G\AgencyPack\FileVariants\Service\ResourcesService;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -22,9 +23,9 @@ use TYPO3\CMS\Extbase\Persistence\PersistenceManagerInterface;
 class ImageMetaDataService
 {
     protected SettingsService $settingsService;
-    private ?CustomImageRecognitionService $customImageRecognitionService;
-    private ?OpenAiImageRecognitionService $openAiImageRecognitionService;
-    private MetaDataRepository $metaDataRepository;
+    private readonly ?CustomImageRecognitionService $customImageRecognitionService;
+    private readonly ?OpenAiImageRecognitionService $openAiImageRecognitionService;
+    private readonly MetaDataRepository $metaDataRepository;
     protected ResourceFactory $resourceFactory;
     protected PersistenceManagerInterface $persistenceManager;
 
@@ -92,7 +93,7 @@ class ImageMetaDataService
              */
             if (ExtensionManagementUtility::isLoaded('file_variants')) {
                 /** @var \T3G\AgencyPack\FileVariants\Service\ResourcesService $resourcesService */
-                $resourcesService = GeneralUtility::makeInstance(\T3G\AgencyPack\FileVariants\Service\ResourcesService::class);
+                $resourcesService = GeneralUtility::makeInstance(ResourcesService::class);
                 $fileMetadata = $fileObject->getMetaData()->get();
                 $fileMetadataUid = $fileMetadata['uid'] ?? null;
                 if (empty($fileMetadataUid)) {

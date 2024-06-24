@@ -73,7 +73,7 @@ class OpenAiImageRecognitionService
 
         if ($response->getStatusCode() === 200) {
             $responseBody = $response->getBody()->getContents();
-            $responseArray = json_decode($responseBody, true);
+            $responseArray = json_decode((string) $responseBody, true);
             return $responseArray['choices'][0]['message']['content'] ?? '';
         }
 

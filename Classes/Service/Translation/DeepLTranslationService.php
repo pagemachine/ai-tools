@@ -90,7 +90,7 @@ class DeepLTranslationService
         ]);
 
         if ($response->getStatusCode() === 200) {
-            $responseBody = json_decode($response->getBody()->getContents(), true);
+            $responseBody = json_decode((string) $response->getBody()->getContents(), true);
             return $responseBody['translations'][0]['text']; // Extracting the translated text
         }
 

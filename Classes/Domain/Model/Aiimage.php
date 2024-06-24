@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Domain\Model;
 
-class Aiimage extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
+use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+
+class Aiimage extends AbstractEntity
 {
     /**
      * @var string $description
@@ -87,5 +89,4 @@ class Aiimage extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     {
         $this->file = $file;
     }
-
 }

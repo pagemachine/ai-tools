@@ -130,7 +130,7 @@ class ImageRecognizeController extends ActionController
         foreach ($sites as $site) {
             try {
                 return $site->getLanguageById($languageId);
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 continue;
             }
         }

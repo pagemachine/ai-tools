@@ -11,8 +11,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class TranslationService
 {
     protected SettingsService $settingsService;
-    private ?CustomTranslationService $customTranslationService;
-    private ?DeepLTranslationService $deeplTranslationService;
+    private readonly ?CustomTranslationService $customTranslationService;
+    private readonly ?DeepLTranslationService $deeplTranslationService;
 
     public function __construct()
     {

@@ -48,7 +48,7 @@ class AiToolItemProvider extends AbstractProvider
         parent::initialize();
         try {
             $this->record = GeneralUtility::makeInstance(ResourceFactory::class)->retrieveFileOrFolderObject($this->identifier);
-        } catch (ResourceDoesNotExistException $e) {
+        } catch (ResourceDoesNotExistException) {
             $this->record = null;
         }
     }

@@ -239,7 +239,7 @@ class CustomTranslationService
 
         $url = $this->settingsService->getSetting('custom_translation_api_uri');
 
-        $url .= '?source_lang=' . urlencode($sourceLang) . '&target_lang=' . urlencode($targetLang);
+        $url .= '?source_lang=' . urlencode((string) $sourceLang) . '&target_lang=' . urlencode((string) $targetLang);
 
         // Prepare the form data
         $formData = http_build_query([
