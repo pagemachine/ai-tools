@@ -12,6 +12,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
+use TYPO3\CMS\Core\Localization\Locale;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\FolderInterface;
@@ -156,7 +157,7 @@ class ImageRecognizeController extends ActionController
 
         // get default language
         $defaultLanguage = $this->getLanguageById(0);
-        $defaultTwoLetterIsoCode = $defaultLanguage->getLocale()->getLanguageCode();
+        $defaultTwoLetterIsoCode = $this->getLocale($defaultLanguage)->getLanguageCode();
 
         // Setting target, which must be a file reference to a file within the mounts.
         $action = $parsedBody['action'] ?? $queryParams['action'] ?? '';
@@ -169,7 +170,7 @@ class ImageRecognizeController extends ActionController
                 if ($doTranslate) {
                     // fetch all site languages and translate the altText
                     foreach ($siteLanguages as $siteLanguage) {
-                        $altTextTranslated = $this->translationService->translateText($altText, $defaultTwoLetterIsoCode, $siteLanguage->getLocale()->getLanguageCode());
+                        $altTextTranslated = $this->translationService->translateText($altText, $defaultTwoLetterIsoCode, $this->getLocale($siteLanguage)->getLanguageCode());
                         $this->imageMetaDataService->saveMetaData($parsedBody['target'], $altTextTranslated, $siteLanguage->getLanguageId());
                     }
                 }
@@ -213,5 +214,14 @@ class ImageRecognizeController extends ActionController
                     ->withHeader('Content-Type', 'text/html; charset=utf-8')
                     ->withBody($this->streamFactory->createStream($moduleTemplate->renderContent()));
         }
+    }
+
+    public function getLocale(SiteLanguage $siteLanguage): Locale
+    {
+        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
+        if (version_compare($version, '12.0', '>=')) {
+            return $siteLanguage()->getLocale();
+        }
+        return new Locale($siteLanguage()->getLocale());
     }
 }
