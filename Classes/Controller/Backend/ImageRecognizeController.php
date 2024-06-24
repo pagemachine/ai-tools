@@ -19,6 +19,7 @@ use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
 use TYPO3\CMS\Extbase\Mvc\Request;
@@ -65,7 +66,9 @@ class ImageRecognizeController extends ActionController
     {
         $templatePaths = new TemplatePaths($this->templateRootPath);
         $view = GeneralUtility::makeInstance(StandaloneView::class);
-        if ($request !== null) {
+
+        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
+        if ($request !== null && version_compare($version, '12.0', '>=')) {
             // needed in TYPO3 v12 see https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Breaking-98377-FluidStandaloneViewDoesNotCreateAnExtbaseRequestAnymore.html
             $attribute = new ExtbaseRequestParameters(ImageRecognizeController::class);
             $request = $request->withAttribute('extbase', $attribute);

@@ -12,5 +12,8 @@ parameters:
       path: ext_emconf.php
     - message: '#T3G\\AgencyPack\\FileVariants\\Service\\ResourcesService#'
       path: Classes/Service/ImageMetaDataService.php
+    - message: '#TYPO3\\CMS\\Fluid\\View\\StandaloneView::setRequest()#'
+      count: 1
+      path: Classes/Controller/Backend/ImageRecognizeController.php
 
   reportUnmatchedIgnoredErrors: false
