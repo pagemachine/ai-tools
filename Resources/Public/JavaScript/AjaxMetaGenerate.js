@@ -76,7 +76,7 @@ async function callAjaxMetaGenerateActionForAll(button, saveAndTranslate) {
         await new Promise((resolve, reject) => {
           genButton.addEventListener('ajaxComplete', resolve, {once: true});
           genButton.addEventListener('ajaxError', reject, {once: true});
-          callAjaxMetaGenerateAction(fileIdentifierField.value, altText, textPromptField, genButton)
+          callAjaxMetaGenerateAction(fileIdentifierField.value, altText, textPromptField, genButton, imageEntry)
         });
         await new Promise((resolve, reject) => {
           saveAndTranslateButton.addEventListener('ajaxComplete', resolve, {once: true});
@@ -88,7 +88,7 @@ async function callAjaxMetaGenerateActionForAll(button, saveAndTranslate) {
         await new Promise((resolve, reject) => {
           genButton.addEventListener('ajaxComplete', resolve, {once: true});
           genButton.addEventListener('ajaxError', reject, {once: true});
-          callAjaxMetaGenerateAction(fileIdentifierField.value, altTextSuggestion, textPromptField, genButton)
+          callAjaxMetaGenerateAction(fileIdentifierField.value, altTextSuggestion, textPromptField, genButton, imageEntry)
         });
       }
     } catch (error) {
@@ -102,13 +102,15 @@ async function callAjaxMetaGenerateActionForAll(button, saveAndTranslate) {
   button.disabled = false;
 }
 
-function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, button) {
+function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, button, blockElement) {
   var oldText = textarea.value;
   var textPrompt = textPromptField.value;
   var originalButtonText = button.textContent;
   button.textContent = 'Generating...';
   button.disabled = true;
   var savedSuccess = false;
+
+  let imageBlockDebugImageRecognizedText = blockElement.querySelector('.debugImageRecognizedText')
 
   top.TYPO3.Notification.info('Generating Metadata', 'Generating Metadata...', 5);
 
@@ -121,6 +123,7 @@ function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, b
       var response = JSON.parse(this.responseText);
       if (response) {
         textarea.value = response.alternative;
+        imageBlockDebugImageRecognizedText.textContent = response.baseAlternative;
         textarea.dispatchEvent(new Event('input'));
         top.TYPO3.Notification.success('Generated Metadata', 'Generated Metadata successful', 5);
         savedSuccess = true;
@@ -143,9 +146,10 @@ function callAjaxMetaSaveAction(fileIdentifier, textarea, doTranslate, button) {
   var originalButtonText = button.textContent;
   button.textContent = 'Saving...';
   button.disabled = true;
+  let textareaValue = textarea.value
 
   var xhr = new XMLHttpRequest();
-  var params = 'action=saveMetaData&target=' + encodeURIComponent(fileIdentifier) + '&altText=' + encodeURIComponent(textarea.value) + '&translate=' + (doTranslate ? '1' : '0');
+  var params = 'action=saveMetaData&target=' + encodeURIComponent(fileIdentifier) + '&altText=' + encodeURIComponent(textareaValue) + '&translate=' + (doTranslate ? '1' : '0');
   xhr.open('POST', ajaxUrl, true);
   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   xhr.onreadystatechange = function() {
@@ -185,15 +189,30 @@ document.addEventListener('DOMContentLoaded', function() {
       saveBtn.disabled = false;
     });
     saveBtn.disabled = true;
+
+    let textPromptSelect = imageEntry.querySelector('.textPromptSelect');
+    let textPrompt = imageEntry.querySelector('.textPrompt');
+    textPromptSelect.addEventListener('input', function() {
+      textPrompt.value = textPromptSelect.value;
+    });
+
   });
 
   // set all alTexts fields to globalTextPrompt if globalTextPrompt was changed
   var globalTextPromptField = document.querySelector('.globalTextPrompt');
-  globalTextPromptField.addEventListener('input', function() {
-    var textPrompts = document.querySelectorAll('.textPrompt');
-    textPrompts.forEach((textPrompt) => {
-      textPrompt.value = globalTextPromptField.value;
-      textPrompt.dispatchEvent(new Event('input'));
+  // check if there is a globalTextPromptField
+  if (globalTextPromptField) {
+    globalTextPromptField.addEventListener('input', function () {
+      var textPrompts = document.querySelectorAll('.textPrompt');
+      textPrompts.forEach((textPrompt) => {
+        textPrompt.value = globalTextPromptField.value;
+        textPrompt.dispatchEvent(new Event('input'));
+      });
+      var textPromptSelects = document.querySelectorAll('.textPromptSelect');
+      textPromptSelects.forEach((textPromptSelect) => {
+        textPromptSelect.value = globalTextPromptField.value;
+        textPromptSelect.dispatchEvent(new Event('input'));
+      });
     });
-  });
+  }
 });

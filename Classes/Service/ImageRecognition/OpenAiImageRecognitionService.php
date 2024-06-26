@@ -9,7 +9,7 @@ use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class OpenAiImageRecognitionService
+class OpenAiImageRecognitionService implements ImageRecognitionServiceInterface
 {
     protected $requestFactory;
     protected string $apikey;
@@ -73,7 +73,7 @@ class OpenAiImageRecognitionService
 
         if ($response->getStatusCode() === 200) {
             $responseBody = $response->getBody()->getContents();
-            $responseArray = json_decode($responseBody, true);
+            $responseArray = json_decode((string) $responseBody, true);
             return $responseArray['choices'][0]['message']['content'] ?? '';
         }
 

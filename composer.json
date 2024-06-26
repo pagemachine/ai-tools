@@ -1,9 +1,9 @@
 {
     "name": "pagemachine/ai-tools",
     "description": "Use A.I. Tools in the TYPO3 backend",
+    "license": "proprietary",
     "type": "typo3-cms-extension",
     "version": "dev-0.0.5",
-    "license": "proprietary",
     "keywords": [
         "typo3",
         "extension",
@@ -26,18 +26,80 @@
         }
     ],
     "require": {
-        "typo3/cms-core": "^11.0 || ^12.0",
+        "php": "^8.1",
+        "aws/aws-sdk-php": "^3.0",
         "openai-php/client": "^0.6.0",
-        "aws/aws-sdk-php": "^3.0"
+        "typo3/cms-backend": "^11.5 || ^12.4",
+        "typo3/cms-core": "^11.5 || ^12.4",
+        "typo3/cms-fluid": "^11.5 || ^12.4"
+    },
+    "require-dev": {
+        "ergebnis/composer-normalize": "^2.43",
+        "jangregor/phpstan-prophecy": "^1.0",
+        "php-parallel-lint/php-console-highlighter": "^1.0",
+        "php-parallel-lint/php-parallel-lint": "^1.4",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^1.11",
+        "rector/rector": "^1.1",
+        "saschaegerer/phpstan-typo3": "^1.10",
+        "sclable/xml-lint": "^0.7.0",
+        "slevomat/coding-standard": "^8.15",
+        "squizlabs/php_codesniffer": "^3.10",
+        "ssch/typo3-rector": "^2.6"
     },
     "autoload": {
         "psr-4": {
             "Pagemachine\\AItools\\": "Classes"
         }
     },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "ergebnis/composer-normalize": true,
+            "php-http/discovery": true,
+            "phpstan/extension-installer": true,
+            "typo3/class-alias-loader": true,
+            "typo3/cms-composer-installers": true
+        },
+        "preferred-install": {
+            "typo3/cms-core": "source"
+        },
+        "sort-packages": true
+    },
     "extra": {
         "typo3/cms": {
+            "cms-package-dir": "{$vendor-dir}/typo3/cms",
             "extension-key": "ai_tools"
         }
+    },
+    "scripts": {
+        "build": [
+            "@composer require --no-progress --ansi --update-with-dependencies typo3/cms-core $TYPO3_VERSION",
+            "@lint"
+        ],
+        "composer:lint": [
+            "@composer validate --ansi",
+            "@composer normalize --no-update-lock --dry-run"
+        ],
+        "fix": [
+            "@composer normalize",
+            "@php:style:fix",
+            "@php:rector:fix"
+        ],
+        "lint": [
+            "@composer:lint",
+            "@php:syntax:lint",
+            "@php:style:lint",
+            "@php:static:lint",
+            "@xml:lint",
+            "@php:rector:lint"
+        ],
+        "php:rector:fix": "rector",
+        "php:rector:lint": "rector --dry-run --no-progress-bar",
+        "php:static:lint": "phpstan analyse --ansi --no-progress --configuration=phpstan.neon",
+        "php:style:fix": "phpcbf",
+        "php:style:lint": "phpcs",
+        "php:syntax:lint": "parallel-lint --show-deprecated --exclude bin --exclude vendor --exclude web .",
+        "xml:lint": "xmllint --pattern '*.xlf,*.svg' Resources --ansi"
     }
 }

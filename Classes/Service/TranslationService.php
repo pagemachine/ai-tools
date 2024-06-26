@@ -11,8 +11,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class TranslationService
 {
     protected SettingsService $settingsService;
-    private ?CustomTranslationService $customTranslationService;
-    private ?DeepLTranslationService $deeplTranslationService;
+    private readonly ?CustomTranslationService $customTranslationService;
+    private readonly ?DeepLTranslationService $deeplTranslationService;
 
     public function __construct()
     {
@@ -24,6 +24,9 @@ class TranslationService
 
     public function translateText(string $text, string $sourceLanguage = 'en', string $targetLanguage = 'en'): string
     {
+        if ($text == '') {
+            return '';
+        }
         $translationService = $this->settingsService->getSetting('translation_service');
         return match ($translationService) {
             'deepl' => $this->deeplTranslationService->sendTranslationRequestToApi(text: $text, sourceLang: $sourceLanguage, targetLang: $targetLanguage),

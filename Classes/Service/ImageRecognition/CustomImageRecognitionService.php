@@ -9,14 +9,14 @@ use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class CustomImageRecognitionService
+class CustomImageRecognitionService implements ImageRecognitionServiceInterface
 {
     protected $requestFactory;
     protected string $authToken = '';
     protected string $basicAuth = '';
     protected $settingsService;
 
-    static private string $cleanUpRegex = '/^The image (shows|displays|depicts|showcases|features)/';
+    private static string $cleanUpRegex = '/^The image (shows|displays|depicts|showcases|features)/';
 
     public function __construct()
     {

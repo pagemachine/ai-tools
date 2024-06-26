@@ -1,9 +1,10 @@
 <?php
 
 declare(strict_types=1);
-
+use Pagemachine\AItools\Controller\Backend\SettingsController;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
+use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
 
 defined('TYPO3') or die();
 
@@ -11,7 +12,7 @@ $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumeric
 if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0', '<')) {
     // for TYPO3 v11
 
-    \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
+    ExtensionUtility::registerModule(
         'AItools',
         'aitools',
         '',
@@ -24,13 +25,13 @@ if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0',
         ]
     );
 
-    \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
+    ExtensionUtility::registerModule(
         'AItools',
         'aitools',
         'settings',
         '',
         [
-            \Pagemachine\AItools\Controller\Backend\SettingsController::class => 'settings, save, addPrompt, saveDefaultPrompt',
+            SettingsController::class => 'settings, save, addPrompt, saveDefaultPrompt',
         ],
         [
             'access' => 'user, group',

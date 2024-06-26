@@ -9,7 +9,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class SettingsService
 {
-    private Registry $registry;
+    private readonly Registry $registry;
 
     private string $namespace = 'ai_tools';
 
@@ -33,11 +33,9 @@ class SettingsService
      * set setting
      *
      * @param string $key
-     * @param mixed $value
      */
     public function setSetting(string $key, mixed $value): void
     {
         $this->registry->set($this->namespace, $key, $value);
     }
-
 }

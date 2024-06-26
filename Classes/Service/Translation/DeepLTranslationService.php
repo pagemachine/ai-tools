@@ -8,7 +8,7 @@ use Pagemachine\AItools\Service\SettingsService;
 use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class DeepLTranslationService
+class DeepLTranslationService implements TranslationServiceInterface
 {
     protected $requestFactory;
     protected string $authKey;
@@ -60,7 +60,15 @@ class DeepLTranslationService
         $this->apiEndpointUri = $this->endpoints[(string)$this->settingsService->getSetting('deepl_endpoint')];
     }
 
-    private function getLanguageScript($code)
+    /**
+     * Retrieves the script code for a given language code.
+     * Used for mapping AI language codes to TYPO3 Language codes.
+     * Where the array key is the TYPO3 lang. code and the value the AI language code.
+     *
+     * @param string $code The language code.
+     * @return string|null The script code for the given language code, or null if the language code is not found.
+     */
+    private function getLanguageScript(string $code): ?string
     {
         return $this->languages[$code] ?? null;
     }
@@ -90,7 +98,7 @@ class DeepLTranslationService
         ]);
 
         if ($response->getStatusCode() === 200) {
-            $responseBody = json_decode($response->getBody()->getContents(), true);
+            $responseBody = json_decode((string) $response->getBody()->getContents(), true);
             return $responseBody['translations'][0]['text']; // Extracting the translated text
         }
 

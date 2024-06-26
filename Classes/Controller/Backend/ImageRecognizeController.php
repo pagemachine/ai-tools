@@ -19,6 +19,7 @@ use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
 use TYPO3\CMS\Extbase\Mvc\Request;
@@ -65,7 +66,9 @@ class ImageRecognizeController extends ActionController
     {
         $templatePaths = new TemplatePaths($this->templateRootPath);
         $view = GeneralUtility::makeInstance(StandaloneView::class);
-        if ($request !== null) {
+
+        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
+        if ($request !== null && version_compare($version, '12.0', '>=')) {
             // needed in TYPO3 v12 see https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Breaking-98377-FluidStandaloneViewDoesNotCreateAnExtbaseRequestAnymore.html
             $attribute = new ExtbaseRequestParameters(ImageRecognizeController::class);
             $request = $request->withAttribute('extbase', $attribute);
@@ -88,7 +91,7 @@ class ImageRecognizeController extends ActionController
      * @return FileInterface[]|null
      * @throws ResourceDoesNotExistException
      */
-    private function getFileObjectFromRequestTarget(ServerRequestInterface $request)
+    private function getFileObjectFromRequestTarget(ServerRequestInterface $request): ?array
     {
         $parsedBody = $request->getParsedBody();
         $queryParams = $request->getQueryParams();
@@ -126,7 +129,7 @@ class ImageRecognizeController extends ActionController
         foreach ($sites as $site) {
             try {
                 return $site->getLanguageById($languageId);
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 continue;
             }
         }
@@ -153,7 +156,7 @@ class ImageRecognizeController extends ActionController
 
         // get default language
         $defaultLanguage = $this->getLanguageById(0);
-        $defaultTwoLetterIsoCode = $defaultLanguage->getLocale()->getLanguageCode();
+        $defaultTwoLetterIsoCode = $this->getLocaleLanguageCode($defaultLanguage);
 
         // Setting target, which must be a file reference to a file within the mounts.
         $action = $parsedBody['action'] ?? $queryParams['action'] ?? '';
@@ -166,7 +169,7 @@ class ImageRecognizeController extends ActionController
                 if ($doTranslate) {
                     // fetch all site languages and translate the altText
                     foreach ($siteLanguages as $siteLanguage) {
-                        $altTextTranslated = $this->translationService->translateText($altText, $defaultTwoLetterIsoCode, $siteLanguage->getLocale()->getLanguageCode());
+                        $altTextTranslated = $this->translationService->translateText($altText, $defaultTwoLetterIsoCode, $this->getLocaleLanguageCode($siteLanguage));
                         $this->imageMetaDataService->saveMetaData($parsedBody['target'], $altTextTranslated, $siteLanguage->getLanguageId());
                     }
                 }
@@ -176,12 +179,12 @@ class ImageRecognizeController extends ActionController
                     ->withBody($this->streamFactory->createStream(json_encode($saved)));
             case 'generateMetaData':
                 $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt ? $defaultPrompt->getPrompt() : '');
-                $altText = $this->imageMetaDataService->generateImageDescription(
+                $altTextFromImage = $this->imageMetaDataService->generateImageDescription(
                     fileObject: $fileObjects[0],
                     textPrompt: $textPrompt,
                 );
-                $altText = $this->translationService->translateText($altText, 'en', $defaultTwoLetterIsoCode);
-                $data = ['alternative' => $altText];
+                $altText = $this->translationService->translateText($altTextFromImage, 'en', $defaultTwoLetterIsoCode);
+                $data = ['alternative' => $altText, 'baseAlternative' => $altTextFromImage];
                 return $this->responseFactory->createResponse()
                     ->withHeader('Content-Type', 'application/json')
                     ->withBody($this->streamFactory->createStream(json_encode($data)));
@@ -210,5 +213,15 @@ class ImageRecognizeController extends ActionController
                     ->withHeader('Content-Type', 'text/html; charset=utf-8')
                     ->withBody($this->streamFactory->createStream($moduleTemplate->renderContent()));
         }
+    }
+
+    public function getLocaleLanguageCode(SiteLanguage $siteLanguage): string
+    {
+        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
+        if (version_compare($version, '12.0', '>=')) {
+            // @phpstan-ignore-next-line Stop PHPStan about complaining this line for TYPO3 v11
+            return $siteLanguage->getLocale()->getLanguageCode();
+        }
+        return $siteLanguage->getTwoLetterIsoCode();
     }
 }
