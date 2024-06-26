@@ -9,7 +9,7 @@ use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class CustomImageRecognitionService
+class CustomImageRecognitionService implements ImageRecognitionServiceInterface
 {
     protected $requestFactory;
     protected string $authToken = '';

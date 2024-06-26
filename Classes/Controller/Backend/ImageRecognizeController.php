@@ -92,7 +92,7 @@ class ImageRecognizeController extends ActionController
      * @return FileInterface[]|null
      * @throws ResourceDoesNotExistException
      */
-    private function getFileObjectFromRequestTarget(ServerRequestInterface $request)
+    private function getFileObjectFromRequestTarget(ServerRequestInterface $request): ?array
     {
         $parsedBody = $request->getParsedBody();
         $queryParams = $request->getQueryParams();

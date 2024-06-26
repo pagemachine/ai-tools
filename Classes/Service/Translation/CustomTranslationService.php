@@ -8,7 +8,7 @@ use Pagemachine\AItools\Service\SettingsService;
 use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class CustomTranslationService
+class CustomTranslationService implements TranslationServiceInterface
 {
     protected $requestFactory;
     protected string $authToken = '';
@@ -227,7 +227,15 @@ class CustomTranslationService
         }
     }
 
-    private function getLanguageScript($code)
+    /**
+     * Retrieves the script code for a given language code.
+     * Used for mapping AI language codes to TYPO3 Language codes.
+     * Where the array key is the TYPO3 lang. code and the value the AI language code.
+     *
+     * @param string $code The language code.
+     * @return string|null The script code for the given language code, or null if the language code is not found.
+     */
+    private function getLanguageScript(string $code): ?string
     {
         return $this->languages[$code] ?? null;
     }
