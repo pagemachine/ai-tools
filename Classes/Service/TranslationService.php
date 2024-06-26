@@ -24,6 +24,9 @@ class TranslationService
 
     public function translateText(string $text, string $sourceLanguage = 'en', string $targetLanguage = 'en'): string
     {
+        if ($text == '') {
+            return '';
+        }
         $translationService = $this->settingsService->getSetting('translation_service');
         return match ($translationService) {
             'deepl' => $this->deeplTranslationService->sendTranslationRequestToApi(text: $text, sourceLang: $sourceLanguage, targetLang: $targetLanguage),
