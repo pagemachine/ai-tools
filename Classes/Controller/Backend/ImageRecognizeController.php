@@ -219,7 +219,10 @@ class ImageRecognizeController extends ActionController
     {
         $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
         if (version_compare($version, '12.0', '>=')) {
-            return $siteLanguage->getLocale()->getLanguageCode();
+            $locale = $siteLanguage->getLocale();
+            if (method_exists($locale, 'getLanguageCode')) { // satisfy PHPStan for TYPO3 v11
+                return $locale->getLanguageCode();
+            }
         }
         return $siteLanguage->getTwoLetterIsoCode();
     }
