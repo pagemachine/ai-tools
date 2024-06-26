@@ -157,7 +157,7 @@ class ImageRecognizeController extends ActionController
 
         // get default language
         $defaultLanguage = $this->getLanguageById(0);
-        $defaultTwoLetterIsoCode = $this->getLocale($defaultLanguage)->getLanguageCode();
+        $defaultTwoLetterIsoCode = $this->getLocaleLanguageCode($defaultLanguage);
 
         // Setting target, which must be a file reference to a file within the mounts.
         $action = $parsedBody['action'] ?? $queryParams['action'] ?? '';
@@ -170,7 +170,7 @@ class ImageRecognizeController extends ActionController
                 if ($doTranslate) {
                     // fetch all site languages and translate the altText
                     foreach ($siteLanguages as $siteLanguage) {
-                        $altTextTranslated = $this->translationService->translateText($altText, $defaultTwoLetterIsoCode, $this->getLocale($siteLanguage)->getLanguageCode());
+                        $altTextTranslated = $this->translationService->translateText($altText, $defaultTwoLetterIsoCode, $this->getLocaleLanguageCode($siteLanguage));
                         $this->imageMetaDataService->saveMetaData($parsedBody['target'], $altTextTranslated, $siteLanguage->getLanguageId());
                     }
                 }
@@ -216,12 +216,12 @@ class ImageRecognizeController extends ActionController
         }
     }
 
-    public function getLocale(SiteLanguage $siteLanguage): Locale
+    public function getLocaleLanguageCode(SiteLanguage $siteLanguage): string
     {
         $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
         if (version_compare($version, '12.0', '>=')) {
-            return $siteLanguage()->getLocale();
+            return $siteLanguage->getLocale()->getLanguageCode();
         }
-        return new Locale($siteLanguage()->getLocale());
+        return $siteLanguage->getTwoLetterIsoCode();
     }
 }
