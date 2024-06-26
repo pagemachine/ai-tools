@@ -180,12 +180,12 @@ class ImageRecognizeController extends ActionController
                     ->withBody($this->streamFactory->createStream(json_encode($saved)));
             case 'generateMetaData':
                 $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt ? $defaultPrompt->getPrompt() : '');
-                $altText = $this->imageMetaDataService->generateImageDescription(
+                $altTextFromImage = $this->imageMetaDataService->generateImageDescription(
                     fileObject: $fileObjects[0],
                     textPrompt: $textPrompt,
                 );
-                $altText = $this->translationService->translateText($altText, 'en', $defaultTwoLetterIsoCode);
-                $data = ['alternative' => $altText];
+                $altText = $this->translationService->translateText($altTextFromImage, 'en', $defaultTwoLetterIsoCode);
+                $data = ['alternative' => $altText, 'baseAlternative' => $altTextFromImage];
                 return $this->responseFactory->createResponse()
                     ->withHeader('Content-Type', 'application/json')
                     ->withBody($this->streamFactory->createStream(json_encode($data)));
