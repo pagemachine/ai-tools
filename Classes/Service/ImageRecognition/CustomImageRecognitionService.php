@@ -16,7 +16,7 @@ class CustomImageRecognitionService implements ImageRecognitionServiceInterface
     protected string $basicAuth = '';
     protected $settingsService;
 
-    private static string $cleanUpRegex = '/^The image (shows|displays|depicts|showcases|features)/';
+    private static string $cleanUpRegex = '/^(?:Certainly!\s*)?(?:The\s*|This\s*)?(?:main subject of the\s*)?(?:image\s)?(?:is\s*|prominently\s*|primarily\s*|predominantly\s*)?(?:shows|showing|displays|depicts|showcases|features|features)?\s*/';
 
     public function __construct()
     {
