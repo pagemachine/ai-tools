@@ -227,8 +227,6 @@ class ImageRecognizeController extends ActionController
                     ->withHeader('Content-Type', 'text/html; charset=utf-8')
                     ->withBody($this->streamFactory->createStream($moduleTemplate->renderContent()));
         }
-        /** @noinspection PhpUnreachableStatementInspection make linter happy even if it is unreachable. */
-        return $this->htmlResponse();
     }
 
     public function getLocaleLanguageCode(SiteLanguage $siteLanguage): string
