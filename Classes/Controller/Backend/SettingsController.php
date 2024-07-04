@@ -80,6 +80,7 @@ class SettingsController extends ActionController
         } else {
             /**
              * @var Prompt $defaultPrompt
+             * @phpstan-ignore-next-line
              */
             $defaultPrompt = $this->promptRepository->findOneBy(['default' => true]);
         }
@@ -167,6 +168,7 @@ class SettingsController extends ActionController
         } else {
             /**
              * @var Prompt $oldDefaultPrompt
+             * @phpstan-ignore-next-line
              */
             $oldDefaultPrompt = $this->promptRepository->findOneBy(['default' => true]);
         }

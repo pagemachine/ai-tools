@@ -162,6 +162,7 @@ class ImageRecognizeController extends ActionController
         } else {
             /**
              * @var Prompt $defaultPrompt
+             * @phpstan-ignore-next-line
              */
             $defaultPrompt = $this->promptRepository->findOneBy(['default' => true]);
         }
