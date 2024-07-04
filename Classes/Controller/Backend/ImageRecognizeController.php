@@ -148,16 +148,23 @@ class ImageRecognizeController extends ActionController
      */
     public function ajaxMetaGenerateAction(ServerRequestInterface $request): ResponseInterface
     {
+        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
         $parsedBody = $request->getParsedBody();
         $queryParams = $request->getQueryParams();
 
         $fileObjects = $this->getFileObjectFromRequestTarget($request);
 
         $allPrompts = $this->promptRepository->findAll();
-        /**
-         * @var Prompt $defaultPrompt
-         */
-        $defaultPrompt = $this->promptRepository->findOneBy(['default' => true]);
+        if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0', '<')) {
+            // for TYPO3 v11
+            // @phpstan-ignore-next-line
+            $defaultPrompt = $this->promptRepository->findOneByDefault(true);
+        } else {
+            /**
+             * @var Prompt $defaultPrompt
+             */
+            $defaultPrompt = $this->promptRepository->findOneBy(['default' => true]);
+        }
 
         $siteLanguages = $this->getAllSiteLanguages();
 

@@ -13,6 +13,7 @@ use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Http\RedirectResponse;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Http\ForwardResponse;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException;
@@ -63,6 +64,7 @@ class SettingsController extends ActionController
      */
     public function settingsAction(): ResponseInterface
     {
+        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
         $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
 
         foreach ($this->settingOptions as $option) {
@@ -71,7 +73,16 @@ class SettingsController extends ActionController
 
         // get all prompts
         $prompts = $this->promptRepository->findAll();
-        $defaultPrompt = $this->promptRepository->findOneBy(['default' => true]);
+        if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0', '<')) {
+            // for TYPO3 v11
+            // @phpstan-ignore-next-line
+            $defaultPrompt = $this->promptRepository->findOneByDefault(true);
+        } else {
+            /**
+             * @var Prompt $defaultPrompt
+             */
+            $defaultPrompt = $this->promptRepository->findOneBy(['default' => true]);
+        }
 
         $this->view->assign('prompts', $prompts);
         $this->view->assign('defaultPrompt', $defaultPrompt);
@@ -139,6 +150,8 @@ class SettingsController extends ActionController
      */
     public function saveDefaultPromptAction(): ResponseInterface
     {
+        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
+
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
         $uri = (string)$uriBuilder->buildUriFromRoute('aitools_AItoolsSettings', ['tx_aitools_settings' => ['controller' => 'Settings', 'action' => 'settings']]);
 
@@ -147,10 +160,16 @@ class SettingsController extends ActionController
         }
 
         // set old default prompt to false
-        /**
-         * @var Prompt $oldDefaultPrompt
-         */
-        $oldDefaultPrompt = $this->promptRepository->findOneBy(['default' => true]);
+        if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0', '<')) {
+            // for TYPO3 v11
+            // @phpstan-ignore-next-line
+            $oldDefaultPrompt = $this->promptRepository->findOneByDefault(true);
+        } else {
+            /**
+             * @var Prompt $oldDefaultPrompt
+             */
+            $oldDefaultPrompt = $this->promptRepository->findOneBy(['default' => true]);
+        }
         if ($oldDefaultPrompt != null) {
             $oldDefaultPrompt->setDefault(false);
             $this->promptRepository->update($oldDefaultPrompt);
