@@ -102,7 +102,11 @@ class ImageRecognizeController extends ActionController
                 return [$fileObject];
             }
             if ($fileObject instanceof FolderInterface) {
-                return $fileObject->getFiles();
+                $files = $fileObject->getFiles();
+                $files = array_filter($files, function ($file) {
+                    return $file->getType() === AbstractFile::FILETYPE_IMAGE;
+                });
+                return $files;
             }
         }
         return null;
