@@ -48,7 +48,6 @@ class SettingsController extends ActionController
     /**
      * Check if the current user has the permission to manage prompts
      *
-     * @param string $itemKey
      * @return bool
      */
     private function checkPermission(string $itemKey): bool
@@ -72,7 +71,7 @@ class SettingsController extends ActionController
 
         // get all prompts
         $prompts = $this->promptRepository->findAll();
-        $defaultPrompt = $this->promptRepository->findOneByDefault(true);
+        $defaultPrompt = $this->promptRepository->findOneBy(['default' => true]);
 
         $this->view->assign('prompts', $prompts);
         $this->view->assign('defaultPrompt', $defaultPrompt);
@@ -148,7 +147,7 @@ class SettingsController extends ActionController
         }
 
         // set old default prompt to false
-        $oldDefaultPrompt = $this->promptRepository->findOneByDefault(true);
+        $oldDefaultPrompt = $this->promptRepository->findOneBy(['default' => true]);
         if ($oldDefaultPrompt) {
             $oldDefaultPrompt->setDefault(false);
             $this->promptRepository->update($oldDefaultPrompt);

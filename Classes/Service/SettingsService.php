@@ -21,7 +21,6 @@ class SettingsService
     /**
      * get setting
      *
-     * @param string $key
      * @return mixed|null
      */
     public function getSetting(string $key): mixed
@@ -31,8 +30,6 @@ class SettingsService
 
     /**
      * set setting
-     *
-     * @param string $key
      */
     public function setSetting(string $key, mixed $value): void
     {

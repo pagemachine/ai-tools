@@ -16,8 +16,6 @@ class MetaDataRepository extends \TYPO3\CMS\Core\Resource\Index\MetaDataReposito
     /**
      * Retrieves metadata for file
      *
-     * @param int $fileUid
-     * @param int $languageUid
      * @return array|null
      * @throws Exception
      * @throws InvalidUidException
@@ -55,10 +53,6 @@ class MetaDataRepository extends \TYPO3\CMS\Core\Resource\Index\MetaDataReposito
     /**
      * Update metadata for file
      *
-     * @param int $fileUid
-     * @param int $languageUid
-     * @param string $fieldName
-     * @param string $fieldValue
      * @return int
      * @throws Exception
      * @throws InvalidUidException

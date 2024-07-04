@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Tests\Unit\Service;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Pagemachine\AItools\Service\ImageRecognition\CustomImageRecognitionService;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 class CustomImageRecognitionServiceTest extends UnitTestCase
 {
-    /**
-     * @dataProvider regexProvider
-     */
+    #[DataProvider('regexProvider')]
     public function testCleanUpRegex(string $input, string $expected)
     {
         $reflection = new \ReflectionClass(CustomImageRecognitionService::class);
@@ -20,7 +19,7 @@ class CustomImageRecognitionServiceTest extends UnitTestCase
         $regex = $property->getValue();
 
         $result = preg_replace($regex, '', $input);
-        $this->assertEquals($expected, trim($result));
+        $this->assertEquals($expected, trim((string) $result));
     }
 
     public static function regexProvider(): array

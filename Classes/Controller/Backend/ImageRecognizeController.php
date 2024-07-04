@@ -59,7 +59,6 @@ class ImageRecognizeController extends ActionController
     /**
      * Return custom Standalone View
      * @internal
-     * @param string $templateName
      * @return StandaloneView
      */
     protected function getView(string $templateName = 'Default', $request = null): StandaloneView
@@ -87,7 +86,6 @@ class ImageRecognizeController extends ActionController
 
     /**
      * Gets the file object from the request target value (which is the file combined identifier)
-     * @param ServerRequestInterface $request
      * @return FileInterface[]|null
      * @throws ResourceDoesNotExistException
      */
@@ -138,7 +136,6 @@ class ImageRecognizeController extends ActionController
 
     /**
      * Process the Image recognition request from Filelist (accessed by right click on file)
-     * @param ServerRequestInterface $request
      * @return ResponseInterface
      * @throws \JsonException
      */
@@ -150,7 +147,7 @@ class ImageRecognizeController extends ActionController
         $fileObjects = $this->getFileObjectFromRequestTarget($request);
 
         $allPrompts = $this->promptRepository->findAll();
-        $defaultPrompt = $this->promptRepository->findOneByDefault(true);
+        $defaultPrompt = $this->promptRepository->findOneBy(['default' => true]);
 
         $siteLanguages = $this->getAllSiteLanguages();
 

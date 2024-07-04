@@ -1,5 +1,6 @@
 <?php
 
+use Pagemachine\AItools\Controller\Backend\SettingsController;
 return [
     'aitools' => [
         'position' => ['after' => 'web'],
@@ -37,7 +38,7 @@ return [
         'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf',
         'extensionName' => 'AItools',
         'controllerActions' => [
-            \Pagemachine\AItools\Controller\Backend\SettingsController::class => [
+            SettingsController::class => [
                 'settings',
                 'save',
                 'addPrompt',

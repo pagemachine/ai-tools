@@ -34,9 +34,6 @@ class Aiimage extends AbstractEntity
         return $this->description;
     }
 
-    /**
-     * @param string $description
-     */
     public function setDescription(string $description)
     {
         $this->description = $description;
@@ -50,9 +47,6 @@ class Aiimage extends AbstractEntity
         return $this->imagesnumber;
     }
 
-    /**
-     * @param string $imagesnumber
-     */
     public function setImagesnumber(string $imagesnumber)
     {
         $this->imagesnumber = $imagesnumber;
@@ -66,9 +60,6 @@ class Aiimage extends AbstractEntity
         return $this->resolution;
     }
 
-    /**
-     * @param string $resolution
-     */
     public function setResolution(string $resolution)
     {
         $this->resolution = $resolution;
@@ -82,9 +73,6 @@ class Aiimage extends AbstractEntity
         return $this->file;
     }
 
-    /**
-     * @param array $file
-     */
     public function setFile(array $file)
     {
         $this->file = $file;

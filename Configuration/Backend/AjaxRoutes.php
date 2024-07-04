@@ -1,5 +1,6 @@
 <?php
 
+use Pagemachine\AItools\Controller\Backend\ImageRecognizeController;
 /**
  * Definitions for routes provided by EXT:backend
  * Contains all "regular" routes for entry points
@@ -14,6 +15,6 @@ return [
     //
     'aitools_ai_tools_images' => [
         'path' => '/aitoolsimages/metagen',
-        'target' => \Pagemachine\AItools\Controller\Backend\ImageRecognizeController::class . '::ajaxMetaGenerateAction',
+        'target' => ImageRecognizeController::class . '::ajaxMetaGenerateAction',
     ],
 ];

@@ -44,8 +44,6 @@ class ImageMetaDataService
 
     /**
      * Process the Image recognition request
-     * @param FileInterface $fileObject
-     * @param string $textPrompt
      * @return string
      * @throws \Exception
      */
@@ -61,9 +59,7 @@ class ImageMetaDataService
 
     /**
      * generate MetaData for this File and redirect back to ajaxMetaGenerate
-     * @param string $target
      * @param string|null $altText
-     * @param int $language
      * @return bool true if metadata was saved
      * @throws InvalidUidException
      * @throws ResourceDoesNotExistException
@@ -92,7 +88,7 @@ class ImageMetaDataService
              * Special file_variants handling
              */
             if (ExtensionManagementUtility::isLoaded('file_variants')) {
-                /** @var \T3G\AgencyPack\FileVariants\Service\ResourcesService $resourcesService */
+                /** @var ResourcesService $resourcesService */
                 $resourcesService = GeneralUtility::makeInstance(ResourcesService::class);
                 $fileMetadata = $fileObject->getMetaData()->get();
                 $fileMetadataUid = $fileMetadata['uid'] ?? null;

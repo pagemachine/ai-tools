@@ -11,8 +11,6 @@ interface ImageRecognitionServiceInterface
     /**
      * Sends the file to the image recognition API
      *
-     * @param FileInterface $fileObject
-     * @param string $textPrompt
      * @return string
      */
     public function sendFileToApi(FileInterface $fileObject, string $textPrompt = ''): string;

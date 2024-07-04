@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Controller\Backend;
 
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use OpenAI\Client;
 use Pagemachine\AItools\Domain\Model\Aiimage;
 use Pagemachine\AItools\Service\SettingsService;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Http\Response;
-use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\StorageRepository;
@@ -38,9 +38,6 @@ class ImageCreationController extends ActionController
         return $this->htmlResponse();
     }
 
-    /**
-     * @param Aiimage $aiimage
-     */
     public function generateAction(Aiimage $aiimage): ResponseInterface
     {
         //Do the openai request to generate image
@@ -78,9 +75,6 @@ class ImageCreationController extends ActionController
         return $this->htmlResponse();
     }
 
-    /**
-     * @param Aiimage $aiimage
-     */
     public function variateAction(Aiimage $aiimage): ResponseInterface
     {
         $file = $aiimage->getFile();
@@ -92,7 +86,7 @@ class ImageCreationController extends ActionController
         if ($file['tmp_name']) {
             $filePath = $file['tmp_name'];
             $fileName = $file['name'];
-            $fileName = str_replace('.png', '', $fileName);
+            $fileName = str_replace('.png', '', (string) $fileName);
 
             $imageVariationUrlArray = $this->variationImage($filePath, $imagesnumber, $resolution);
 
@@ -105,7 +99,6 @@ class ImageCreationController extends ActionController
     }
 
     /**
-     * @param array $result_aiimage
      * @throws Exception
      */
     public function saveAction(array $result_aiimage): Response
@@ -142,7 +135,7 @@ class ImageCreationController extends ActionController
             $this->addFlashMessage(
                 'The image has been saved in ' . $saveTarget,
                 'Image saved',
-                FlashMessage::INFO,
+                ContextualFeedbackSeverity::INFO,
                 true
             );
             /** @phpstan-ignore-next-line Else branch is unreachable because previous condition is always true. */
@@ -150,7 +143,7 @@ class ImageCreationController extends ActionController
             $this->addFlashMessage(
                 'The image could not be saved',
                 'Image not saved',
-                FlashMessage::ERROR,
+                ContextualFeedbackSeverity::ERROR,
                 true
             );
         }
@@ -184,7 +177,7 @@ class ImageCreationController extends ActionController
             $this->addFlashMessage(
                 $exceptionMsg,
                 'Warning',
-                FlashMessage::WARNING,
+                ContextualFeedbackSeverity::WARNING,
                 true
             );
         }
@@ -217,7 +210,7 @@ class ImageCreationController extends ActionController
             $this->addFlashMessage(
                 $exceptionMsg,
                 'Warning',
-                FlashMessage::WARNING,
+                ContextualFeedbackSeverity::WARNING,
                 true
             );
         }

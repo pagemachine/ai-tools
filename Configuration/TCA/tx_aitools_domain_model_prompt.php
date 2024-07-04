@@ -8,7 +8,6 @@ return [
         'label' => 'description',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
-        'cruser_id' => 'cruser_id',
         'delete' => 'deleted',
         'default_sortby' => 'description',
         'searchFields' => 'description',
@@ -29,7 +28,7 @@ return [
                 'default' => 0,
                 'items' => [
                     [
-                        0 => '',
+                        'label' => '',
                         'invertStateDisplay' => true,
                     ],
                 ],
