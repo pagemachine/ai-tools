@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Controller\Backend;
 
+use Pagemachine\AItools\Domain\Model\Prompt;
 use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Pagemachine\AItools\Service\ImageMetaDataService;
 use Pagemachine\AItools\Service\SettingsService;
@@ -153,6 +154,9 @@ class ImageRecognizeController extends ActionController
         $fileObjects = $this->getFileObjectFromRequestTarget($request);
 
         $allPrompts = $this->promptRepository->findAll();
+        /**
+         * @var Prompt $defaultPrompt
+         */
         $defaultPrompt = $this->promptRepository->findOneBy(['default' => true]);
 
         $siteLanguages = $this->getAllSiteLanguages();
@@ -181,7 +185,7 @@ class ImageRecognizeController extends ActionController
                     ->withHeader('Content-Type', 'application/json')
                     ->withBody($this->streamFactory->createStream(json_encode($saved)));
             case 'generateMetaData':
-                $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt ? $defaultPrompt->getPrompt() : '');
+                $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt != null ? $defaultPrompt->getPrompt() : '');
                 $altTextFromImage = $this->imageMetaDataService->generateImageDescription(
                     fileObject: $fileObjects[0],
                     textPrompt: $textPrompt,

@@ -147,8 +147,11 @@ class SettingsController extends ActionController
         }
 
         // set old default prompt to false
+        /**
+         * @var Prompt $oldDefaultPrompt
+         */
         $oldDefaultPrompt = $this->promptRepository->findOneBy(['default' => true]);
-        if ($oldDefaultPrompt) {
+        if ($oldDefaultPrompt != null) {
             $oldDefaultPrompt->setDefault(false);
             $this->promptRepository->update($oldDefaultPrompt);
         }
