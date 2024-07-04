@@ -12,6 +12,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
+use TYPO3\CMS\Core\Resource\AbstractFile;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\FolderInterface;
@@ -99,13 +100,14 @@ class ImageRecognizeController extends ActionController
         if ($target) {
             $fileObject = $this->resourceFactory->retrieveFileOrFolderObject($target);
             if ($fileObject instanceof FileInterface) {
+                if ($fileObject->getType() !== AbstractFile::FILETYPE_IMAGE) {
+                    return null;
+                }
                 return [$fileObject];
             }
             if ($fileObject instanceof FolderInterface) {
                 $files = $fileObject->getFiles();
-                $files = array_filter($files, function ($file) {
-                    return $file->getType() === AbstractFile::FILETYPE_IMAGE;
-                });
+                $files = array_filter($files, fn($file) => $file->getType() === AbstractFile::FILETYPE_IMAGE);
                 return $files;
             }
         }

@@ -48,14 +48,14 @@
 
                         <h3>DeepL</h3>
                         <label for="deepl_endpoint">DeepL Endpoint:</label>
-                        <f:form.select name="deepl_endpoint" id="deepl_endpoint" value="{deepl_endpoint}" class="form-control">
+                        <f:form.select name="deepl_endpoint" id="deepl_endpoint" value="{deepl_endpoint}" class="form-control form-select">
                             <f:form.select.option value="free">Free</f:form.select.option>
                             <f:form.select.option value="pro">Pro</f:form.select.option>
                         </f:form.select>
                         <label for="deepl_auth_key">DeepL Auth Key:</label>
                         <f:form.textfield name="deepl_auth_key" id="deepl_auth_key" value="{deepl_auth_key}" class="form-control" type="password" />
                         <label for="deepl_formality">Formality:</label>
-                        <f:form.select name="deepl_formality" id="deepl_formality" value="{deepl_formality}" class="form-control">
+                        <f:form.select name="deepl_formality" id="deepl_formality" value="{deepl_formality}" class="form-control form-select">
                             <f:form.select.option value="">Default</f:form.select.option>
                             <f:form.select.option value="prefer_more">More</f:form.select.option>
                             <f:form.select.option value="prefer_less">Less</f:form.select.option>
@@ -97,7 +97,7 @@
                     <div class="form-group">
                         <h3>Image Recognition</h3>
                         <label for="image_recognition_service">Image Recognition Service:</label>
-                        <f:form.select name="image_recognition_service" id="image_recognition_service" value="{image_recognition_service}" class="form-control">
+                        <f:form.select name="image_recognition_service" id="image_recognition_service" value="{image_recognition_service}" class="form-control form-select">
                             <f:form.select.option value="">Select Service</f:form.select.option>
                             <f:form.select.option value="custom">Custom</f:form.select.option>
                             <f:form.select.option value="openai">Open AI</f:form.select.option>
@@ -105,7 +105,7 @@
 
                         <h3>Translation</h3>
                         <label for="translation_service">Translation Service:</label>
-                        <f:form.select name="translation_service" id="translation_service" value="{translation_service}" class="form-control">
+                        <f:form.select name="translation_service" id="translation_service" value="{translation_service}" class="form-control form-select">
                             <f:form.select.option value="">Select Service</f:form.select.option>
                             <f:form.select.option value="custom">Custom</f:form.select.option>
                             <f:form.select.option value="deepl">DeepL</f:form.select.option>
@@ -121,7 +121,7 @@
                         <div class="form-group">
                             <h3>Default Prompt</h3>
                             <label for="defaultPrompt">Default Prompt:</label>
-                            <f:form.select name="defaultPrompt" id="defaultPrompt" value="{defaultPrompt}" class="form-control" options="{prompts}" optionValueField="uid" optionLabelField="descriptionPrompt">
+                            <f:form.select name="defaultPrompt" id="defaultPrompt" value="{defaultPrompt}" class="form-control form-select" options="{prompts}" optionValueField="uid" optionLabelField="descriptionPrompt">
                                 <f:if condition="!{defaultPrompt}">
                                     <f:form.select.option value="">Select Prompt</f:form.select.option>
                                 </f:if>

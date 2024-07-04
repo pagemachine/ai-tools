@@ -1,6 +1,7 @@
 <?php
 
 use Pagemachine\AItools\Controller\Backend\SettingsController;
+
 return [
     'aitools' => [
         'position' => ['after' => 'web'],

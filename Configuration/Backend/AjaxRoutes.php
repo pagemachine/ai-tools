@@ -1,6 +1,7 @@
 <?php
 
 use Pagemachine\AItools\Controller\Backend\ImageRecognizeController;
+
 /**
  * Definitions for routes provided by EXT:backend
  * Contains all "regular" routes for entry points

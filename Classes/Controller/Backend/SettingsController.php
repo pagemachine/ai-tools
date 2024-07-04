@@ -42,8 +42,7 @@ class SettingsController extends ActionController
         private readonly PromptRepository $promptRepository,
         private readonly PersistenceManagerInterface $persistenceManager,
         private readonly ModuleTemplateFactory $moduleTemplateFactory
-    ) {
-    }
+    ) {}
 
     /**
      * Check if the current user has the permission to manage prompts

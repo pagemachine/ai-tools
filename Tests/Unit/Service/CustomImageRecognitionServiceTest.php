@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Tests\Unit\Service;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use Pagemachine\AItools\Service\ImageRecognition\CustomImageRecognitionService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 class CustomImageRecognitionServiceTest extends UnitTestCase
@@ -19,24 +19,24 @@ class CustomImageRecognitionServiceTest extends UnitTestCase
         $regex = $property->getValue();
 
         $result = preg_replace($regex, '', $input);
-        $this->assertEquals($expected, trim((string) $result));
+        self::assertEquals($expected, trim((string)$result));
     }
 
     public static function regexProvider(): array
     {
         return [
-            ["Certainly! The main subject of the image is a cat.", "a cat."],
-            ["This image prominently shows a beautiful landscape.", "a beautiful landscape."],
-            ["The image showcases a modern building.", "a modern building."],
-            ["Certainly! This image predominantly features a sunset.", "a sunset."],
-            ["The main subject of the image displays a group of people.", "a group of people."],
-            ["Certainly! The main subject of the image is a cat!@#.", "a cat!@#."],
-            ["This image prominently shows a beautiful landscape, with mountains.", "a beautiful landscape, with mountains."],
+            ['Certainly! The main subject of the image is a cat.', 'a cat.'],
+            ['This image prominently shows a beautiful landscape.', 'a beautiful landscape.'],
+            ['The image showcases a modern building.', 'a modern building.'],
+            ['Certainly! This image predominantly features a sunset.', 'a sunset.'],
+            ['The main subject of the image displays a group of people.', 'a group of people.'],
+            ['Certainly! The main subject of the image is a cat!@#.', 'a cat!@#.'],
+            ['This image prominently shows a beautiful landscape, with mountains.', 'a beautiful landscape, with mountains.'],
             ["The image showcases a modern building; it's very tall.", "a modern building; it's very tall."],
-            ["Certainly! This image predominantly features a sunset... amazing!", "a sunset... amazing!"],
-            ["The main subject of the image displays a group of people - friends.", "a group of people - friends."],
-            ["The image predominantly showcases a dog.", "a dog."],
-            ["A dinosaur in the park.", "A dinosaur in the park."],
+            ['Certainly! This image predominantly features a sunset... amazing!', 'a sunset... amazing!'],
+            ['The main subject of the image displays a group of people - friends.', 'a group of people - friends.'],
+            ['The image predominantly showcases a dog.', 'a dog.'],
+            ['A dinosaur in the park.', 'A dinosaur in the park.'],
         ];
     }
 }

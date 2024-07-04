@@ -15,20 +15,33 @@
         .w5 {
             width: 49%;
         }
+        .info-block {
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-left: 5px solid orange;
+            border-radius: 5px;
+            font-size: 1.25rem;
+        }
     </style>
 
     <f:if condition="{fileObjects -> f:count()} > 1">
-        <div class="row">
-            <div class="col-xs-12">
-                <f:render section="form-group-select" arguments="{label: 'Global AI Prompt', class: 'globalTextPrompt', name: 'globalTextPrompt', options: allTextPrompts, value: textPrompt.prompt, optionLabelField: 'description', optionValueField: 'prompt'}" />
+        <f:then>
+            <div class="row">
+                <div class="col-xs-12">
+                    <f:render section="form-group-select" arguments="{label: 'Global AI Prompt', class: 'globalTextPrompt', name: 'globalTextPrompt', options: allTextPrompts, value: textPrompt.prompt, optionLabelField: 'description', optionValueField: 'prompt'}" />
 
-                <label for="skipExistingDescriptions">Skip existing descriptions <input type="checkbox" id="skipExistingDescriptions" name="skipExistingDescriptions" class="skipExistingDescriptions" value="1" checked /></label><br />
-                <button onclick="callAjaxMetaGenerateActionForAll(this, false)" class="btn btn-primary">Generate Meta-Data for all Images</button>
-                <button onclick="callAjaxMetaGenerateActionForAll(this, true)" class="btn btn-primary">Generate, Save + Translate Meta-Data for all Images</button>
-                <progress value="0" max="{fileObjects -> f:count()}" id="progressBar" class="progressBar"></progress>
+                    <label for="skipExistingDescriptions">Skip existing descriptions <input type="checkbox" id="skipExistingDescriptions" name="skipExistingDescriptions" class="skipExistingDescriptions" value="1" checked /></label><br />
+                    <button onclick="callAjaxMetaGenerateActionForAll(this, false)" class="btn btn-primary">Generate Meta-Data for all Images</button>
+                    <button onclick="callAjaxMetaGenerateActionForAll(this, true)" class="btn btn-primary">Generate, Save + Translate Meta-Data for all Images</button>
+                    <progress value="0" max="{fileObjects -> f:count()}" id="progressBar" class="progressBar"></progress>
+                </div>
             </div>
-        </div>
-        <div class="help-block">&nbsp;</div>
+            <div class="help-block">&nbsp;</div>
+        </f:then>
+        <f:else>
+            <div class="info-block">No image.</div>
+        </f:else>
     </f:if>
 
     <f:for as="fileObject" each="{fileObjects}">
@@ -143,7 +156,7 @@
         <div class="formengine-field-item t3js-formengine-field-item"><div class="form-control-wrap" style="max-width: 636px">
             <div class="form-wizards-wrap">
                 <div class="form-wizards-element">
-                    <f:form.select options="{options}" optionLabelField="{optionLabelField}" optionValueField="{optionValueField}" class="form-control form-select-sm t3-js-jumpMenuBox {class}" value="{value}" />
+                    <f:form.select options="{options}" optionLabelField="{optionLabelField}" optionValueField="{optionValueField}" class="form-control form-select t3-js-jumpMenuBox {class}" value="{value}" />
                 </div>
             </div>
         </div></div>

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Controller\Backend;
 
-use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use OpenAI\Client;
 use Pagemachine\AItools\Domain\Model\Aiimage;
 use Pagemachine\AItools\Service\SettingsService;
@@ -14,15 +13,14 @@ use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\StorageRepository;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Http\ForwardResponse;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
 class ImageCreationController extends ActionController
 {
-    public function __construct(private readonly ?SettingsService $settingsService)
-    {
-    }
+    public function __construct(private readonly ?SettingsService $settingsService) {}
 
     private function getOpenAIClient(): Client
     {
@@ -86,7 +84,7 @@ class ImageCreationController extends ActionController
         if ($file['tmp_name']) {
             $filePath = $file['tmp_name'];
             $fileName = $file['name'];
-            $fileName = str_replace('.png', '', (string) $fileName);
+            $fileName = str_replace('.png', '', (string)$fileName);
 
             $imageVariationUrlArray = $this->variationImage($filePath, $imagesnumber, $resolution);
 

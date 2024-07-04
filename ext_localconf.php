@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-use Pagemachine\AItools\ContextMenu\AiToolItemProvider;
+use Pagemachine\AItools\ContextMenu\ItemProviders\AiToolItemProvider;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
