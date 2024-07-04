@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\Php74\Rector\LNumber\AddLiteralSeparatorToNumberRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
+use Rector\Renaming\Rector\ClassConstFetch\RenameClassConstFetchRector;
 use Ssch\TYPO3Rector\Set\Typo3SetList;
 
 return RectorConfig::configure()
@@ -12,9 +14,19 @@ return RectorConfig::configure()
         __DIR__ . '/Tests',
     ])
     ->withRootFiles()
-    ->withImportNames(true, false, false, true)
+    ->withImportNames(
+        importShortClasses: false,
+        removeUnusedImports: true,
+    )
     ->withPhpSets()
     ->withSets([
-        PHPUnitSetList::PHPUNIT_90,
+        PHPUnitSetList::PHPUNIT_100,
         Typo3SetList::TYPO3_11,
+        Typo3SetList::TYPO3_12,
+    ])
+    ->withSkip([
+        AddLiteralSeparatorToNumberRector::class,
+        RenameClassConstFetchRector::class => [
+            __DIR__ . '/packages/**/ExternalImport/*', // Skip invalid AbstractMessage::* migration
+        ],
     ]);

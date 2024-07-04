@@ -20,7 +20,9 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
 class ImageCreationController extends ActionController
 {
-    public function __construct(private readonly ?SettingsService $settingsService) {}
+    public function __construct(private readonly ?SettingsService $settingsService)
+    {
+    }
 
     private function getOpenAIClient(): Client
     {

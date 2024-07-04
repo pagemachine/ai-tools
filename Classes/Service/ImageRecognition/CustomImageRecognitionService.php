@@ -66,7 +66,7 @@ class CustomImageRecognitionService implements ImageRecognitionServiceInterface
 
             // cleanup text from "The image depicts" introduction text.
             $text = preg_replace(self::$cleanUpRegex, '', (string)$text);
-            $text = trim((string) $text);
+            $text = trim((string)$text);
             $text[0] = strtoupper($text[0]);
             return $text;
         }
