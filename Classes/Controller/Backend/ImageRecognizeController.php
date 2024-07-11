@@ -67,7 +67,7 @@ class ImageRecognizeController extends ActionController
             'edit' =>
                 [
                     'sys_file_metadata' => [$uid => 'edit'],
-                ]
+                ],
         ];
         if (!empty($returnUrl)) {
             $uriParameters['returnUrl'] = $returnUrl;

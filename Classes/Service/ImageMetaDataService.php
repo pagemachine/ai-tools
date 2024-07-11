@@ -9,9 +9,6 @@ use Pagemachine\AItools\Domain\Repository\MetaDataRepository;
 use Pagemachine\AItools\Service\ImageRecognition\CustomImageRecognitionService;
 use Pagemachine\AItools\Service\ImageRecognition\OpenAiImageRecognitionService;
 use T3G\AgencyPack\FileVariants\Service\ResourcesService;
-use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Resource\Exception\InvalidUidException;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\FileInterface;
@@ -20,7 +17,6 @@ use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\PersistenceManagerInterface;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 class ImageMetaDataService
 {
