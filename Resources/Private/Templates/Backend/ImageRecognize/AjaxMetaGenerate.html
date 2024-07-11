@@ -25,6 +25,47 @@
             border-radius: 5px;
             font-size: 1.25rem;
         }
+
+
+        .otherLanguages ul {
+            list-style-type: none;
+            padding: 0;
+            margin: .5rem 0;
+        }
+        .otherLanguages li {
+            margin-bottom: 15px;
+            max-width: 636px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: flex-start; /* Align items to the start to ensure proper alignment */
+        }
+        .otherLanguages li img {
+            vertical-align: middle;
+            display: block;
+            margin-right: 10px; /* Space between image and text */
+            flex-shrink: 0; /* Prevent the image from shrinking */
+            width: 30px; /* Fixed width for the flag */
+        }
+        .otherLanguages li a {
+            text-decoration: none;
+            color: #000;
+            transition: color 0.3s;
+            flex-grow: 1; /* Allow the link to take up the remaining space */
+        }
+        .otherLanguages li a:hover {
+            color: #0056b3;
+        }
+        .otherLanguages li a::after {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .otherLanguages li a:hover::after {
+            opacity: 1;
+        }
     </style>
 
     <script>
