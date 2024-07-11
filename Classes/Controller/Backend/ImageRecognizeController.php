@@ -12,6 +12,8 @@ use Pagemachine\AItools\Service\TranslationService;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
+use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Resource\AbstractFile;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
@@ -48,7 +50,8 @@ class ImageRecognizeController extends ActionController
 
     public function __construct(
         private readonly ResourceFactory $resourceFactory,
-        private readonly ModuleTemplateFactory $moduleTemplateFactory
+        private readonly ModuleTemplateFactory $moduleTemplateFactory,
+        private readonly UriBuilder $backendUriBuilder,
     ) {
         $this->imageMetaDataService = GeneralUtility::makeInstance(ImageMetaDataService::class);
         $this->translationService = GeneralUtility::makeInstance(TranslationService::class);
@@ -56,6 +59,30 @@ class ImageRecognizeController extends ActionController
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
         $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
         $this->promptRepository = GeneralUtility::makeInstance(PromptRepository::class);
+    }
+
+    protected function getFileMetaDataEditLink(int $uid, string $returnUrl = null): UriInterface
+    {
+        $uriParameters = [
+            'edit' =>
+                [
+                    'sys_file_metadata' => [$uid => 'edit'],
+                ],
+        ];
+        if (!empty($returnUrl)) {
+            $uriParameters['returnUrl'] = $returnUrl;
+        }
+        return $this->backendUriBuilder
+            ->buildUriFromRoute('record_edit', $uriParameters);
+    }
+
+    protected function getFileMetaDatGenerateLink(string $target): UriInterface
+    {
+        $uriParameters = [
+            'target' => $target,
+        ];
+        return $this->backendUriBuilder
+            ->buildUriFromRoute('ajax_aitools_ai_tools_images', $uriParameters);
     }
 
     /**
@@ -124,9 +151,11 @@ class ImageRecognizeController extends ActionController
         $sites = $this->siteFinder->getAllSites();
         $languages = [];
         foreach ($sites as $site) {
-            $languages = array_merge($languages, $site->getAllLanguages());
+            foreach ($site->getAllLanguages() as $language) {
+                $languages[$language->getLanguageId()] = $language;
+            }
         }
-        return $languages;
+        return array_values($languages);
     }
     private function getLanguageById(int $languageId)
     {
@@ -175,23 +204,41 @@ class ImageRecognizeController extends ActionController
 
         // Setting target, which must be a file reference to a file within the mounts.
         $action = $parsedBody['action'] ?? $queryParams['action'] ?? '';
+        $target = $parsedBody['target'] ?? $queryParams['target'] ?? '';
         switch ($action) {
             case 'saveMetaData':
                 $altText = $parsedBody['altText'] ?? $queryParams['altText'] ?? '';
                 $doTranslate = $parsedBody['translate'] ?? $queryParams['translate'] ?? false;
-                $saved = $this->imageMetaDataService->saveMetaData($parsedBody['target'], $altText);
+                $saved = $this->imageMetaDataService->saveMetaData($target, $altText);
 
+                $translations = [];
                 if ($doTranslate) {
                     // fetch all site languages and translate the altText
                     foreach ($siteLanguages as $siteLanguage) {
-                        $altTextTranslated = $this->translationService->translateText($altText, $defaultTwoLetterIsoCode, $this->getLocaleLanguageCode($siteLanguage));
-                        $this->imageMetaDataService->saveMetaData($parsedBody['target'], $altTextTranslated, $siteLanguage->getLanguageId());
+                        // only translate additional languages (skip default language)
+                        if ($siteLanguage->getLanguageId() > 0) {
+                            $altTextTranslated = $this->translationService->translateText($altText, $defaultTwoLetterIsoCode, $this->getLocaleLanguageCode($siteLanguage));
+                            $metaDataUid = $this->imageMetaDataService->saveMetaData($target, $altTextTranslated, $siteLanguage->getLanguageId());
+                            $translations[] = [
+                                'languageId' => $siteLanguage->getLanguageId(),
+                                'title' => $siteLanguage->getTitle(),
+                                //'languageCode' => $this->getLocaleLanguageCode($siteLanguage),
+                                'languageFlagIdentifier' => str_replace('flags-', '', $siteLanguage->getFlagIdentifier()),
+                                'altTextTranslated' => $altTextTranslated,
+                                'editLink' => (string)$this->getFileMetaDataEditLink($metaDataUid),
+                            ];
+                        }
                     }
                 }
 
+                $returnArray = [
+                    'translations' => $translations,
+                   'saved' => (bool)$saved,
+                ];
+
                 return $this->responseFactory->createResponse()
                     ->withHeader('Content-Type', 'application/json')
-                    ->withBody($this->streamFactory->createStream(json_encode($saved)));
+                    ->withBody($this->streamFactory->createStream(json_encode($returnArray)));
             case 'generateMetaData':
                 $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt != null ? $defaultPrompt->getPrompt() : '');
                 $altTextFromImage = $this->imageMetaDataService->generateImageDescription(
@@ -211,6 +258,7 @@ class ImageRecognizeController extends ActionController
 
                 $view->assign('siteLanguages', $siteLanguages);
                 $view->assign('action', $action);
+                $view->assign('target', $target);
                 $view->assign('fileObjects', $fileObjects ?? null);
 
                 $view->assign(

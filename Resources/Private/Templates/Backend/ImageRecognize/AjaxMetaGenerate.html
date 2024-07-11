@@ -2,6 +2,8 @@
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
     xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    xmlns:aitools="http://typo3.org/ns/Pagemachine/AItools/ViewHelpers"
+    xmlns:vhs="http://typo3.org/ns/FluidTYPO3/Vhs/ViewHelpers"
     data-namespace-typo3-fluid="true">
 
 <f:layout name="DefaultAjax" />
@@ -23,7 +25,52 @@
             border-radius: 5px;
             font-size: 1.25rem;
         }
+
+
+        .otherLanguages ul {
+            list-style-type: none;
+            padding: 0;
+            margin: .5rem 0;
+        }
+        .otherLanguages li {
+            margin-bottom: 15px;
+            max-width: 636px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: flex-start; /* Align items to the start to ensure proper alignment */
+        }
+        .otherLanguages li img {
+            vertical-align: middle;
+            display: block;
+            margin-right: 10px; /* Space between image and text */
+            flex-shrink: 0; /* Prevent the image from shrinking */
+            width: 30px; /* Fixed width for the flag */
+        }
+        .otherLanguages li a {
+            text-decoration: none;
+            color: #000;
+            transition: color 0.3s;
+            flex-grow: 1; /* Allow the link to take up the remaining space */
+        }
+        .otherLanguages li a:hover {
+            color: #0056b3;
+        }
+        .otherLanguages li a::after {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .otherLanguages li a:hover::after {
+            opacity: 1;
+        }
     </style>
+
+    <script>
+        var currentUrl = "{aitools:backend.generateMetadataEditLink(target: target)}";
+    </script>
 
     <f:if condition="{fileObjects -> f:count()} > 1">
         <f:then>
@@ -40,7 +87,9 @@
             <div class="help-block">&nbsp;</div>
         </f:then>
         <f:else>
-            <div class="info-block">No image.</div>
+            <f:if condition="{fileObjects -> f:count()} == 0">
+                <div class="info-block">No image.</div>
+            </f:if>
         </f:else>
     </f:if>
 
@@ -102,13 +151,31 @@
                                         </div>
                                     </div>
                                     <div class="debugImageRecognizedText"></div>
+                                    <div class="otherLanguages">
+                                        <ul>
+                                            <f:for as="metaLanguage" each="{aitools:backend.metaDataLanguages(languages: siteLanguages, fileObject: fileObject)}">
+                                                <li>
+                                                    <f:for as="siteLanguage" each="{siteLanguages}">
+                                                        <f:if condition="{siteLanguage.languageId} == {metaLanguage.sys_language_uid}">
+                                                            <f:then>
+                                                                <img src="/typo3/sysext/core/Resources/Public/Icons/Flags/{siteLanguage.flagIdentifier -> vhs:format.replace(substring: 'flags-', replacement: '')}.webp" alt="" title="{siteLanguage.title}" />
+                                                            </f:then>
+                                                        </f:if>
+                                                    </f:for>
+                                                    <a href="{be:uri.editRecord(uid:metaLanguage.uid, table:'sys_file_metadata', returnUrl:'{aitools:backend.generateMetadataEditLink(target: target)}')}">
+                                                        {metaLanguage.alternative}
+                                                    </a>
+                                                </li>
+                                            </f:for>
+                                        </ul>
+                                    </div>
                                 </div>
                             </f:form>
                             <div class="form-group bottom">
-                                <button onclick="callAjaxMetaSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altText-{fileObject.properties.identifier_hash}')[0], false, this)" class="save-btn btn btn-primary">Save</button>
-                                <button onclick="callAjaxMetaSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altText-{fileObject.properties.identifier_hash}')[0], true, this)" class="save-translate-btn btn btn-secondary">Save and Translate</button>
+                                <button onclick="callAjaxMetaSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altText-{fileObject.properties.identifier_hash}')[0], false, this, document.querySelectorAll('.imageEntry-{fileObject.properties.identifier_hash}')[0])" class="save-btn btn btn-primary">Save</button>
+                                <button onclick="callAjaxMetaSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altText-{fileObject.properties.identifier_hash}')[0], true, this, document.querySelectorAll('.imageEntry-{fileObject.properties.identifier_hash}')[0])" class="save-translate-btn btn btn-secondary">Save and Translate</button>
                                 <button onclick="callAjaxMetaGenerateAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altTextSuggestion-{fileObject.properties.identifier_hash}')[0], document.querySelectorAll('.textPrompt-{fileObject.properties.identifier_hash}')[0], this, document.querySelectorAll('.imageEntry-{fileObject.properties.identifier_hash}')[0])" class="generate-btn btn btn-secondary">Generate Image Description</button>
-                                <button onclick="takeSuggestionSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altTextSuggestion-{fileObject.properties.identifier_hash}')[0], document.querySelectorAll('.textarea-altText-{fileObject.properties.identifier_hash}')[0], this)" class="generate-btn btn btn-secondary">Use Suggestion and Save</button>
+                                <button onclick="takeSuggestionSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altTextSuggestion-{fileObject.properties.identifier_hash}')[0], document.querySelectorAll('.textarea-altText-{fileObject.properties.identifier_hash}')[0], this, document.querySelectorAll('.imageEntry-{fileObject.properties.identifier_hash}')[0])" class="generate-btn btn btn-secondary">Use Suggestion and Save</button>
                             </div>
                         </div>
                     </div>
