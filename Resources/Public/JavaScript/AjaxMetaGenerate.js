@@ -164,11 +164,10 @@ function callAjaxMetaSaveAction(fileIdentifier, textarea, doTranslate, button, b
           let ul = document.createElement('ul');
           response.translations.forEach((translation) => {
             let li = document.createElement('li');
-            let img = document.createElement('img');
+            let icon = document.createElement('div');
             let link = document.createElement('a');
-            img.src = '/typo3/sysext/core/Resources/Public/Icons/Flags/' + translation.languageFlagIdentifier + '.webp'; // Adjust the path as necessary
-            img.title = translation.title;
-            li.appendChild(img);
+            icon.innerHTML = translation.flagHtml;
+            li.appendChild(icon.firstChild);
 
             link.href = translation.editLink + '&returnUrl=' + encodeURIComponent(currentUrl);
             link.textContent = ' ' + translation.altTextTranslated;

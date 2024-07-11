@@ -15,6 +15,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
+use TYPO3\CMS\Core\Imaging\Icon;
+use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Resource\AbstractFile;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\FileInterface;
@@ -22,6 +24,7 @@ use TYPO3\CMS\Core\Resource\FolderInterface;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
+use TYPO3\CMS\Core\Type\Icon\IconState;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
@@ -76,13 +79,13 @@ class ImageRecognizeController extends ActionController
             ->buildUriFromRoute('record_edit', $uriParameters);
     }
 
-    protected function getFileMetaDatGenerateLink(string $target): UriInterface
-    {
-        $uriParameters = [
-            'target' => $target,
-        ];
-        return $this->backendUriBuilder
-            ->buildUriFromRoute('ajax_aitools_ai_tools_images', $uriParameters);
+    protected function getLanguageFlagHtml($identifier, $title='', $size=Icon::SIZE_LARGE, $overlay='', $state=IconState::STATE_DEFAULT) {
+        $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
+        $icon = $iconFactory->getIcon($identifier, $size, $overlay, IconState::cast($state));
+        if ($title ?? false) {
+            $icon->setTitle($title);
+        }
+        return $icon->render();
     }
 
     /**
@@ -222,8 +225,7 @@ class ImageRecognizeController extends ActionController
                             $translations[] = [
                                 'languageId' => $siteLanguage->getLanguageId(),
                                 'title' => $siteLanguage->getTitle(),
-                                //'languageCode' => $this->getLocaleLanguageCode($siteLanguage),
-                                'languageFlagIdentifier' => str_replace('flags-', '', $siteLanguage->getFlagIdentifier()),
+                                'flagHtml' => $this->getLanguageFlagHtml($siteLanguage->getFlagIdentifier(), $siteLanguage->getTitle()),
                                 'altTextTranslated' => $altTextTranslated,
                                 'editLink' => (string)$this->getFileMetaDataEditLink($metaDataUid),
                             ];

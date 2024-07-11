@@ -41,20 +41,21 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             display: flex;
-            align-items: flex-start; /* Align items to the start to ensure proper alignment */
+            align-items: flex-start;
         }
-        .otherLanguages li img {
+        .otherLanguages li .icon {
             vertical-align: middle;
             display: block;
-            margin-right: 10px; /* Space between image and text */
-            flex-shrink: 0; /* Prevent the image from shrinking */
-            width: 30px; /* Fixed width for the flag */
+            margin-right: 10px;
+            flex-shrink: 0;
+            width: 30px;
+            height: 30px;
         }
         .otherLanguages li a {
             text-decoration: none;
             color: #000;
             transition: color 0.3s;
-            flex-grow: 1; /* Allow the link to take up the remaining space */
+            flex-grow: 1;
         }
         .otherLanguages li a:hover {
             color: #0056b3;
@@ -158,7 +159,7 @@
                                                     <f:for as="siteLanguage" each="{siteLanguages}">
                                                         <f:if condition="{siteLanguage.languageId} == {metaLanguage.sys_language_uid}">
                                                             <f:then>
-                                                                <img src="/typo3/sysext/core/Resources/Public/Icons/Flags/{siteLanguage.flagIdentifier -> vhs:format.replace(substring: 'flags-', replacement: '')}.webp" alt="" title="{siteLanguage.title}" />
+                                                                <core:icon title="{siteLanguage.title}" identifier="{siteLanguage.flagIdentifier}" size="large" />
                                                             </f:then>
                                                         </f:if>
                                                     </f:for>
