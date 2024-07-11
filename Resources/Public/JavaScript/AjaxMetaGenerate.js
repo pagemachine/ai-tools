@@ -81,7 +81,7 @@ async function callAjaxMetaGenerateActionForAll(button, saveAndTranslate) {
         await new Promise((resolve, reject) => {
           saveAndTranslateButton.addEventListener('ajaxComplete', resolve, {once: true});
           genButton.addEventListener('ajaxError', reject, {once: true});
-          callAjaxMetaSaveAction(fileIdentifierField.value, altText, true, saveAndTranslateButton)
+          callAjaxMetaSaveAction(fileIdentifierField.value, altText, true, saveAndTranslateButton, imageEntry)
         });
       } else {
         // only generate alt-text and write into suggestion field.
@@ -142,7 +142,7 @@ function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, b
   xhr.send(params);
 }
 
-function callAjaxMetaSaveAction(fileIdentifier, textarea, doTranslate, button) {
+function callAjaxMetaSaveAction(fileIdentifier, textarea, doTranslate, button, blockElement) {
   var originalButtonText = button.textContent;
   button.textContent = 'Saving...';
   button.disabled = true;
@@ -155,7 +155,28 @@ function callAjaxMetaSaveAction(fileIdentifier, textarea, doTranslate, button) {
   xhr.onreadystatechange = function() {
     if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
       var response = JSON.parse(this.responseText);
-      if (response) {
+      if (response && response.saved) {
+
+        // html list of all translations from response.translations
+        let otherLanguages = blockElement.querySelector('.otherLanguages');
+        otherLanguages.innerHTML = '';
+        let ul = document.createElement('ul');
+        response.translations.forEach((translation) => {
+          let li = document.createElement('li');
+          let img = document.createElement('img');
+          let link = document.createElement('a');
+          img.src = '/typo3/sysext/core/Resources/Public/Icons/Flags/' + translation.languageFlagIdentifier + '.webp'; // Adjust the path as necessary
+          img.title = translation.title;
+          li.appendChild(img);
+
+          link.href = translation.editLink + '&returnUrl=' + encodeURIComponent(currentUrl);
+          link.textContent = ' ' + translation.altTextTranslated;
+          li.appendChild(link);
+          ul.appendChild(li);
+
+          otherLanguages.appendChild(ul);
+        });
+
         top.TYPO3.Notification.success('Saved Metadata', 'Saved Metadata successful', 5);
         button.dispatchEvent(new CustomEvent('ajaxComplete'));
       } else {
@@ -172,10 +193,10 @@ function callAjaxMetaSaveAction(fileIdentifier, textarea, doTranslate, button) {
   xhr.send(params);
 }
 
-function takeSuggestionSaveAction(fileIdentifier, textareaSuggestion, textarea, button) {
+function takeSuggestionSaveAction(fileIdentifier, textareaSuggestion, textarea, button, blockElement) {
   textarea.value = textareaSuggestion.value;
   textarea.dispatchEvent(new Event('input'));
-  callAjaxMetaSaveAction(fileIdentifier, textarea, false, button);
+  callAjaxMetaSaveAction(fileIdentifier, textarea, false, button, blockElement);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
