@@ -81,10 +81,15 @@ class ImageRecognizeController extends ActionController
 
     protected function getLanguageFlagHtml($identifier, $title = '', $size = Icon::SIZE_LARGE, $overlay = '', $state = IconState::STATE_DEFAULT)
     {
+        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
         $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
         $icon = $iconFactory->getIcon($identifier, $size, $overlay, IconState::cast($state));
-        if ($title ?? false) {
-            $icon->setTitle($title);
+
+        if (version_compare($version, '12.0', '>=')) {
+            if ($title ?? false) {
+                // @phpstan-ignore-next-line
+                $icon->setTitle($title);
+            }
         }
         return $icon->render();
     }
