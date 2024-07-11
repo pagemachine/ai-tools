@@ -158,24 +158,26 @@ function callAjaxMetaSaveAction(fileIdentifier, textarea, doTranslate, button, b
       if (response && response.saved) {
 
         // html list of all translations from response.translations
-        let otherLanguages = blockElement.querySelector('.otherLanguages');
-        otherLanguages.innerHTML = '';
-        let ul = document.createElement('ul');
-        response.translations.forEach((translation) => {
-          let li = document.createElement('li');
-          let img = document.createElement('img');
-          let link = document.createElement('a');
-          img.src = '/typo3/sysext/core/Resources/Public/Icons/Flags/' + translation.languageFlagIdentifier + '.webp'; // Adjust the path as necessary
-          img.title = translation.title;
-          li.appendChild(img);
+        if (doTranslate) {
+          let otherLanguages = blockElement.querySelector('.otherLanguages');
+          otherLanguages.innerHTML = '';
+          let ul = document.createElement('ul');
+          response.translations.forEach((translation) => {
+            let li = document.createElement('li');
+            let img = document.createElement('img');
+            let link = document.createElement('a');
+            img.src = '/typo3/sysext/core/Resources/Public/Icons/Flags/' + translation.languageFlagIdentifier + '.webp'; // Adjust the path as necessary
+            img.title = translation.title;
+            li.appendChild(img);
 
-          link.href = translation.editLink + '&returnUrl=' + encodeURIComponent(currentUrl);
-          link.textContent = ' ' + translation.altTextTranslated;
-          li.appendChild(link);
-          ul.appendChild(li);
+            link.href = translation.editLink + '&returnUrl=' + encodeURIComponent(currentUrl);
+            link.textContent = ' ' + translation.altTextTranslated;
+            li.appendChild(link);
+            ul.appendChild(li);
 
-          otherLanguages.appendChild(ul);
-        });
+            otherLanguages.appendChild(ul);
+          });
+        }
 
         top.TYPO3.Notification.success('Saved Metadata', 'Saved Metadata successful', 5);
         button.dispatchEvent(new CustomEvent('ajaxComplete'));
