@@ -18,8 +18,6 @@ class MetaDataRepository extends \TYPO3\CMS\Core\Resource\Index\MetaDataReposito
     /**
      * Retrieves metadata for file with multiple language overlays
      *
-     * @param int $fileUid
-     * @param array $languageUids
      * @return array
      * @throws InvalidUidException
      * @throws \Doctrine\DBAL\Exception
@@ -77,8 +75,6 @@ class MetaDataRepository extends \TYPO3\CMS\Core\Resource\Index\MetaDataReposito
     /**
      * find all translated file variants for a fileMetaDataUid and list of languageUids
      *
-     * @param int $fileMetaDataUid
-     * @param array $languageUids
      * @return array
      * @throws \Doctrine\DBAL\Exception
      */

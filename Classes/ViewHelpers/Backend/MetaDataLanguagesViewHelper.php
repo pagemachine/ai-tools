@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\ViewHelpers\Backend;
 
+use Doctrine\DBAL\Exception;
 use Pagemachine\AItools\Service\ImageMetaDataService;
+use TYPO3\CMS\Core\Resource\Exception\InvalidUidException;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
@@ -25,8 +27,8 @@ class MetaDataLanguagesViewHelper extends AbstractViewHelper
      * Render the view helper.
      *
      * @return array
-     * @throws \TYPO3\CMS\Core\Resource\Exception\InvalidUidException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws InvalidUidException
+     * @throws Exception
      */
     public function render(): array
     {

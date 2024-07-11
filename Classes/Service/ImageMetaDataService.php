@@ -169,7 +169,6 @@ class ImageMetaDataService
     /**
      * Retrieve all language overlays for a file
      *
-     * @param File $fileObject
      * @param int[]|SiteLanguage[] $languages
      * @return array
      * @throws InvalidUidException
