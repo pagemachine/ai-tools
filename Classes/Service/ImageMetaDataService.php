@@ -11,7 +11,9 @@ use Pagemachine\AItools\Service\ImageRecognition\OpenAiImageRecognitionService;
 use T3G\AgencyPack\FileVariants\Service\ResourcesService;
 use TYPO3\CMS\Core\Resource\Exception\InvalidUidException;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
+use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileInterface;
+use TYPO3\CMS\Core\Resource\FolderInterface;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
@@ -168,15 +170,14 @@ class ImageMetaDataService
     /**
      * Retrieve all language overlays for a file
      *
-     * @param FileInterface|int $fileObject
+     * @param File $fileObject
      * @param int[]|SiteLanguage[] $languages
      * @return array
      * @throws InvalidUidException
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getMetaDataLanguages(FileInterface|int $fileObject, array $languages): array
+    public function getMetaDataLanguages(File $fileObject, array $languages): array
     {
-        $translations = [];
         $siteLanguages = [];
 
         foreach ($languages as $language) {
@@ -185,9 +186,6 @@ class ImageMetaDataService
             } elseif (is_numeric($language)) {
                 $siteLanguages[] = $language;
             }
-        }
-        if (is_numeric($fileObject)) {
-            $fileObject = $this->resourceFactory->retrieveFileOrFolderObject($fileObject);
         }
         $fileMetadata = $fileObject->getMetaData()->get();
         $fileMetadataUid = $fileMetadata['uid'];

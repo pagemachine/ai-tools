@@ -182,6 +182,9 @@ class SettingsController extends ActionController
             // in case argument is an identity array
             $promptUid = $promptUid['__identity'];
         }
+        /**
+         * @var Prompt $defaultPrompt
+         */
         $defaultPrompt = $this->promptRepository->findByUid($promptUid);
 
         // check if deletePrompt argument is set
