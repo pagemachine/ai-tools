@@ -79,7 +79,8 @@ class ImageRecognizeController extends ActionController
             ->buildUriFromRoute('record_edit', $uriParameters);
     }
 
-    protected function getLanguageFlagHtml($identifier, $title='', $size=Icon::SIZE_LARGE, $overlay='', $state=IconState::STATE_DEFAULT) {
+    protected function getLanguageFlagHtml($identifier, $title = '', $size = Icon::SIZE_LARGE, $overlay = '', $state = IconState::STATE_DEFAULT)
+    {
         $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
         $icon = $iconFactory->getIcon($identifier, $size, $overlay, IconState::cast($state));
         if ($title ?? false) {
