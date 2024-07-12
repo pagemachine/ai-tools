@@ -35,4 +35,17 @@ class SettingsService
     {
         $this->registry->set($this->namespace, $key, $value);
     }
+
+    /**
+     * Check if the current user has the permission to manage prompts
+     *
+     * @return bool
+     */
+    public function checkPermission(string $itemKey): bool
+    {
+        if (!isset($GLOBALS['BE_USER'])) {
+            return false;
+        }
+        return $GLOBALS['BE_USER']->check('custom_options', 'tx_aitools_permissions' . ':' . $itemKey);
+    }
 }

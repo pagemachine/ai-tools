@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\ContextMenu\ItemProviders;
 
+use Pagemachine\AItools\Service\SettingsService;
 use TYPO3\CMS\Backend\ContextMenu\ItemProviders\AbstractProvider;
 use TYPO3\CMS\Core\Resource\AbstractFile;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
@@ -18,7 +19,12 @@ class AiToolItemProvider extends AbstractProvider
     /**
      * @var File|Folder|null
      */
-    protected $record;
+    protected mixed $record;
+
+    /**
+     * @var SettingsService
+     */
+    protected SettingsService $settingsService;
 
     /**
      * This array contains configuration for items you want to add
@@ -32,6 +38,12 @@ class AiToolItemProvider extends AbstractProvider
             'callbackAction' => 'generateAIMetadata', //name of the function in the JS file
         ],
     ];
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
+    }
 
     /**
      * @return bool
@@ -143,9 +155,15 @@ class AiToolItemProvider extends AbstractProvider
         return $this->isFile() && $this->record->getType() == AbstractFile::FILETYPE_IMAGE;
     }
 
+    protected function isUserAllowed(): bool
+    {
+        return $this->settingsService->checkPermission('generate_metadata');
+    }
+
     protected function canEditMetadataOfFile(): bool
     {
         return $this->isImage()
+            && $this->isUserAllowed()
             && $this->record->isIndexed()
             && $this->record->checkActionPermission('editMeta')
             && $this->record->getMetaData()->offsetExists('uid')
@@ -156,6 +174,7 @@ class AiToolItemProvider extends AbstractProvider
     protected function canEditMetadataOfFolder(): bool
     {
         return $this->isFolder()
+            && $this->isUserAllowed()
             && $this->backendUser->check('tables_modify', 'sys_file_metadata')
             && $this->backendUser->checkLanguageAccess(0);
     }

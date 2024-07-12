@@ -50,5 +50,11 @@ $GLOBALS['TYPO3_CONF_VARS']['BE']['customPermOptions']['tx_aitools_permissions']
             'tcarecords-tx_styleguide_forms-default',
             'Allows User to manage prompts',
         ],
+        'generate_metadata' => [ // key
+            'Generate metadata',
+            // Icon has been registered above
+            'tcarecords-tx_styleguide_forms-default',
+            'Allows User to use the generate metadata context menu',
+        ],
     ],
 ];

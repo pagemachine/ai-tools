@@ -47,19 +47,6 @@ class SettingsController extends ActionController
     }
 
     /**
-     * Check if the current user has the permission to manage prompts
-     *
-     * @return bool
-     */
-    private function checkPermission(string $itemKey): bool
-    {
-        if (!isset($GLOBALS['BE_USER'])) {
-            return false;
-        }
-        return $GLOBALS['BE_USER']->check('custom_options', 'tx_aitools_permissions' . ':' . $itemKey);
-    }
-
-    /**
      * Show settings form
      */
     public function settingsAction(): ResponseInterface
@@ -90,7 +77,7 @@ class SettingsController extends ActionController
 
         $this->view->assign('permissions', [
             'admin' => $GLOBALS['BE_USER']->isAdmin(),
-            'promptManagement' => $this->checkPermission('prompt_management'),
+            'promptManagement' => $this->settingsService->checkPermission('prompt_management'),
         ]);
         $moduleTemplate->setContent($this->view->render());
         return $this->htmlResponse($moduleTemplate->renderContent());
@@ -126,7 +113,7 @@ class SettingsController extends ActionController
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
         $uri = (string)$uriBuilder->buildUriFromRoute('aitools_AItoolsSettings', ['tx_aitools_settings' => ['controller' => 'Settings', 'action' => 'settings']]);
 
-        if (!$this->checkPermission('prompt_management')) {
+        if (!$this->settingsService->checkPermission('prompt_management')) {
             return GeneralUtility::makeInstance(RedirectResponse::class, $uri);
         }
 
@@ -156,7 +143,7 @@ class SettingsController extends ActionController
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
         $uri = (string)$uriBuilder->buildUriFromRoute('aitools_AItoolsSettings', ['tx_aitools_settings' => ['controller' => 'Settings', 'action' => 'settings']]);
 
-        if (!$this->checkPermission('prompt_management')) {
+        if (!$this->settingsService->checkPermission('prompt_management')) {
             return GeneralUtility::makeInstance(RedirectResponse::class, $uri);
         }
 

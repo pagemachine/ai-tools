@@ -186,6 +186,10 @@ class ImageRecognizeController extends ActionController
      */
     public function ajaxMetaGenerateAction(ServerRequestInterface $request): ResponseInterface
     {
+        if (!$this->settingsService->checkPermission('generate_metadata')) {
+            return $this->responseFactory->createResponse(500, 'Insufficient permissions');
+        }
+
         $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
         $parsedBody = $request->getParsedBody();
         $queryParams = $request->getQueryParams();
