@@ -19,7 +19,7 @@ class AiToolItemProvider extends AbstractProvider
     /**
      * @var File|Folder|null
      */
-    protected mixed $record;
+    protected mixed $record = null;
 
     /**
      * @var SettingsService
