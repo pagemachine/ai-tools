@@ -81,6 +81,33 @@ class MetaDataRepository extends \TYPO3\CMS\Core\Resource\Index\MetaDataReposito
     }
 
     /**
+     * Update metadata
+     *
+     * @return int
+     * @throws Exception
+     * @throws InvalidUidException
+     */
+    public function updateMetaDataByUidAndLanguageUid(int $metaUid, int $languageUid, string $fieldName = 'alternative', string $fieldValue = ''): int
+    {
+        if ($metaUid <= 0) {
+            throw new InvalidUidException('Metadata can only be updated for valid metadata. UID: "' . $metaUid . '"', 1721088386);
+        }
+
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($this->tableName);
+
+        $queryBuilder->getRestrictions()->add(GeneralUtility::makeInstance(RootLevelRestriction::class));
+
+        return $queryBuilder
+            ->update($this->tableName)
+            ->where(
+                $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($metaUid, Connection::PARAM_INT)),
+                $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter($languageUid, Connection::PARAM_INT))
+            )
+            ->set($fieldName, $fieldValue)
+            ->executeStatement();
+    }
+
+    /**
      * find all translated file variants for a fileMetaDataUid and list of languageUids
      *
      * @return array

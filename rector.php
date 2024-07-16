@@ -31,5 +31,5 @@ return RectorConfig::configure()
         RenameClassConstFetchRector::class => [
             __DIR__ . '/packages/**/ExternalImport/*', // Skip invalid AbstractMessage::* migration
         ],
-        MigrateMagicRepositoryMethodsRector::class,// ignore for now to support TYPO3 v11
+        MigrateMagicRepositoryMethodsRector::class, // ignore for now to support TYPO3 v11
     ]);

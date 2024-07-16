@@ -103,7 +103,7 @@ class ImageMetaDataService
                 if (!empty($translatedFiles)) {
                     $metaDataUid = (int)$translatedFiles[0]['uid'];
                     // Otherwise update file variant meta data
-                    $this->metaDataRepository->updateMetaDataByFileUidAndLanguageUid(
+                    $this->metaDataRepository->updateMetaDataByUidAndLanguageUid(
                         $metaDataUid,
                         languageUid: $language,
                         fieldName: 'alternative',
@@ -121,12 +121,6 @@ class ImageMetaDataService
                         'alternative' => $altText,
                         'l10n_diffsource' => $diffSourceJson,
                     ]);
-                    $folder = $resourcesService->prepareFileStorageEnvironment();
-                    $resourcesService->copyOriginalFileAndUpdateAllConsumingReferencesToUseTheCopy(
-                        sys_language_uid: $language,
-                        metaDataRecord: $translatedMetaDataRecord,
-                        folder: $folder,
-                    );
                     $metaDataUid = (int)$translatedMetaDataRecord['uid'];
                 }
 
