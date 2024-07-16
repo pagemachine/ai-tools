@@ -39,9 +39,20 @@ class AiToolItemProvider extends AbstractProvider
         ],
     ];
 
-    public function __construct()
+
+    public function __construct(string $table='', string $identifier='', string $context='')
     {
-        parent::__construct();
+        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
+        if (version_compare($version, '12.0', '>=')) {
+            // TYPO3 v12 or later
+            // @phpstan-ignore-next-line
+            parent::__construct();
+        } else {
+            // TYPO3 v11 or earlier
+            // @phpstan-ignore-next-line
+            parent::__construct($table, $identifier, $context);
+        }
+
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
     }
 
