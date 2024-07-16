@@ -39,8 +39,7 @@ class AiToolItemProvider extends AbstractProvider
         ],
     ];
 
-
-    public function __construct(string $table='', string $identifier='', string $context='')
+    public function __construct(string $table = '', string $identifier = '', string $context = '')
     {
         $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
         if (version_compare($version, '12.0', '>=')) {
@@ -157,10 +156,12 @@ class AiToolItemProvider extends AbstractProvider
     {
         return $this->record instanceof File;
     }
+
     protected function isFolder(): bool
     {
         return $this->record instanceof Folder;
     }
+
     protected function isImage(): bool
     {
         return $this->isFile() && $this->record->getType() == AbstractFile::FILETYPE_IMAGE;
