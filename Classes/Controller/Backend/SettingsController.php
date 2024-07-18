@@ -113,11 +113,7 @@ class SettingsController extends ActionController
         $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
 
-        if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0', '<')) {
-            $uri = (string)$uriBuilder->buildUriFromRoute('AItoolsAitools_AItoolsSettings', ['tx_aitools_settings' => ['controller' => 'Settings', 'action' => 'settings']]);
-        } else {
-            $uri = (string)$uriBuilder->buildUriFromRoute('aitools_AItoolsSettings', ['tx_aitools_settings' => ['controller' => 'Settings', 'action' => 'settings']]);
-        }
+        $uri = (string)$uriBuilder->buildUriFromRoute('AItoolsAitools_AItoolsSettings', ['tx_aitools_settings' => ['controller' => 'Settings', 'action' => 'settings']]);
 
         if (!$this->settingsService->checkPermission('prompt_management')) {
             return GeneralUtility::makeInstance(RedirectResponse::class, $uri);
@@ -147,11 +143,7 @@ class SettingsController extends ActionController
         $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
 
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-        if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0', '<')) {
-            $uri = (string)$uriBuilder->buildUriFromRoute('AItoolsAitools_AItoolsSettings', ['tx_aitools_settings' => ['controller' => 'Settings', 'action' => 'settings']]);
-        } else {
-            $uri = (string)$uriBuilder->buildUriFromRoute('aitools_AItoolsSettings', ['tx_aitools_settings' => ['controller' => 'Settings', 'action' => 'settings']]);
-        }
+        $uri = (string)$uriBuilder->buildUriFromRoute('AItoolsAitools_AItoolsSettings', ['tx_aitools_settings' => ['controller' => 'Settings', 'action' => 'settings']]);
 
         if (!$this->settingsService->checkPermission('prompt_management')) {
             return GeneralUtility::makeInstance(RedirectResponse::class, $uri);

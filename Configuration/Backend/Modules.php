@@ -3,13 +3,13 @@
 use Pagemachine\AItools\Controller\Backend\SettingsController;
 
 return [
-    'aitools' => [
+    'AItoolsAitools' => [
         'position' => ['after' => 'web'],
         'iconIdentifier' => 'tx-aitools-svgicon',
         'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_mainmodule.xlf',
     ],
-    /*'aitools_AItoolsImages' => [
-        'parent' => 'aitools',
+    /*'AItoolsAitools_AItoolsImages' => [
+        'parent' => 'AItoolsAitools',
         'position' => ['before' => '*'],
         'access' => 'user',
         'workspaces' => 'live',
@@ -29,8 +29,8 @@ return [
             ],
         ],
     ],*/
-    'aitools_AItoolsSettings' => [
-        'parent' => 'aitools',
+    'AItoolsAitools_AItoolsSettings' => [
+        'parent' => 'AItoolsAitools',
         'position' => ['before' => '*'],
         'access' => 'user',
         'workspaces' => 'live',
