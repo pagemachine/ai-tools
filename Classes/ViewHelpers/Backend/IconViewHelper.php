@@ -100,7 +100,7 @@ class IconViewHelper extends AbstractViewHelper
         $iconHtml = $icon->render($alternativeMarkupIdentifier);
         if ($arguments['title'] ?? false) {
             // add title to icon (backwards compatibility for TYPO3 v11.
-            $iconHtml = str_replace('<span', '<span title="'. htmlspecialchars($arguments['title']). '"', $iconHtml);
+            $iconHtml = str_replace('<span', '<span title="'. htmlspecialchars((string) $arguments['title']). '"', $iconHtml);
         }
 
         return $iconHtml;
