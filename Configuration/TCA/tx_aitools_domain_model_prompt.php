@@ -6,6 +6,7 @@ return [
     'ctrl' => [
         'title' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt',
         'label' => 'description',
+        'label_userFunc' => \Pagemachine\AItools\Userfuncs\Tca::class . '->promptTitle',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
         'delete' => 'deleted',
@@ -78,7 +79,7 @@ return [
         '0' => [
             'showitem' => '
                 --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:general,
-                --palette--;;paletteHidden, type, description, prompt,
+                --palette--;;paletteHidden, default, type, description, prompt,
             ',
         ],
     ],
