@@ -14,7 +14,7 @@ return [
         'enablecolumns' => [
             'disabled' => 'hidden',
         ],
-        'iconfile' => 'EXT:aitools/Resources/Public/Icons/ext_icon.png',
+        'iconfile' => 'EXT:ai_tools/Resources/Public/Icons/ext_icon.png',
         'hideAtCopy' => true,
         'thumbnail' => 'logo',
     ],
