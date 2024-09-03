@@ -4,7 +4,7 @@ defined('TYPO3') or die();
 
 return [
     'ctrl' => [
-        'title' => 'LLL:EXT:aitools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt',
+        'title' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt',
         'label' => 'description',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
@@ -28,7 +28,7 @@ return [
                 'default' => 0,
                 'items' => [
                     [
-                        'label' => '',
+                        0 => '',
                         'invertStateDisplay' => true,
                     ],
                 ],
@@ -36,16 +36,17 @@ return [
         ],
         'prompt' => [
             'exclude' => true,
-            'label' => 'LLL:EXT:aitools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.prompt',
+            'label' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.prompt',
             'config' => [
                 'type' => 'text',
                 'cols' => '40',
+                'required' => true,
                 'rows' => '15',
             ],
         ],
         'description' => [
             'exclude' => true,
-            'label' => 'LLL:EXT:aitools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.description',
+            'label' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.description',
             'config' => [
                 'type' => 'input',
                 'eval' => 'trim',
@@ -55,17 +56,18 @@ return [
         ],
         'type' => [
             'exclude' => true,
-            'label' => 'LLL:EXT:aitools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.type',
+            'label' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.type',
             'config' => [
-                'type' => 'input',
-                'maxlength' => 255,
-                'size' => '20',
-                'eval' => 'trim',
+                'type' => 'select',
+                'renderType' => 'selectSingle',
+                'items' => [
+                    ['LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.img2txt', 'img2txt'],
+                ],
             ],
         ],
         'default' => [
             'exclude' => true,
-            'label' => 'LLL:EXT:aitools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.default',
+            'label' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.default',
             'config' => [
                 'type' => 'check',
                 'default' => 0,
@@ -76,9 +78,7 @@ return [
         '0' => [
             'showitem' => '
                 --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:general,
-                    prompt, description, type,
-                --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:access,
-                    --palette--;;paletteHidden,
+                --palette--;;paletteHidden, type, description, prompt,
             ',
         ],
     ],

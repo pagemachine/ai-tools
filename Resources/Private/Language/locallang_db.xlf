@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2023-03-21T19:40:40Z" product-name="ai_tools">
+		<body>
+			<trans-unit id="tx_aitools_domain_model_prompt">
+				<source>Prompt Template</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_prompt.prompt">
+				<source>Prompt</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_prompt.description">
+				<source>Title</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_prompt.type">
+				<source>Type</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_prompt.img2txt">
+				<source>Image to text</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_prompt.default">
+				<source>Default prompt</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>
