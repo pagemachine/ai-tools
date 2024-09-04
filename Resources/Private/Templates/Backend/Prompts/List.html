@@ -1,0 +1,91 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:rd="http://typo3.org/ns/TYPO3/CMS/Redirects/ViewHelpers"
+    xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+
+<f:layout name="Default" />
+
+<f:section name="Content">
+    <h1><f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.templates" /></h1>
+
+    <f:render section="table" arguments="{_all}" />
+
+</f:section>
+
+<f:section name="table">
+    <div class="table-fit">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.description" />
+                    </th>
+                    <th>
+                        <f:translate
+                            key="LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.prompt" />
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <f:for each="{prompts}" key="domainName" as="prompt">
+                    <tr>
+                        <td>
+                            <core:iconForRecord table="tx_aitools_domain_model_prompt" row="{0: prompt.uid}" />
+                            <f:if condition="{prompt.default}">
+                                🏠
+                            </f:if>
+                            <be:link.editRecord returnUrl="{returnUrl}" table="tx_aitools_domain_model_prompt" uid="{prompt.uid}"
+                                title="{f:translate(key: 'LLL:EXT:core/Resources/Private/Language/locallang_mod_web_list.xlf:edit')}">
+                                {prompt.description -> f:format.crop(maxCharacters:50)}
+                            </be:link.editRecord>
+                        </td>
+                        <td>
+                            <be:link.editRecord title="{prompt.prompt}" returnUrl="{returnUrl}" table="tx_aitools_domain_model_prompt" uid="{prompt.uid}">
+                                {prompt.prompt -> f:format.crop(maxCharacters:50)}
+                            </be:link.editRecord>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <be:link.editRecord returnUrl="{returnUrl}" class="btn btn-default" table="tx_aitools_domain_model_prompt"
+                                    uid="{prompt.uid}"
+                                    title="{f:translate(key: 'LLL:EXT:core/Resources/Private/Language/locallang_mod_web_list.xlf:edit')}">
+                                    <core:icon identifier="actions-open" />
+                                </be:link.editRecord>
+                                <f:if condition="{prompt.hidden} == 1">
+                                    <f:then>
+                                        <a class="btn btn-default"
+                                            href="{be:moduleLink(route:'tce_db', query:'data[tx_aitools_domain_model_prompt][{prompt.uid}][hidden]=0', arguments:'{redirect: returnUrl}')}"
+                                            title="{f:translate(key:'LLL:EXT:core/Resources/Private/Language/locallang_mod_web_list.xlf:unHide')}">
+                                            <core:icon identifier="actions-edit-unhide" />
+                                        </a>
+                                    </f:then>
+                                    <f:else>
+                                        <a class="btn btn-default"
+                                            href="{be:moduleLink(route:'tce_db', query:'data[tx_aitools_domain_model_prompt][{prompt.uid}][hidden]=1', arguments:'{redirect: returnUrl}')}"
+                                            title="{f:translate(key:'LLL:EXT:core/Resources/Private/Language/locallang_mod_web_list.xlf:hide')}">
+                                            <core:icon identifier="actions-edit-hide" />
+                                        </a>
+                                    </f:else>
+                                </f:if>
+                                <a class="btn btn-default t3js-modal-trigger"
+                                    href="{be:moduleLink(route:'tce_db', query:'cmd[tx_aitools_domain_model_prompt][{prompt.uid}][delete]=1', arguments:'{redirect: returnUrl}')}"
+                                    title="{f:translate(key: 'LLL:EXT:core/Resources/Private/Language/locallang_mod_web_list.xlf:delete')}"
+                                    data-severity="warning"
+                                    data-title="{f:translate(key: 'LLL:EXT:backend/Resources/Private/Language/locallang_alt_doc.xlf:label.confirm.delete_record.title')}"
+                                    data-bs-content="{f:translate(key: 'LLL:EXT:backend/Resources/Private/Language/locallang_alt_doc.xlf:deleteWarning')}"
+                                    data-button-close-text="{f:translate(key: 'LLL:EXT:backend/Resources/Private/Language/locallang_alt_doc.xlf:buttons.confirm.delete_record.no')}">
+                                    <core:icon identifier="actions-delete" />
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                </f:for>
+            </tbody>
+        </table>
+    </div>
+</f:section>
+
+</html>

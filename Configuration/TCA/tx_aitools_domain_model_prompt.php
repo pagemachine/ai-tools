@@ -6,7 +6,6 @@ return [
     'ctrl' => [
         'title' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt',
         'label' => 'description',
-        'label_userFunc' => \Pagemachine\AItools\Userfuncs\Tca::class . '->promptTitle',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
         'delete' => 'deleted',
@@ -18,6 +17,11 @@ return [
         'iconfile' => 'EXT:ai_tools/Resources/Public/Icons/ext_icon.png',
         'hideAtCopy' => true,
         'thumbnail' => 'logo',
+        'rootLevel' => -1,
+        'security' => [
+            'ignoreWebMountRestriction' => true,
+            'ignoreRootLevelRestriction' => true,
+        ],
     ],
     'columns' => [
         'hidden' => [

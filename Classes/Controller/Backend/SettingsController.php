@@ -8,7 +8,6 @@ use Pagemachine\AItools\Domain\Model\Prompt;
 use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Pagemachine\AItools\Service\SettingsService;
 use Psr\Http\Message\ResponseInterface;
-use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
@@ -20,8 +19,6 @@ use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Http\ForwardResponse;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException;
-use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
-use TYPO3\CMS\Recordlist\Controller\RecordListController;
 
 class SettingsController extends ActionController
 {
@@ -112,4 +109,8 @@ class SettingsController extends ActionController
         return GeneralUtility::makeInstance(ForwardResponse::class, 'settings');
     }
 
+    protected function getLanguageService(): LanguageService
+    {
+        return $GLOBALS['LANG'];
+    }
 }

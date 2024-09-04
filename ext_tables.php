@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+use Pagemachine\AItools\Controller\Backend\PromptsController;
 use Pagemachine\AItools\Controller\Backend\SettingsController;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
@@ -31,7 +32,7 @@ if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0',
         'prompts',
         '',
         [
-            SettingsController::class => 'promptList',
+            PromptsController::class => 'list',
         ],
         [
             'access' => 'user, group',

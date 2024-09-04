@@ -1,5 +1,6 @@
 <?php
 
+use Pagemachine\AItools\Controller\Backend\PromptsController;
 use Pagemachine\AItools\Controller\Backend\SettingsController;
 
 return [
@@ -18,8 +19,8 @@ return [
         'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf',
         'extensionName' => 'AItools',
         'controllerActions' => [
-            SettingsController::class => [
-                'promptList',
+            PromptsController::class => [
+                'list',
             ],
         ],
     ],
