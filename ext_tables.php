@@ -19,9 +19,24 @@ if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0',
         'after:web',
         [],
         [
-            'access' => 'user,group',
-            'iconIdentifier' => 'EXT:ai_tools/Resources/Public/Icons/ext_icon.svg',
+            'access' => '',
+            'icon' => 'EXT:ai_tools/Resources/Public/Icons/ext_icon.svg',
             'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_mainmodule.xlf',
+        ]
+    );
+
+    ExtensionUtility::registerModule(
+        'AItools',
+        'aitools',
+        'prompts',
+        '',
+        [
+            SettingsController::class => 'promptList',
+        ],
+        [
+            'access' => 'user, group',
+            'iconIdentifier' => 'actions-notebook',
+            'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.templates',
         ]
     );
 
@@ -31,11 +46,11 @@ if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0',
         'settings',
         '',
         [
-            SettingsController::class => 'settings, save, addPrompt, saveDefaultPrompt',
+            SettingsController::class => 'settings, save',
         ],
         [
-            'access' => 'user, group',
-            'icon' => 'EXT:ai_tools/Resources/Public/Icons/ext_icon.svg',
+            'access' => 'admin',
+            'iconIdentifier' => 'module-install-settings',
             'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf',
         ]
     );
@@ -44,12 +59,6 @@ if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0',
 $GLOBALS['TYPO3_CONF_VARS']['BE']['customPermOptions']['tx_aitools_permissions'] = [
     'header' => 'AI Tools permissions',
     'items' => [
-        'prompt_management' => [ // key
-            'Prompt management',
-            // Icon has been registered above
-            'tcarecords-tx_styleguide_forms-default',
-            'Allows User to manage prompts',
-        ],
         'generate_metadata' => [ // key
             'Generate metadata',
             // Icon has been registered above
