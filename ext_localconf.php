@@ -4,10 +4,40 @@ declare(strict_types=1);
 
 use Pagemachine\AItools\ContextMenu\ItemProviders\AiToolItemProvider;
 use Pagemachine\AItools\Hooks\DataHandlerHooks;
+use Pagemachine\AItools\Service\ImageRecognition\CustomImageRecognitionService;
+use Pagemachine\AItools\Service\ImageRecognition\OpenAiImageRecognitionService;
+use Pagemachine\AItools\Service\Translation\CustomTranslationService;
+use Pagemachine\AItools\Service\Translation\DeepLTranslationService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 defined('TYPO3') or die();
+
+$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ai_tools']['servers'] = [
+    'aigude' => [
+        'name' => 'AI Gude',
+        'functionality' => [],
+    ],
+    'openai' => [
+        'name' => 'Open AI',
+        'functionality' => [
+            'image_recognition' => OpenAiImageRecognitionService::class,
+        ],
+    ],
+    'deepl' => [
+        'name' => 'DeepL',
+        'functionality' => [
+            'translation' => DeepLTranslationService::class,
+        ],
+    ],
+    'custom' => [
+        'name' => 'Custom',
+        'functionality' => [
+            'image_recognition' => CustomImageRecognitionService::class,
+            'translation' => CustomTranslationService::class,
+        ],
+    ],
+];
 
 $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
 

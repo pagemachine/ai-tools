@@ -26,6 +26,9 @@
                     <th>
                         <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_server.title" />
                     </th>
+                    <th>
+                        Functionality
+                    </th>
                     <th></th>
                 </tr>
             </thead>
@@ -42,6 +45,14 @@
                                 title="{f:translate(key: 'LLL:EXT:core/Resources/Private/Language/locallang_mod_web_list.xlf:edit')}">
                                 {server.title -> f:format.crop(maxCharacters:50)}
                             </be:link.editRecord>
+                        </td>
+
+                        <td>
+                            <f:for each="{server.functionality}" as="functionality">
+                                <span class="label label-default">
+                                    <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_server.{functionality}" />
+                                </span>
+                            </f:for>
                         </td>
 
                         <td>

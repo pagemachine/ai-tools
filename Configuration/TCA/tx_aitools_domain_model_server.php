@@ -1,6 +1,11 @@
 <?php
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Pagemachine\AItools\Service\ServerService;
+
 defined('TYPO3') or die();
+
+$serverService = GeneralUtility::makeInstance(ServerService::class);
 
 return [
     'ctrl' => [
@@ -57,24 +62,8 @@ return [
             'config' => [
                 'type' => 'select',
                 'renderType' => 'selectSingle',
-                'items' => [
-                    [
-                        'AI Gude',
-                        'pagemachine',
-                    ],
-                    [
-                        'Open AI',
-                        'openai',
-                    ],
-                    [
-                        'DeepL',
-                        'deepl',
-                    ],
-                    [
-                        'Custom',
-                        'custom',
-                    ],
-                ],
+                'default' => 'aigude',
+                'items' => $serverService->getTcaOptions(),
             ],
         ],
         'apikey' => [
@@ -170,12 +159,7 @@ return [
         ],
     ],
     'types' => [
-        '0' => [
-            'showitem' => '
-                --palette--;;paletteGeneral
-            ',
-        ],
-        'pagemachine' => [
+        'aigude' => [
             'showitem' => '
                 --palette--;;paletteGeneral, apikey
             ',

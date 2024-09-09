@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Domain\Model;
 
+use Pagemachine\AItools\Service\ServerService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 class Server extends AbstractEntity
@@ -55,6 +57,11 @@ class Server extends AbstractEntity
 
     public function getServer(): string
     {
-        return 'Unknown';
+        return GeneralUtility::makeInstance(ServerService::class)->getNameOfServerType($this->getType());
+    }
+
+    public function getFunctionality(): array
+    {
+        return GeneralUtility::makeInstance(ServerService::class)->getFunctionalityOfServerType($this->getType());
     }
 }

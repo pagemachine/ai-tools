@@ -57,6 +57,12 @@
 			<trans-unit id="tx_aitools_domain_model_server.translationUrl">
 				<source>Translation API URI</source>
 			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_server.translation">
+				<source>Translation</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_server.image_recognition">
+				<source>Image Recognition</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

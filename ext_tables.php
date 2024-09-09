@@ -66,7 +66,7 @@ if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0',
         ],
         [
             'access' => 'admin',
-            'iconIdentifier' => 'module-install-settings',
+            'iconIdentifier' => 'apps-filetree-mount',
             'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_server.servers',
         ]
     );

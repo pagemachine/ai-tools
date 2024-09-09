@@ -46,7 +46,7 @@ return [
         'position' => ['before' => '*'],
         'access' => 'admin',
         'workspaces' => 'live',
-        'iconIdentifier' => 'module-install-setting',
+        'iconIdentifier' => 'apps-filetree-mount',
         'path' => '/module/aitools/AItoolsServers',
         'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_server.servers',
         'extensionName' => 'AItools',

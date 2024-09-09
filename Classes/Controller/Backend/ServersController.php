@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pagemachine\AItools\Controller\Backend;
 
 use Pagemachine\AItools\Domain\Repository\ServerRepository;
+use Pagemachine\AItools\Service\ServerService;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
@@ -23,6 +24,7 @@ class ServersController extends ActionController
         private readonly ServerRepository $serverRepository,
         private readonly ModuleTemplateFactory $moduleTemplateFactory,
         private readonly IconFactory $iconFactory,
+        private readonly ServerService $serverService,
     ) {
     }
 
@@ -32,20 +34,31 @@ class ServersController extends ActionController
 
         $buttonBar = $moduleTemplate->getDocHeaderComponent()->getButtonBar();
 
-        $newRecordButton = $buttonBar->makeLinkButton()
-            ->setHref((string)$uriBuilder->buildUriFromRoute(
-                'record_edit',
-                [
-                    'edit' => [
-                        'tx_aitools_domain_model_server' => ['new'],
-                    ],
-                    'returnUrl' => (string)$requestUri,
-                ]
-            ))
-            ->setTitle('Add')
-            ->setIcon($this->iconFactory->getIcon('actions-add', Icon::SIZE_SMALL));
+        $group = 0;
 
-        $buttonBar->addButton($newRecordButton, ButtonBar::BUTTON_POSITION_LEFT, 10);
+        foreach ($this->serverService->getServers() as $key => $value) {
+            $newRecordButton = $buttonBar->makeLinkButton()
+                ->setHref((string)$uriBuilder->buildUriFromRoute(
+                    'record_edit',
+                    [
+                        'edit' => [
+                            'tx_aitools_domain_model_server' => ['new'],
+                        ],
+                        'defVals' => [
+                            'tx_aitools_domain_model_server' => [
+                                'type' => $key,
+                            ],
+                        ],
+                        'returnUrl' => (string)$requestUri,
+                    ]
+                ))
+                ->setTitle($value['name'])
+                ->setShowLabelText(true)
+                ->setIcon($this->iconFactory->getIcon('actions-add', Icon::SIZE_SMALL));
+
+            $group++;
+            $buttonBar->addButton($newRecordButton, ButtonBar::BUTTON_POSITION_LEFT, $group);
+        }
     }
 
     public function listAction(): ResponseInterface
