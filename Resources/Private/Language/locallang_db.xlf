@@ -23,6 +23,40 @@
 			<trans-unit id="tx_aitools_domain_model_prompt.default">
 				<source>Default prompt</source>
 			</trans-unit>
+
+			<trans-unit id="tx_aitools_domain_model_server">
+				<source>Server</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_server.servers">
+				<source>Servers</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_server.title">
+				<source>Name</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_server.type">
+				<source>Server</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_server.apikey">
+				<source>API Key</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_server.endpoint">
+				<source>Endpoint</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_server.formality">
+				<source>Formality</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_server.username">
+				<source>Username</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_server.password">
+				<source>Password</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_server.imageUrl">
+				<source>Image Recognition API URI</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_server.translationUrl">
+				<source>Translation API URI</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 use Pagemachine\AItools\Controller\Backend\PromptsController;
+use Pagemachine\AItools\Controller\Backend\ServersController;
 use Pagemachine\AItools\Controller\Backend\SettingsController;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
@@ -53,6 +54,20 @@ if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0',
             'access' => 'admin',
             'iconIdentifier' => 'module-install-settings',
             'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf',
+        ]
+    );
+    ExtensionUtility::registerModule(
+        'AItools',
+        'aitools',
+        'servers',
+        '',
+        [
+            ServersController::class => 'list',
+        ],
+        [
+            'access' => 'admin',
+            'iconIdentifier' => 'module-install-settings',
+            'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_server.servers',
         ]
     );
 }
