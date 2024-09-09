@@ -79,6 +79,12 @@
                                     data-button-close-text="{f:translate(key: 'LLL:EXT:backend/Resources/Private/Language/locallang_alt_doc.xlf:buttons.confirm.delete_record.no')}">
                                     <core:icon identifier="actions-delete" />
                                 </a>
+                                <f:if condition="{prompt.default} == 0">
+                                    <a class="btn btn-default btn-disabled"
+                                        href="{be:moduleLink(route:'tce_db', query:'data[tx_aitools_domain_model_prompt][{prompt.uid}][default]=1', arguments:'{redirect: returnUrl}')}">
+                                        set as Default
+                                    </a>
+                                </f:if>
                             </div>
                         </td>
                     </tr>
