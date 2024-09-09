@@ -22,84 +22,36 @@
 
     <h1>AI Tools Settings</h1>
 
-    <ul class="nav nav-tabs" id="tablist-settings" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="services-tab" data-bs-toggle="tab" data-bs-target="#servicesTab" type="button" role="tab" aria-controls="services" aria-selected="true">API Integration Settings</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="aiselect-tab" data-bs-toggle="tab" data-bs-target="#aiselectTab" type="button" role="tab" aria-controls="aiselect" aria-selected="false">API Selection & Customization</button>
-        </li>
-    </ul>
-    <f:form enctype="multipart/form-data" id="EditSettingsController" action="save" name="settings" class="form-section">
+    <f:form enctype="multipart/form-data" id="EditSettingsController" action="save" name="settings">
         <div class="tab-content" id="tabcontent-settings">
-            <div class="tab-pane fade show active" id="servicesTab" role="tabpanel" aria-labelledby="services-tab">
-                <div class="form-group">
-                    <h3>Open AI</h3>
-                    <label for="openai_apikey">Open AI API Key:</label>
-                    <f:form.textfield name="openai_apikey" id="openai_apikey" value="{openai_apikey}" class="form-control" type="password" />
-
-                    <h3>DeepL</h3>
-                    <label for="deepl_endpoint">DeepL Endpoint:</label>
-                    <f:form.select name="deepl_endpoint" id="deepl_endpoint" value="{deepl_endpoint}" class="form-control form-select">
-                        <f:form.select.option value="free">Free</f:form.select.option>
-                        <f:form.select.option value="pro">Pro</f:form.select.option>
-                    </f:form.select>
-                    <label for="deepl_auth_key">DeepL Auth Key:</label>
-                    <f:form.textfield name="deepl_auth_key" id="deepl_auth_key" value="{deepl_auth_key}" class="form-control" type="password" />
-                    <label for="deepl_formality">Formality:</label>
-                    <f:form.select name="deepl_formality" id="deepl_formality" value="{deepl_formality}" class="form-control form-select">
-                        <f:form.select.option value="">Default</f:form.select.option>
-                        <f:form.select.option value="prefer_more">More</f:form.select.option>
-                        <f:form.select.option value="prefer_less">Less</f:form.select.option>
-                    </f:form.select>
-
-                    <h3>Custom</h3>
-                    <label for="custom_auth_token">Custom API Auth Token:</label>
-                    <f:form.textfield name="custom_auth_token" id="custom_auth_token" value="{custom_auth_token}" class="form-control" type="password" />
-
-                    <label>Custom API Basic Auth:</label>
-                    <div class="row">
-                        <div class="form-group t3js-formengine-validation-marker t3js-formengine-palette-field col col-sm-6"><div class="formengine-field-item t3js-formengine-field-item">
-                            <div class="form-control-wrap" style="max-width: 480px">
-                                <label class="t3js-formengine-label">
-                                    <span class="help-link"><abbr>Username</abbr></span>
-                                </label>
-                                <f:form.textfield name="custom_api_username" id="custom_api_username" value="{custom_api_username}" class="form-control" type="text" placeholder="Username" />
-                            </div>
-                        </div></div>
-                        <div class="form-group t3js-formengine-validation-marker t3js-formengine-palette-field col col-sm-6"><div class="formengine-field-item t3js-formengine-field-item">
-                            <div class="form-control-wrap" style="max-width: 480px">
-                                <label class="t3js-formengine-label">
-                                    <span class="help-link"><abbr>Password</abbr></span>
-                                </label>
-                                <f:form.textfield name="custom_api_password" id="custom_api_password" value="{custom_api_password}" class="form-control" type="password" placeholder="Password" />
-                            </div>
-                        </div></div>
+            <ul class="nav nav-tabs t3js-tabs"></ul>
+            <div class="tab-pane fade show active" id="aiselectTab" role="tabpanel" aria-labelledby="aiselect-tab">
+                <fieldset class="form-section">
+                    <div class="form-group">
+                        <h3>Image Recognition</h3>
+                        <label for="image_recognition_service">Image Recognition Service:</label>
+                        <f:form.select name="image_recognition_service" id="image_recognition_service" value="{image_recognition_service}"
+                            class="form-control form-select">
+                            <f:form.select.option value="">Select Service</f:form.select.option>
+                            <f:for each="{imageOptions}" as="option">
+                                <f:form.select.option value="{option.uid}">{option.title} [{option.server}]</f:form.select.option>
+                            </f:for>
+                        </f:form.select>
                     </div>
-                    <label for="custom_image_recognition_api_uri">Custom Image Recognition API URI:</label>
-                    <f:form.textfield name="custom_image_recognition_api_uri" id="custom_image_recognition_api_uri" value="{custom_image_recognition_api_uri}" class="form-control" />
-                    <label for="custom_translation_api_uri">Custom Translation API URI:</label>
-                    <f:form.textfield name="custom_translation_api_uri" id="custom_translation_api_uri" value="{custom_translation_api_uri}" class="form-control" />
-                </div>
-            </div>
-            <div class="tab-pane fade" id="aiselectTab" role="tabpanel" aria-labelledby="aiselect-tab">
-                <div class="form-group">
-                    <h3>Image Recognition</h3>
-                    <label for="image_recognition_service">Image Recognition Service:</label>
-                    <f:form.select name="image_recognition_service" id="image_recognition_service" value="{image_recognition_service}" class="form-control form-select">
-                        <f:form.select.option value="">Select Service</f:form.select.option>
-                        <f:form.select.option value="custom">Custom</f:form.select.option>
-                        <f:form.select.option value="openai">Open AI</f:form.select.option>
-                    </f:form.select>
-
-                    <h3>Translation</h3>
-                    <label for="translation_service">Translation Service:</label>
-                    <f:form.select name="translation_service" id="translation_service" value="{translation_service}" class="form-control form-select">
-                        <f:form.select.option value="">Select Service</f:form.select.option>
-                        <f:form.select.option value="custom">Custom</f:form.select.option>
-                        <f:form.select.option value="deepl">DeepL</f:form.select.option>
-                    </f:form.select>
-                </div>
+                </fieldset>
+                <fieldset class="form-section">
+                    <div class="form-group">
+                        <h3>Translation</h3>
+                        <label for="translation_service">Translation Service:</label>
+                        <f:form.select name="translation_service" id="translation_service" value="{translation_service}"
+                            class="form-control form-select">
+                            <f:form.select.option value="">Select Service</f:form.select.option>
+                            <f:for each="{translationOptions}" as="option">
+                                <f:form.select.option value="{option.uid}">{option.title} [{option.server}]</f:form.select.option>
+                            </f:for>
+                        </f:form.select>
+                    </div>
+                </fieldset>
             </div>
         </div>
     </f:form>

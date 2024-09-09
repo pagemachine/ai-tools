@@ -18,6 +18,19 @@ class ServerService
         return $this->serverConfig;
     }
 
+    public function getServerKeysByFunctionality($functionality): array
+    {
+        $serverKeys = [];
+
+        foreach ($this->serverConfig as $key => $value) {
+            if (in_array($functionality, array_keys($value['functionality']))) {
+                $serverKeys[] = $key;
+            }
+        }
+
+        return $serverKeys;
+    }
+
     public function getTcaOptions(): array
     {
         $options = [];
