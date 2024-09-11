@@ -71,10 +71,9 @@ return [
             'label' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_server.apikey',
             'config' => [
                 'type' => 'input',
-                'eval' => 'trim,required,password',
-                'required' => true,
+                'eval' => 'trim,password',
                 'size' => 20,
-                'max' => 50,
+                'max' => 120,
             ],
         ],
         'endpoint' => [
@@ -124,7 +123,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'size' => 20,
-                'max' => 50,
+                'max' => 120,
             ],
         ],
         'password' => [
@@ -132,9 +131,9 @@ return [
             'label' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_server.password',
             'config' => [
                 'type' => 'input',
-                'eval' => 'trim',
+                'eval' => 'trim,password',
                 'size' => 20,
-                'max' => 50,
+                'max' => 120,
             ],
         ],
         'imageUrl' => [
@@ -144,7 +143,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'size' => 50,
-                'max' => 50,
+                'max' => 120,
             ],
         ],
         'translationUrl' => [
@@ -154,7 +153,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'size' => 50,
-                'max' => 50,
+                'max' => 120,
             ],
         ],
     ],
