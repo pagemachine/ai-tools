@@ -6,8 +6,6 @@ namespace Pagemachine\AItools\Service;
 
 use Doctrine\DBAL\Driver\Exception;
 use Pagemachine\AItools\Domain\Repository\MetaDataRepository;
-use Pagemachine\AItools\Service\ImageRecognition\CustomImageRecognitionService;
-use Pagemachine\AItools\Service\ImageRecognition\OpenAiImageRecognitionService;
 use T3G\AgencyPack\FileVariants\Service\ResourcesService;
 use TYPO3\CMS\Core\Resource\Exception\InvalidUidException;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
@@ -21,22 +19,16 @@ use TYPO3\CMS\Extbase\Persistence\PersistenceManagerInterface;
 
 class ImageMetaDataService
 {
-    protected SettingsService $settingsService;
-    private readonly ?CustomImageRecognitionService $customImageRecognitionService;
-    private readonly ?OpenAiImageRecognitionService $openAiImageRecognitionService;
+    protected ServerService $serverService;
     private readonly MetaDataRepository $metaDataRepository;
     protected ResourceFactory $resourceFactory;
     protected PersistenceManagerInterface $persistenceManager;
 
     public function __construct()
     {
-        $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
-
-        $this->customImageRecognitionService = GeneralUtility::makeInstance(CustomImageRecognitionService::class);
-        $this->openAiImageRecognitionService = GeneralUtility::makeInstance(OpenAiImageRecognitionService::class);
+        $this->serverService = GeneralUtility::makeInstance(ServerService::class);
 
         $this->metaDataRepository = GeneralUtility::makeInstance(MetaDataRepository::class);
-
         $this->resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);
         $this->persistenceManager = GeneralUtility::makeInstance(PersistenceManagerInterface::class);
     }
@@ -48,12 +40,8 @@ class ImageMetaDataService
      */
     public function generateImageDescription(FileInterface $fileObject, string $textPrompt = ''): string
     {
-        $imageRecognitionService = $this->settingsService->getSetting('image_recognition_service');
-        return match ($imageRecognitionService) {
-            'openai' => $this->openAiImageRecognitionService->sendFileToApi(fileObject: $fileObject, textPrompt: $textPrompt),
-            'custom' => $this->customImageRecognitionService->sendFileToApi(fileObject: $fileObject, textPrompt: $textPrompt),
-            default => throw new \Exception('No valid image recognition service configured'),
-        };
+        $serverClass = $this->serverService->getActiveServerClassByFunctionality('image_recognition');
+        return $serverClass->sendFileToApi($fileObject, $textPrompt);
     }
 
     /**

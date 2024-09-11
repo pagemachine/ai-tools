@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Service\Translation;
 
-use Pagemachine\AItools\Service\SettingsService;
+use Pagemachine\AItools\Domain\Model\Server;
+use Pagemachine\AItools\Domain\Model\ServerDeepl;
 use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class DeepLTranslationService implements TranslationServiceInterface
 {
+    protected ServerDeepl $server;
     protected $requestFactory;
     protected string $authKey;
-    protected $settingsService;
 
     protected string $apiEndpointUri;
     private $endpoints = [
@@ -52,12 +53,17 @@ class DeepLTranslationService implements TranslationServiceInterface
         'zh' => 'ZH',
     ];
 
-    public function __construct()
+    public function __construct(Server $server)
     {
-        $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
+        if ($server instanceof ServerDeepl) {
+            $this->server = $server;
+        } else {
+            throw new \InvalidArgumentException('Expected instance of ServerDeepl');
+        }
+
         $this->requestFactory = GeneralUtility::makeInstance(RequestFactory::class);
-        $this->authKey = $this->settingsService->getSetting('deepl_auth_key');
-        $this->apiEndpointUri = $this->endpoints[(string)$this->settingsService->getSetting('deepl_endpoint')];
+        $this->authKey = $this->server->getApikey();
+        $this->apiEndpointUri = $this->endpoints[(string)$this->server->getEndpoint()];
     }
 
     /**
@@ -78,9 +84,9 @@ class DeepLTranslationService implements TranslationServiceInterface
         $sourceLang = $this->getLanguageScript($sourceLang);
         $targetLang = $this->getLanguageScript($targetLang);
 
-        $formality = $this->settingsService->getSetting('deepl_formality');
+        $formality = $this->server->getFormality();
 
-        $authKey = $this->settingsService->getSetting('deepl_auth_key'); // Assuming the DeepL auth key is stored in settings
+        $authKey = $this->authKey; // Assuming the DeepL auth key is stored in settings
 
         $data = [
             'text' => $text,

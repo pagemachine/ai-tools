@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Service\Translation;
 
-use Pagemachine\AItools\Service\SettingsService;
+use Pagemachine\AItools\Domain\Model\Server;
+use Pagemachine\AItools\Domain\Model\ServerCustom;
 use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CustomTranslationService implements TranslationServiceInterface
 {
+    protected ServerCustom $server;
     protected $requestFactory;
     protected string $authToken = '';
     protected string $basicAuth = '';
-    protected $settingsService;
 
     private array $languages = [
         'ace' => 'ace_Arab',  // ace_Latn
@@ -214,14 +215,19 @@ class CustomTranslationService implements TranslationServiceInterface
         'zu' => 'zul_Latn',
     ];
 
-    public function __construct()
+    public function __construct(Server $server)
     {
-        $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
+        if ($server instanceof ServerCustom) {
+            $this->server = $server;
+        } else {
+            throw new \InvalidArgumentException('Expected instance of ServerCustom');
+        }
+
         $this->requestFactory = GeneralUtility::makeInstance(RequestFactory::class);
-        $this->authToken = $this->settingsService->getSetting('custom_auth_token');
+        $this->authToken = $this->server->getApikey();
         // Retrieve the username and password from settings
-        $username = $this->settingsService->getSetting('custom_api_username');
-        $password = $this->settingsService->getSetting('custom_api_password');
+        $username = $this->server->getUsername();
+        $password = $this->server->getPassword();
         if (!empty($username) && !empty($password)) {
             $this->basicAuth = base64_encode($username . ':' . $password);
         }
@@ -245,7 +251,7 @@ class CustomTranslationService implements TranslationServiceInterface
         $sourceLang = $this->getLanguageScript($sourceLang);
         $targetLang = $this->getLanguageScript($targetLang);
 
-        $url = $this->settingsService->getSetting('custom_translation_api_uri');
+        $url = $this->server->getTranslationUrl();
 
         $url .= '?source_lang=' . urlencode((string)$sourceLang) . '&target_lang=' . urlencode((string)$targetLang);
 

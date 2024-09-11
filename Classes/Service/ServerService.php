@@ -4,13 +4,23 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Service;
 
+use Pagemachine\AItools\Domain\Model\Server;
+use Pagemachine\AItools\Domain\Repository\ServerRepository;
+use Pagemachine\AItools\Service\SettingsService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 class ServerService
 {
     private readonly array $serverConfig;
+    private readonly SettingsService $settingsService;
+    private readonly ServerRepository $serverRepository;
 
     public function __construct()
     {
         $this->serverConfig = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ai_tools']['servers'];
+
+        $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
+        $this->serverRepository = GeneralUtility::makeInstance(ServerRepository::class);
     }
 
     public function getServers(): array
@@ -53,5 +63,24 @@ class ServerService
     public function getFunctionalityOfServerType(string $type): array
     {
         return array_keys($this->serverConfig[$type]['functionality']);
+    }
+
+    public function getActiveServerClassByFunctionality($functionality)
+    {
+        $serviceUid = (integer) $this->settingsService->getSetting($functionality.'_service');
+
+        if (empty($serviceUid)) {
+            throw new \Exception('No valid '.$functionality.' service configured');
+        }
+
+        $serverEntry = $this->serverRepository->findByUid($serviceUid);
+
+        if (!$serverEntry instanceof Server) {
+            throw new \Exception('No valid '.$functionality.' service configured');
+        }
+
+        $serverClass = $this->serverConfig[$serverEntry->getType()]['functionality'][$functionality];
+
+        return new $serverClass($serverEntry);
     }
 }

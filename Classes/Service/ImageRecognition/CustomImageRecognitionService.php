@@ -4,28 +4,34 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Service\ImageRecognition;
 
-use Pagemachine\AItools\Service\SettingsService;
+use Pagemachine\AItools\Domain\Model\Server;
+use Pagemachine\AItools\Domain\Model\ServerCustom;
 use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CustomImageRecognitionService implements ImageRecognitionServiceInterface
 {
+    protected ServerCustom $server;
     protected $requestFactory;
     protected string $authToken = '';
     protected string $basicAuth = '';
-    protected $settingsService;
 
     private static string $cleanUpRegex = '/^(?:Certainly!\s*)?(?:The\s*|This\s*)?(?:main subject of the\s*)?(?:image\s)?(?:is\s*|prominently\s*|primarily\s*|predominantly\s*)?(?:shows|showing|displays|depicts|showcases|features|features)?\s*/';
 
-    public function __construct()
+    public function __construct(Server $server)
     {
-        $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
+        if ($server instanceof ServerCustom) {
+            $this->server = $server;
+        } else {
+            throw new \InvalidArgumentException('Expected instance of ServerCustom');
+        }
+
         $this->requestFactory = GeneralUtility::makeInstance(RequestFactory::class);
-        $this->authToken = $this->settingsService->getSetting('custom_auth_token');
+        $this->authToken = $this->server->getApikey();
         // Retrieve the username and password from settings
-        $username = $this->settingsService->getSetting('custom_api_username');
-        $password = $this->settingsService->getSetting('custom_api_password');
+        $username = $this->server->getUsername();
+        $password = $this->server->getPassword();
         if (!empty($username) && !empty($password)) {
             $this->basicAuth = base64_encode($username . ':' . $password);
         }
@@ -34,7 +40,7 @@ class CustomImageRecognitionService implements ImageRecognitionServiceInterface
     public function sendFileToApi(FileInterface $fileObject, string $textPrompt = ''): string
     {
         /** @var string $url */
-        $url = $this->settingsService->getSetting('custom_image_recognition_api_uri');
+        $url = $this->server->getImageUrl();
 
         if (!empty($textPrompt)) {
             $url .= '?prompt=' . urlencode($textPrompt);

@@ -25,6 +25,11 @@ class Server extends AbstractEntity
      */
     protected string $type;
 
+    /**
+     * @var string
+     */
+    protected string $apikey;
+
     public function getHidden(): bool
     {
         return $this->hidden;
@@ -63,5 +68,15 @@ class Server extends AbstractEntity
     public function getFunctionality(): array
     {
         return GeneralUtility::makeInstance(ServerService::class)->getFunctionalityOfServerType($this->getType());
+    }
+
+    public function getApikey(): string
+    {
+        return $this->apikey;
+    }
+
+    public function setApikey(string $apikey): void
+    {
+        $this->apikey = $apikey;
     }
 }
