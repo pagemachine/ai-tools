@@ -1,0 +1,17 @@
+.btn-pagemachine-ai-tools {
+    background-color: #e966d4;
+    border-color: #e960d3;
+    border-width: 2px;
+    color: white;
+}
+
+.btn-pagemachine-ai-tools:hover {
+    background-color: #e451cc;
+    border-color: #e451cc;
+    color: white;
+}
+
+.btn-pagemachine-ai-tools .label {
+    background-color: #c223a9;
+    margin-left: 5px;
+}

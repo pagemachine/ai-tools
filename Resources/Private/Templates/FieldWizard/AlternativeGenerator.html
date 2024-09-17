@@ -1,0 +1,22 @@
+
+<f:layout name="DefaultFieldWizard" />
+
+<f:section name="Content">
+    <button class="btn btn-default btn-pagemachine-ai-tools">
+        <core:icon identifier="actions-cpu" size="small" />
+        Generate
+        <span class="label label-default">
+            2 Credits
+        </span>
+    </button>
+
+    <button
+        class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-generator-settings-trigger"
+        data-title="{title}"
+        data-target="{target}"
+        data-base="{f:be.uri(route: 'ajax_aitools_ai_tools_images')}"
+    >
+        <core:icon identifier="actions-cog-alt" size="small" />
+    </button>
+
+</f:section>

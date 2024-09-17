@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Pagemachine\AItools\ContextMenu\ItemProviders\AiToolItemProvider;
+use Pagemachine\AItools\FormEngine\FieldWizard\AlternativeGenerator;
 use Pagemachine\AItools\Hooks\DataHandlerHooks;
 use Pagemachine\AItools\Service\ImageRecognition\CustomImageRecognitionService;
 use Pagemachine\AItools\Service\ImageRecognition\OpenAiImageRecognitionService;
@@ -48,3 +49,9 @@ if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0',
 
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processCmdmapClass']['aitools'] = DataHandlerHooks::class;
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processDatamapClass']['aitools'] = DataHandlerHooks::class;
+
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1726477308] = [
+    'nodeName' => 'AlternativeGenerator',
+    'priority' => 30,
+    'class' => AlternativeGenerator::class,
+];
