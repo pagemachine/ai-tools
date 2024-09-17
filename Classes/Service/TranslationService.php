@@ -22,6 +22,10 @@ class TranslationService
             return '';
         }
 
+        if ($sourceLanguage == $targetLanguage) {
+            return $text;
+        }
+
         $serverClass = $this->serverService->getActiveServerClassByFunctionality('translation');
         return $serverClass->sendTranslationRequestToApi(text: $text, sourceLang: $sourceLanguage, targetLang: $targetLanguage);
     }
