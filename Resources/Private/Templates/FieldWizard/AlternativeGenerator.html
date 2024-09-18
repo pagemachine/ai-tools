@@ -2,7 +2,13 @@
 <f:layout name="DefaultFieldWizard" />
 
 <f:section name="Content">
-    <button class="btn btn-default btn-pagemachine-ai-tools">
+    <button
+        href="#"
+        class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-generator-trigger"
+        data-file-identifier="{target}"
+        data-text-prompt="{prompt}"
+        data-output-target="{input-field-selector}"
+    >
         <core:icon identifier="actions-cpu" size="small" />
         Generate
         <span class="label label-default">
@@ -11,6 +17,7 @@
     </button>
 
     <button
+        href="#"
         class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-generator-settings-trigger"
         data-title="{title}"
         data-target="{target}"

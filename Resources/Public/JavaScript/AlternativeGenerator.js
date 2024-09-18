@@ -3,7 +3,7 @@
  *
  * @exports TYPO3/CMS/AiTools/AlternativeGenerator
  */
-define(['jquery', 'TYPO3/CMS/Backend/Modal'], function ($, Modal) {
+define(['jquery', 'TYPO3/CMS/Backend/Modal', 'TYPO3/CMS/AiTools/RemoteCalls'], function ($, Modal, RemoteCalls) {
   'use strict';
 
   /**
@@ -19,6 +19,7 @@ define(['jquery', 'TYPO3/CMS/Backend/Modal'], function ($, Modal) {
   }
 
   AlternativeGenerator.initializeTrigger = function () {
+    RemoteCalls.initGeneratorButton();
     $('.t3js-alternative-generator-settings-trigger').off('click').on('click', AlternativeGenerator.clickSettingsHandler);
   };
 

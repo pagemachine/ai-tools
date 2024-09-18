@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\FormEngine\FieldWizard;
 
-use TYPO3\CMS\Backend\Form\NodeFactory;
 use TYPO3\CMS\Backend\Form\AbstractNode;
-use TYPO3\CMS\Fluid\View\StandaloneView;
+use TYPO3\CMS\Backend\Form\NodeFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Fluid\View\StandaloneView;
 
 class AlternativeGenerator extends AbstractNode
 {
@@ -30,6 +30,8 @@ class AlternativeGenerator extends AbstractNode
         $arguments = [
             'target' => $this->data['databaseRow']['file'][0],
             'title' => $this->data['recordTitle'],
+            'input-field-selector' => '[data-formengine-input-name="' . $this->data["parameterArray"]["itemFormElName"] . '"]',
+            'prompt' => 'Generate alternative text for the image',
         ];
 
         $this->templateView->assignMultiple($arguments);

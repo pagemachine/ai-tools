@@ -9,6 +9,7 @@
 <f:layout name="DefaultAjax" />
 
 <f:section name="Content">
+    <f:asset.css identifier="fieldwizard" href="EXT:ai_tools/Resources/Public/Css/FieldWizard.css" />
     <style>
         .side-by-side {
             display: flex;
@@ -107,11 +108,6 @@
     <div class="typo3-TCEforms imageEntry imageEntry-{fileObject.properties.identifier_hash}">
         <div role="tabpanel">
             <ul class="nav nav-tabs t3js-tabs" role="tablist" id="tabs" data-store-last-tab="1">
-                <li role="presentation" class="t3js-tabmenu-item nav-item">
-                    <a href="#DTM-image-describing-ai-{fileObject.properties.identifier_hash}" class="nav-link active" title="" role="tab" data-bs-toggle="tab" aria-selected="true">
-                        General
-                    </a>
-                </li>
             </ul>
         </div>
 
@@ -121,62 +117,46 @@
                     <div class="module-columns">
                         <div class="module-column">
                             <div class="form-group">
-                                <f:image image="{fileObject}" height="400" />
+                                <f:image image="{fileObject}" height="250" />
+                            </div>
+                            <div class="form-wizards-items-bottom">
+                                <div class="t3-form-original-language">
+                                    <span class="t3js-icon icon icon-size-small icon-state-default icon-flags-multiple"
+                                        data-identifier="flags-multiple">
+                                        <span class="icon-markup">
+                                            <core:icon identifier="actions-clock" size="small" />
+                                        </span>
+                                    </span>
+                                    {fileObject.metaData.alternative}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </fieldset>
+                <f:render section="section-prompt" arguments="{_all}" />
+                <f:render section="section-generation" arguments="{_all}" />
+                <f:comment>
+                    <f:render section="section-translation" arguments="{_all}" />
+                </f:comment>
                 <fieldset class="form-section">
                     <div class="module-columns">
                         <div class="module-column">
-                            <f:form class="module-form" id="generateMetaDataForm-{fileObject.properties.identifier_hash}">
-                                <div class="form-group">
-                                    <f:form.hidden name="action" value="generateMetaData" />
-                                    <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" class="fileIdentifierField" />
-                                    <f:render section="form-group-select" arguments="{label: 'AI Prompt', class: 'textPromptSelect textPromptSelect-{fileObject.properties.identifier_hash}', name: 'textPromptSelect', options: allTextPrompts, value: textPrompt.prompt, optionLabelField: 'description', optionValueField: 'prompt'}" />
-                                    <f:render section="form-group-textfield" arguments="{label: '', class: 'textPrompt textPrompt-{fileObject.properties.identifier_hash}', name: 'textPrompt', value: textPrompt.prompt}" />
-                                </div>
-                            </f:form>
-                            <f:form class="module-form" id="saveMetaDataForm-{fileObject.properties.identifier_hash}">
-                                <div class="form-group">
-                                    <f:form.hidden name="action" value="saveMetaData" />
-                                    <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" />
-                                    <div class="form-group">
-                                        <div class="side-by-side">
-                                            <div class="w5">
-                                                <f:render section="form-group-textarea" arguments="{label: 'Alternative Text', name: 'altText', fileObject: fileObject, value: fileObject.metaData.alternative, additionalClasses: 'altText'}" />
-                                            </div>
-                                            <div class="w5">
-                                                <f:render section="form-group-textarea" arguments="{label: 'Alternative Text Suggestion', name: 'altTextSuggestion', fileObject: fileObject, additionalClasses: 'altTextSuggestion'}" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="debugImageRecognizedText"></div>
-                                    <div class="otherLanguages">
-                                        <ul>
-                                            <f:for as="metaLanguage" each="{aitools:backend.metaDataLanguages(languages: siteLanguages, fileObject: fileObject)}">
-                                                <li>
-                                                    <f:for as="siteLanguage" each="{siteLanguages}">
-                                                        <f:if condition="{siteLanguage.languageId} == {metaLanguage.sys_language_uid}">
-                                                            <f:then>
-                                                                <aitools:backend.icon title="{siteLanguage.title}" identifier="{siteLanguage.flagIdentifier}" size="large" />
-                                                            </f:then>
-                                                        </f:if>
-                                                    </f:for>
-                                                    <a href="{be:uri.editRecord(uid:metaLanguage.uid, table:'sys_file_metadata', returnUrl:'{aitools:backend.generateMetadataEditLink(target: target)}')}">
-                                                        {metaLanguage.alternative}
-                                                    </a>
-                                                </li>
-                                            </f:for>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </f:form>
                             <div class="form-group bottom">
-                                <button onclick="callAjaxMetaSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altText-{fileObject.properties.identifier_hash}')[0], false, this, document.querySelectorAll('.imageEntry-{fileObject.properties.identifier_hash}')[0])" class="save-btn btn btn-primary">Save</button>
+                                <button class="btn btn-default btn-primary">
+                                    <core:icon identifier="actions-save" size="small" />
+                                    save
+                                </button>
+
+                                <button class="btn btn-default">
+                                    <core:icon identifier="actions-close" size="small" />
+                                    close
+                                </button>
+
+
+                                <!--<button onclick="callAjaxMetaSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altText-{fileObject.properties.identifier_hash}')[0], false, this, document.querySelectorAll('.imageEntry-{fileObject.properties.identifier_hash}')[0])" class="save-btn btn btn-primary">Save</button>
                                 <button onclick="callAjaxMetaSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altText-{fileObject.properties.identifier_hash}')[0], true, this, document.querySelectorAll('.imageEntry-{fileObject.properties.identifier_hash}')[0])" class="save-translate-btn btn btn-secondary">Save and Translate</button>
                                 <button onclick="callAjaxMetaGenerateAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altTextSuggestion-{fileObject.properties.identifier_hash}')[0], document.querySelectorAll('.textPrompt-{fileObject.properties.identifier_hash}')[0], this, document.querySelectorAll('.imageEntry-{fileObject.properties.identifier_hash}')[0])" class="generate-btn btn btn-secondary">Generate Image Description</button>
-                                <button onclick="takeSuggestionSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altTextSuggestion-{fileObject.properties.identifier_hash}')[0], document.querySelectorAll('.textarea-altText-{fileObject.properties.identifier_hash}')[0], this, document.querySelectorAll('.imageEntry-{fileObject.properties.identifier_hash}')[0])" class="generate-btn btn btn-secondary">Use Suggestion and Save</button>
+                                <button onclick="takeSuggestionSaveAction('{fileObject.combinedIdentifier}', document.querySelectorAll('.textarea-altTextSuggestion-{fileObject.properties.identifier_hash}')[0], document.querySelectorAll('.textarea-altText-{fileObject.properties.identifier_hash}')[0], this, document.querySelectorAll('.imageEntry-{fileObject.properties.identifier_hash}')[0])" class="generate-btn btn btn-secondary">Use Suggestion and Save</button>-->
                             </div>
                         </div>
                     </div>
@@ -186,17 +166,170 @@
     </div>
 </f:section>
 
+<f:section name="section-prompt">
+    <fieldset class="form-section">
+        <div class="module-columns">
+            <div class="module-column">
+                <f:form class="module-form" id="generateMetaDataForm-{fileObject.properties.identifier_hash}">
+                    <div class="form-group">
+                        <f:form.hidden name="action" value="generateMetaData" />
+                        <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" class="fileIdentifierField" />
+                        <f:render section="form-group-select" arguments="{
+                            label: 'AI Prompt',
+                            class: 'textPromptSelect textPromptSelect-{fileObject.properties.identifier_hash}',
+                            target: '#textPrompt-{fileObject.properties.identifier_hash}',
+                            name: 'textPromptSelect',
+                            options: allTextPrompts,
+                            value: textPrompt.prompt,
+                            optionLabelField: 'description',
+                            optionValueField: 'prompt'
+                        }" />
+
+                        <f:render section="form-group-textarea" arguments="{
+                            label: '',
+                            additionalClasses: 'textPrompt',
+                            id: 'textPrompt-{fileObject.properties.identifier_hash}',
+                            name: 'textPrompt',
+                            value: textPrompt.prompt
+                        }" />
+
+                        <button
+                            href="#"
+                            class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-generator-trigger"
+                            data-file-identifier="{fileObject.combinedIdentifier}"
+                            data-text-prompt-field="#textPrompt-{fileObject.properties.identifier_hash}"
+                            data-output-target="#altTextSuggestion-{fileObject.properties.identifier_hash}"
+                        >
+
+                            <core:icon identifier="actions-cpu" size="small" />
+                            Generate
+                            <span class="label label-default">
+                                2 Credits
+                            </span>
+                        </button>
+
+                        <button class="btn btn-default"
+                            onclick="document.getElementById('hidden-test').style.display = 'block'; document.getElementById('hidden-test').scrollIntoView({behavior: 'smooth'}); return false;">
+                            <core:icon identifier="actions-arrow-down-alt" size="small" />
+                            Use current text
+                        </button>
+                    </div>
+                </f:form>
+            </div>
+        </div>
+    </fieldset>
+</f:section>
+
+<f:section name="section-generation">
+    <fieldset class="form-section">
+        <div class="module-columns">
+            <div class="module-column">
+                <f:form class="module-form" id="saveMetaDataForm-{fileObject.properties.identifier_hash}">
+                    <div class="form-group">
+                        <f:form.hidden name="action" value="saveMetaData" />
+                        <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" />
+                        <div class="form-group">
+                            <div class="side-by-side">
+                                <div class="w5">
+                                    <f:render section="form-group-textarea" arguments="{
+                                        label: 'Alternative Text',
+                                        name: 'altTextSuggestion',
+                                        fileObject: fileObject,
+                                        id: 'altTextSuggestion-{fileObject.properties.identifier_hash}',
+                                        original: fileObject.metaData.alternative,
+                                        additionalClasses: 'altTextSuggestion textarea-pagemachine-ai-tools'
+                                    }" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="debugImageRecognizedText"></div>
+                    </div>
+                </f:form>
+            </div>
+        </div>
+    </fieldset>
+</f:section>
+
+<f:section name="section-translation">
+    <fieldset class="form-section">
+        <div class="module-columns">
+            <div class="module-column">
+                <div class="form-group">
+                    <label class="t3js-formengine-label">
+                        Translations
+                    </label>
+                </div>
+
+                <button class="btn btn-default btn-pagemachine-ai-tools" onclick="return false;">
+                    <core:icon identifier="actions-cpu" size="small" />
+                    Update all translations
+                    <span class="label label-default">
+                        3 Credits
+                    </span>
+                </button>
+
+                <div class="otherLanguages">
+                    <ul>
+                        <f:for as="metaLanguage"
+                            each="{aitools:backend.metaDataLanguages(languages: siteLanguages, fileObject: fileObject)}">
+                            <li>
+                                <f:for as="siteLanguage" each="{siteLanguages}">
+                                    <f:if condition="{siteLanguage.languageId} == {metaLanguage.sys_language_uid}">
+                                        <f:then>
+                                            <aitools:backend.icon title="{siteLanguage.title}"
+                                                identifier="{siteLanguage.flagIdentifier}" size="large" />
+                                        </f:then>
+                                    </f:if>
+                                </f:for>
+                                <a
+                                    href="{be:uri.editRecord(uid:metaLanguage.uid, table:'sys_file_metadata', returnUrl:'{aitools:backend.generateMetadataEditLink(target: target)}')}">
+                                    {metaLanguage.alternative}
+                                </a>
+                            </li>
+                        </f:for>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</f:section>
+
 <f:section name="form-group-textarea">
     <div class="form-group t3js-formengine-validation-marker t3js-formengine-palette-field">
-        <label class="t3js-formengine-label">
-            {label}
-        </label>
+        <f:if condition="{label}">
+            <label class="t3js-formengine-label">
+                {label}
+            </label>
+        </f:if>
         <div class="formengine-field-item t3js-formengine-field-item"><div class="form-control-wrap" style="max-width: 636px">
             <div class="form-wizards-wrap">
                 <div class="form-wizards-element">
-                    <f:form.textarea rows="3" additionalAttributes="{wrap:'virtual'}" name="{name}" value="{value}" class="form-control t3js-formengine-textarea formengine-textarea textarea-{name} textarea-{name}-{fileObject.properties.identifier_hash} {additionalClasses}" style="max-height: 500px; overflow-wrap: break-word; height: 110px;" />
+                    <f:form.textarea
+                        rows="3"
+                        additionalAttributes="{wrap:'virtual'}"
+                        name="{name}"
+                        value="{value}"
+                        id="{id}"
+                        class="form-control t3js-formengine-textarea formengine-textarea textarea-{name} textarea-{name}-{fileObject.properties.identifier_hash} {additionalClasses}"
+                        style="max-height: 500px; overflow-wrap: break-word; height: 110px;"
+                    />
                 </div>
             </div>
+
+            <f:if condition="{original}">
+                <div class="form-wizards-items-bottom">
+                    <div class="t3-form-original-language">
+                        <span class="t3js-icon icon icon-size-small icon-state-default icon-flags-multiple"
+                            data-identifier="flags-multiple">
+                            <span class="icon-markup">
+                                <core:icon identifier="actions-clock" size="small" />
+                            </span>
+                        </span>
+                        {original}
+                    </div>
+                </div>
+            </f:if>
+
         </div></div>
     </div>
 </f:section>
@@ -224,7 +357,13 @@
         <div class="formengine-field-item t3js-formengine-field-item"><div class="form-control-wrap" style="max-width: 636px">
             <div class="form-wizards-wrap">
                 <div class="form-wizards-element">
-                    <f:form.select options="{options}" optionLabelField="{optionLabelField}" optionValueField="{optionValueField}" class="form-control form-select t3-js-jumpMenuBox {class}" value="{value}" />
+                    <f:form.select
+                        options="{options}"
+                        optionLabelField="{optionLabelField}"
+                        optionValueField="{optionValueField}"
+                        class="form-control form-select t3-js-jumpMenuBox {class}"
+                        additionalAttributes="{data: {target: target}}"
+                    />
                 </div>
             </div>
         </div></div>

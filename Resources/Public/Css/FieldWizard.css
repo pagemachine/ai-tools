@@ -3,6 +3,7 @@
     border-color: #e960d3;
     border-width: 2px;
     color: white;
+    position: relative;
 }
 
 .btn-pagemachine-ai-tools:hover {
@@ -11,7 +12,50 @@
     color: white;
 }
 
+.btn-pagemachine-ai-tools:disabled {
+    opacity: 0.9;
+}
+
 .btn-pagemachine-ai-tools .label {
     background-color: #c223a9;
     margin-left: 5px;
+}
+
+.btn-pagemachine-ai-tools.generating {
+    border-color: #e451cc;
+    background: linear-gradient(90deg, #e966d4 0%, rgba(255, 182, 193, 1) 50%, #e966d4 100%);
+    animation: movingGenerationAiTools 3s ease infinite;
+    background-size: 200% 200%;
+    background-repeat: repeat;
+    color: transparent;
+}
+
+.btn-pagemachine-ai-tools.generating * {
+    visibility: hidden;
+}
+
+.btn-pagemachine-ai-tools.generating:after {
+    content: 'Generating...';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: bold;
+    color: white;
+}
+
+.t3js-ai-tools-generating {
+    background: linear-gradient(90deg, #f9f1f8 0%, rgb(255, 193, 244) 50%, #f9f1f8 100%);
+    animation: movingGenerationAiTools 3s ease infinite;
+    background-size: 200% 200%;
+    background-repeat: repeat;
+    color: transparent !important;
+}
+
+@keyframes movingGenerationAiTools {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
 }
