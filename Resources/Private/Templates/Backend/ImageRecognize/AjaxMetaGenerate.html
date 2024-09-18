@@ -78,7 +78,7 @@
         <f:then>
             <div class="row">
                 <div class="col-xs-12">
-                    <f:render section="form-group-select" arguments="{label: 'Global AI Prompt', class: 'globalTextPrompt', name: 'globalTextPrompt', options: allTextPrompts, value: textPrompt.prompt, optionLabelField: 'description', optionValueField: 'prompt'}" />
+                    <f:render section="form-group-select" arguments="{label: 'Global AI Prompt', class: 'globalTextPrompt', name: 'globalTextPrompt', options: allTextPrompts, value: textPrompt, optionLabelField: 'description', optionValueField: 'prompt'}" />
 
                     <label for="skipExistingDescriptions">Skip existing descriptions <input type="checkbox" id="skipExistingDescriptions" name="skipExistingDescriptions" class="skipExistingDescriptions" value="1" checked /></label><br />
                     <button onclick="callAjaxMetaGenerateActionForAll(this, false)" class="btn btn-primary">Generate Meta-Data for all Images</button>
@@ -180,7 +180,7 @@
                             target: '#textPrompt-{fileObject.properties.identifier_hash}',
                             name: 'textPromptSelect',
                             options: allTextPrompts,
-                            value: textPrompt.prompt,
+                            value: textPrompt,
                             optionLabelField: 'description',
                             optionValueField: 'prompt'
                         }" />
@@ -190,7 +190,7 @@
                             additionalClasses: 'textPrompt',
                             id: 'textPrompt-{fileObject.properties.identifier_hash}',
                             name: 'textPrompt',
-                            value: textPrompt.prompt
+                            value: textPrompt
                         }" />
 
                         <button

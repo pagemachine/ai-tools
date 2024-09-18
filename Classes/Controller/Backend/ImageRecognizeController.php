@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Controller\Backend;
 
-use Pagemachine\AItools\Domain\Model\Prompt;
 use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Pagemachine\AItools\Service\ImageMetaDataService;
 use Pagemachine\AItools\Service\SettingsService;
@@ -190,24 +189,14 @@ class ImageRecognizeController extends ActionController
             return $this->responseFactory->createResponse(500, 'Insufficient permissions');
         }
 
-        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
         $parsedBody = $request->getParsedBody();
         $queryParams = $request->getQueryParams();
 
         $fileObjects = $this->getFileObjectFromRequestTarget($request);
 
         $allPrompts = $this->promptRepository->findAll();
-        if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0', '<')) {
-            // for TYPO3 v11
-            // @phpstan-ignore-next-line
-            $defaultPrompt = $this->promptRepository->findOneByDefault(true);
-        } else {
-            /**
-             * @var Prompt $defaultPrompt
-             * @phpstan-ignore-next-line
-             */
-            $defaultPrompt = $this->promptRepository->findOneBy(['default' => true]);
-        }
+
+        $defaultPrompt = $this->promptRepository->getDefaultPromptText();
 
         $siteLanguages = $this->getAllSiteLanguages();
 
@@ -252,7 +241,7 @@ class ImageRecognizeController extends ActionController
                     ->withHeader('Content-Type', 'application/json')
                     ->withBody($this->streamFactory->createStream(json_encode($returnArray)));
             case 'generateMetaData':
-                $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt != null ? $defaultPrompt->getPrompt() : '');
+                $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt != null ? $defaultPrompt : '');
                 $altTextFromImage = $this->imageMetaDataService->generateImageDescription(
                     fileObject: $fileObjects[0],
                     textPrompt: $textPrompt,
