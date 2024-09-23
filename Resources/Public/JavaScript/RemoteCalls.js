@@ -60,6 +60,7 @@ define(['jquery'], function ($) {
 
       const fileIdentifier = $(this).data('file-identifier');
       const target = $($(this).data('output-target'));
+      const showTarget = $(this).data('show-target');
 
       let textPrompt = $(this).data('text-prompt');
       if ($(this).data('text-prompt-field')) {
@@ -81,6 +82,10 @@ define(['jquery'], function ($) {
 
         target.prop('disabled', false);
         target.removeClass('t3js-ai-tools-generating');
+
+        if (showTarget) {
+          $(showTarget).show();
+        }
       });
 
       console.log('Prompt generated', results);

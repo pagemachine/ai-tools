@@ -138,7 +138,7 @@
                 <f:comment>
                     <f:render section="section-translation" arguments="{_all}" />
                 </f:comment>
-                <fieldset class="form-section">
+                <fieldset class="form-section t3js-ai-tools-show-after-prompt-generation-{fileObject.properties.identifier_hash}" style="display: none;">
                     <div class="module-columns">
                         <div class="module-column">
                             <div class="form-group bottom">
@@ -199,6 +199,7 @@
                             data-file-identifier="{fileObject.combinedIdentifier}"
                             data-text-prompt-field="#textPrompt-{fileObject.properties.identifier_hash}"
                             data-output-target="#altTextSuggestion-{fileObject.properties.identifier_hash}"
+                            data-show-target=".t3js-ai-tools-show-after-prompt-generation-{fileObject.properties.identifier_hash}"
                         >
 
                             <core:icon identifier="actions-cpu" size="small" />
@@ -208,8 +209,13 @@
                             </span>
                         </button>
 
-                        <button class="btn btn-default"
-                            onclick="document.getElementById('hidden-test').style.display = 'block'; document.getElementById('hidden-test').scrollIntoView({behavior: 'smooth'}); return false;">
+                        <button
+                            href="#"
+                            class="btn btn-default t3js-alternative-use-current-trigger"
+                            data-current-text="{fileObject.metaData.alternative}"
+                            data-output-target="#altTextSuggestion-{fileObject.properties.identifier_hash}"
+                            data-show-target=".t3js-ai-tools-show-after-prompt-generation-{fileObject.properties.identifier_hash}"
+                        >
                             <core:icon identifier="actions-arrow-down-alt" size="small" />
                             Use current text
                         </button>
@@ -221,7 +227,7 @@
 </f:section>
 
 <f:section name="section-generation">
-    <fieldset class="form-section">
+    <fieldset class="form-section t3js-ai-tools-show-after-prompt-generation-{fileObject.properties.identifier_hash}" style="display: none;">
         <div class="module-columns">
             <div class="module-column">
                 <f:form class="module-form" id="saveMetaDataForm-{fileObject.properties.identifier_hash}">
