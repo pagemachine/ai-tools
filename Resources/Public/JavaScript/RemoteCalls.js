@@ -45,6 +45,28 @@ define(['jquery'], function ($) {
           top.TYPO3.Notification.success('Generated Metadata', 'Generated Metadata successful', 5);
           return response;
         }
+        top.TYPO3.Notification.error('Error', 'Error while generating Metadata (empty response)', 5);
+        throw 'Error: empty response';
+      }).catch(error => {
+        throw error;
+      });
+  }
+
+  RemoteCalls.callAjaxSaveMetaDataAction = async function(fileIdentifier, targetLanguage, altText, translate = 0) {
+    const params = {
+      action: 'saveMetaData',
+      target: fileIdentifier,
+      "target-language": targetLanguage,
+      altText: altText,
+      translate: translate
+    };
+
+    return RemoteCalls.ajaxCall(params)
+      .then(response => {
+        if (response) {
+          top.TYPO3.Notification.success('Saved Metadata successful', 'Saved Metadata successful', 5);
+          return response;
+        }
         top.TYPO3.Notification.error('Error', 'Error while saving Metadata (empty response)', 5);
         throw 'Error: empty response';
       }).catch(error => {

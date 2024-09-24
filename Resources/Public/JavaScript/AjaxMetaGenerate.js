@@ -23,6 +23,39 @@ require(['jquery', 'TYPO3/CMS/AiTools/RemoteCalls', 'TYPO3/CMS/Backend/Modal', '
     });
   });
 
+  $(() => {
+    $('.t3js-alternative-save-trigger').on('click', async function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const fileIdentifier = $(this).data('file-identifier');
+      const targetLanguage = $(this).data('target-language');
+      const target = $($(this).data('output-target'));
+      const buttons = $($(this).data('button-target'));
+      const translate = Number($(this).data('translate'));
+
+      const value = target.val();
+
+      buttons.prop('disabled', true);
+      buttons.addClass('saving');
+      $(this).addClass('generating');
+
+
+      const results = await RemoteCalls.callAjaxSaveMetaDataAction(
+        fileIdentifier,
+        targetLanguage,
+        value,
+        translate
+      ).finally(() => {
+        buttons.prop('disabled', false);
+        buttons.removeClass('saving');
+        $(this).removeClass('generating');
+      });
+
+      console.log('Saving Metadata', results);
+    });
+  });
+
 
   $(() => {
     RemoteCalls.initGeneratorButton();

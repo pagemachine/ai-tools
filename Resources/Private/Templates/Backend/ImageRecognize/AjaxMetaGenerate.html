@@ -147,12 +147,26 @@
                                     Use
                                 </button>
 
-                                <button class="btn btn-default btn-primary t3js-alternative-save-trigger">
+                                <button
+                                    class="btn btn-default btn-primary t3js-alternative-save-trigger t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}"
+                                    data-file-identifier="{fileObject.file.combinedIdentifier}"
+                                    data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
+                                    data-target-language="{targetLanguage}"
+                                    data-button-target=".t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}"
+                                    data-translate="0"
+                                >
                                     <core:icon identifier="actions-save" size="small" />
                                     save
                                 </button>
 
-                                <button class="btn btn-default btn-pagemachine-ai-tools" onclick="return false;">
+                                <button
+                                    class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-save-trigger t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}"
+                                    data-file-identifier="{fileObject.file.combinedIdentifier}"
+                                    data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
+                                    data-target-language="{targetLanguage}"
+                                    data-button-target=".t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}"
+                                    data-translate="1"
+                                >
                                     <core:icon identifier="actions-cpu" size="small" />
                                     Save and translate into all other languages
                                     <span class="label label-default">
