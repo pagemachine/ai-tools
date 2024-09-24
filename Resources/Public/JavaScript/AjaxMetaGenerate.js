@@ -52,6 +52,8 @@ require(['jquery', 'TYPO3/CMS/AiTools/RemoteCalls', 'TYPO3/CMS/Backend/Modal', '
         $(this).removeClass('generating');
       });
 
+      $('.t3js-alternative-use-trigger').trigger('click');
+
       console.log('Saving Metadata', results);
     });
   });

@@ -39,7 +39,7 @@ define(['jquery', 'TYPO3/CMS/Backend/Modal', 'TYPO3/CMS/AiTools/RemoteCalls'], f
 
     currentModal.on('modal-loaded', function () {
       const use = currentModal.find('.t3js-alternative-use-trigger');
-      const save = currentModal.find('.t3js-alternative-save-trigger');
+      const save = currentModal.find('.t3js-alternative-save-trigger.btn-primary');
       const target = $(trigger.data('output-target'));
 
       use.show();
