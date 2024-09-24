@@ -37,6 +37,7 @@ class AlternativeGenerator extends AbstractNode
 
         $arguments = [
             'target' => $this->data['databaseRow']['file'][0],
+            'target-language' => $this-> data['databaseRow']['sys_language_uid'],
             'title' => $this->data['recordTitle'],
             'input-field-selector' => '[data-formengine-input-name="' . $this->data["parameterArray"]["itemFormElName"] . '"]',
             'prompt' => $prompt,

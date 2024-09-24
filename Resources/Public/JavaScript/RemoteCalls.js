@@ -30,10 +30,11 @@ define(['jquery'], function ($) {
     });
   }
 
-  RemoteCalls.callAjaxMetaGenerateAction = async function(fileIdentifier, textPrompt) {
+  RemoteCalls.callAjaxMetaGenerateAction = async function(fileIdentifier, targetLanguage, textPrompt) {
     const params = {
       action: 'generateMetaData',
       target: fileIdentifier,
+      "target-language": targetLanguage,
       textPrompt: textPrompt
     };
 
@@ -59,6 +60,7 @@ define(['jquery'], function ($) {
       e.stopPropagation();
 
       const fileIdentifier = $(this).data('file-identifier');
+      const targetLanguage = $(this).data('target-language');
       const target = $($(this).data('output-target'));
       const showTarget = $(this).data('show-target');
 
@@ -75,6 +77,7 @@ define(['jquery'], function ($) {
 
       const results = await RemoteCalls.callAjaxMetaGenerateAction(
         fileIdentifier,
+        targetLanguage,
         textPrompt
       ).finally(() => {
         $(this).prop('disabled', false);

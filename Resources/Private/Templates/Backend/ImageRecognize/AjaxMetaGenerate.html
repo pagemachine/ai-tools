@@ -102,22 +102,22 @@
 </f:section>
 
 <f:section name="file-form-imagealt">
-    <h1>Generate File Metadata "{fileObject.name}"</h1>
+    <h1>Generate File Metadata "{fileObject.file.name}"</h1>
     <f:flashMessages queueIdentifier="ai-tools.template.flashMessages"/>
 
-    <div class="typo3-TCEforms imageEntry imageEntry-{fileObject.properties.identifier_hash}">
+    <div class="typo3-TCEforms imageEntry imageEntry-{fileObject.file.properties.identifier_hash}">
         <div role="tabpanel">
             <ul class="nav nav-tabs t3js-tabs" role="tablist" id="tabs" data-store-last-tab="1">
             </ul>
         </div>
 
         <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="DTM-image-describing-ai-{fileObject.properties.identifier_hash}">
+            <div role="tabpanel" class="tab-pane active" id="DTM-image-describing-ai-{fileObject.file.properties.identifier_hash}">
                 <fieldset class="form-section">
                     <div class="module-columns">
                         <div class="module-column">
                             <div class="form-group">
-                                <f:image image="{fileObject}" height="250" />
+                                <f:image image="{fileObject.file}" height="250" />
                             </div>
                             <div class="form-wizards-items-bottom">
                                 <div class="t3-form-original-language">
@@ -127,7 +127,7 @@
                                             <core:icon identifier="actions-clock" size="small" />
                                         </span>
                                     </span>
-                                    {fileObject.metaData.alternative}
+                                    {fileObject.meta.alternative}
                                 </div>
                             </div>
                         </div>
@@ -138,13 +138,21 @@
                 <f:comment>
                     <f:render section="section-translation" arguments="{_all}" />
                 </f:comment>
-                <fieldset class="form-section t3js-ai-tools-show-after-prompt-generation-{fileObject.properties.identifier_hash}" style="display: none;">
+                <fieldset class="form-section t3js-ai-tools-show-after-prompt-generation-{fileObject.file.properties.identifier_hash}" style="display: none;">
                     <div class="module-columns">
                         <div class="module-column">
                             <div class="form-group bottom">
                                 <button class="btn btn-default btn-primary">
                                     <core:icon identifier="actions-save" size="small" />
                                     save
+                                </button>
+
+                                <button class="btn btn-default btn-pagemachine-ai-tools" onclick="return false;">
+                                    <core:icon identifier="actions-cpu" size="small" />
+                                    Save and translate into all other languages
+                                    <span class="label label-default">
+                                        3 Credits
+                                    </span>
                                 </button>
 
                                 <button class="btn btn-default">
@@ -170,14 +178,14 @@
     <fieldset class="form-section">
         <div class="module-columns">
             <div class="module-column">
-                <f:form class="module-form" id="generateMetaDataForm-{fileObject.properties.identifier_hash}">
+                <f:form class="module-form" id="generateMetaDataForm-{fileObject.file.properties.identifier_hash}">
                     <div class="form-group">
                         <f:form.hidden name="action" value="generateMetaData" />
-                        <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" class="fileIdentifierField" />
+                        <f:form.hidden name="target" value="{fileObject.file.combinedIdentifier}" class="fileIdentifierField" />
                         <f:render section="form-group-select" arguments="{
                             label: 'AI Prompt',
-                            class: 'textPromptSelect textPromptSelect-{fileObject.properties.identifier_hash}',
-                            target: '#textPrompt-{fileObject.properties.identifier_hash}',
+                            class: 'textPromptSelect textPromptSelect-{fileObject.file.properties.identifier_hash}',
+                            target: '#textPrompt-{fileObject.file.properties.identifier_hash}',
                             name: 'textPromptSelect',
                             options: allTextPrompts,
                             value: textPrompt,
@@ -188,7 +196,7 @@
                         <f:render section="form-group-textarea" arguments="{
                             label: '',
                             additionalClasses: 'textPrompt',
-                            id: 'textPrompt-{fileObject.properties.identifier_hash}',
+                            id: 'textPrompt-{fileObject.file.properties.identifier_hash}',
                             name: 'textPrompt',
                             value: textPrompt
                         }" />
@@ -196,10 +204,11 @@
                         <button
                             href="#"
                             class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-generator-trigger"
-                            data-file-identifier="{fileObject.combinedIdentifier}"
-                            data-text-prompt-field="#textPrompt-{fileObject.properties.identifier_hash}"
-                            data-output-target="#altTextSuggestion-{fileObject.properties.identifier_hash}"
-                            data-show-target=".t3js-ai-tools-show-after-prompt-generation-{fileObject.properties.identifier_hash}"
+                            data-file-identifier="{fileObject.file.combinedIdentifier}"
+                            data-text-prompt-field="#textPrompt-{fileObject.file.properties.identifier_hash}"
+                            data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
+                            data-target-language="{targetLanguage}"
+                            data-show-target=".t3js-ai-tools-show-after-prompt-generation-{fileObject.file.properties.identifier_hash}"
                         >
 
                             <core:icon identifier="actions-cpu" size="small" />
@@ -212,9 +221,9 @@
                         <button
                             href="#"
                             class="btn btn-default t3js-alternative-use-current-trigger"
-                            data-current-text="{fileObject.metaData.alternative}"
-                            data-output-target="#altTextSuggestion-{fileObject.properties.identifier_hash}"
-                            data-show-target=".t3js-ai-tools-show-after-prompt-generation-{fileObject.properties.identifier_hash}"
+                            data-current-text="{fileObject.meta.alternative}"
+                            data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
+                            data-show-target=".t3js-ai-tools-show-after-prompt-generation-{fileObject.file.properties.identifier_hash}"
                         >
                             <core:icon identifier="actions-arrow-down-alt" size="small" />
                             Use current text
@@ -227,22 +236,22 @@
 </f:section>
 
 <f:section name="section-generation">
-    <fieldset class="form-section t3js-ai-tools-show-after-prompt-generation-{fileObject.properties.identifier_hash}" style="display: none;">
+    <fieldset class="form-section t3js-ai-tools-show-after-prompt-generation-{fileObject.file.properties.identifier_hash}" style="display: none;">
         <div class="module-columns">
             <div class="module-column">
-                <f:form class="module-form" id="saveMetaDataForm-{fileObject.properties.identifier_hash}">
+                <f:form class="module-form" id="saveMetaDataForm-{fileObject.file.properties.identifier_hash}">
                     <div class="form-group">
                         <f:form.hidden name="action" value="saveMetaData" />
-                        <f:form.hidden name="target" value="{fileObject.combinedIdentifier}" />
+                        <f:form.hidden name="target" value="{fileObject.file.combinedIdentifier}" />
                         <div class="form-group">
                             <div class="side-by-side">
                                 <div class="w5">
                                     <f:render section="form-group-textarea" arguments="{
                                         label: 'Alternative Text',
                                         name: 'altTextSuggestion',
-                                        fileObject: fileObject,
-                                        id: 'altTextSuggestion-{fileObject.properties.identifier_hash}',
-                                        original: fileObject.metaData.alternative,
+                                        fileObject: fileObject.file,
+                                        id: 'altTextSuggestion-{fileObject.file.properties.identifier_hash}',
+                                        original: fileObject.meta.alternative,
                                         additionalClasses: 'altTextSuggestion textarea-pagemachine-ai-tools'
                                     }" />
                                 </div>
@@ -277,7 +286,7 @@
                 <div class="otherLanguages">
                     <ul>
                         <f:for as="metaLanguage"
-                            each="{aitools:backend.metaDataLanguages(languages: siteLanguages, fileObject: fileObject)}">
+                            each="{aitools:backend.metaDataLanguages(languages: siteLanguages, fileObject: fileObject.file)}">
                             <li>
                                 <f:for as="siteLanguage" each="{siteLanguages}">
                                     <f:if condition="{siteLanguage.languageId} == {metaLanguage.sys_language_uid}">
@@ -316,7 +325,7 @@
                         name="{name}"
                         value="{value}"
                         id="{id}"
-                        class="form-control t3js-formengine-textarea formengine-textarea textarea-{name} textarea-{name}-{fileObject.properties.identifier_hash} {additionalClasses}"
+                        class="form-control t3js-formengine-textarea formengine-textarea textarea-{name} textarea-{name}-{fileObject.file.properties.identifier_hash} {additionalClasses}"
                         style="max-height: 500px; overflow-wrap: break-word; height: 110px;"
                     />
                 </div>

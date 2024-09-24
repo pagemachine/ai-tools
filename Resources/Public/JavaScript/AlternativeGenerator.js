@@ -28,7 +28,7 @@ define(['jquery', 'TYPO3/CMS/Backend/Modal', 'TYPO3/CMS/AiTools/RemoteCalls'], f
       additionalCssClasses: ['modal-image-manipulation'],
       buttons: [
       ],
-      content: trigger.data('base') + '&target=' + encodeURIComponent(trigger.data('target')),
+      content: trigger.data('base') + '&target=' + encodeURIComponent(trigger.data('target')) + '&target-language=' + encodeURIComponent(trigger.data('target-language')),
       type: Modal.types.ajax,
       size: Modal.sizes.large,
       title: trigger.data('title'),

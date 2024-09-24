@@ -151,6 +151,7 @@ class ImageMetaDataService
     /**
      * Retrieve all language overlays for a file
      *
+     * @param File $fileObject
      * @param int[]|SiteLanguage[] $languages
      * @return array
      * @throws InvalidUidException
@@ -170,6 +171,12 @@ class ImageMetaDataService
         $fileMetadata = $fileObject->getMetaData()->get();
         $fileMetadataUid = $fileMetadata['uid'];
 
-        return $this->metaDataRepository->findAllFileVariantsByLanguageUid($fileMetadataUid, $siteLanguages);
+        $metadataEntries = $this->metaDataRepository->findAllFileVariantsByLanguageUid($fileMetadataUid, $siteLanguages);
+
+        if (in_array(0, $siteLanguages) || in_array(-1, $siteLanguages)) {
+            $metadataEntries[] = $fileMetadata;
+        }
+
+        return $metadataEntries;
     }
 }
