@@ -1,3 +1,9 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    xmlns:aitools="http://typo3.org/ns/Pagemachine/AItools/ViewHelpers"
+    xmlns:vhs="http://typo3.org/ns/FluidTYPO3/Vhs/ViewHelpers" data-namespace-typo3-fluid="true">
+
 
 <f:layout name="DefaultFieldWizard" />
 
@@ -12,9 +18,7 @@
     >
         <core:icon identifier="actions-cpu" size="small" />
         Generate
-        <span class="label label-default">
-            2 Credits
-        </span>
+        <aitools:backend.Credits />
     </button>
 
     <button
@@ -30,3 +34,5 @@
     </button>
 
 </f:section>
+
+</html>
