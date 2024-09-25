@@ -191,7 +191,7 @@ class ImageMetaDataService
 
         $processedImage = $this->imageService->applyProcessingInstructions($fileObject, [
             'maxWidth' => 1920,
-            'height' => 1080,
+            'maxHeight' => 1080,
             'fileExtension' => 'jpg',
         ]);
 
