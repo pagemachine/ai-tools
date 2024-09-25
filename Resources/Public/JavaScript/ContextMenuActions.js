@@ -34,7 +34,7 @@ define(function () {
       //top.TYPO3.Notification.info('Generated Metadata', top.TYPO3.settings.ajaxUrls.aitools_ai_tools_images + '&target=' + encodeURIComponent(uid) + '&returnUrl=' + ContextMenuActions.getReturnUrl(), 5);
 
       top.TYPO3.Backend.ContentContainer.setUrl(
-        top.TYPO3.settings.ajaxUrls.aitools_ai_tools_images + '&target=' + encodeURIComponent(uid) + '&returnUrl=' + ContextMenuActions.getReturnUrl()
+        top.TYPO3.settings.ajaxUrls.aitools_ai_tools_images + '&target-language=0&target=' + encodeURIComponent(uid) + '&returnUrl=' + ContextMenuActions.getReturnUrl()
       );
 
     }
