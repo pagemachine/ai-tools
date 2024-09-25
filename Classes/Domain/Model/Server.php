@@ -70,6 +70,22 @@ class Server extends AbstractEntity
         return GeneralUtility::makeInstance(ServerService::class)->getFunctionalityOfServerType($this->getType());
     }
 
+    public function getCredits(): string
+    {
+        $creditsClass = GeneralUtility::makeInstance(ServerService::class)->getCreditsClassOfServerType($this->getType());
+        if (is_null($creditsClass)) {
+            return '';
+        }
+
+        $credits = new $creditsClass($this);
+
+        try {
+            return $credits->sendCreditsRequestToApi();
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
     public function getApikey(): string
     {
         return $this->apikey;

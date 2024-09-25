@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Pagemachine\AItools\ContextMenu\ItemProviders\AiToolItemProvider;
 use Pagemachine\AItools\FormEngine\FieldWizard\AlternativeGenerator;
 use Pagemachine\AItools\Hooks\DataHandlerHooks;
+use Pagemachine\AItools\Service\Credits\AigudeCreditsService;
 use Pagemachine\AItools\Service\ImageRecognition\CustomImageRecognitionService;
 use Pagemachine\AItools\Service\ImageRecognition\OpenAiImageRecognitionService;
 use Pagemachine\AItools\Service\Translation\AigudeTranslationService;
@@ -18,6 +19,7 @@ defined('TYPO3') or die();
 $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ai_tools']['servers'] = [
     'aigude' => [
         'name' => 'AI Gude',
+        'credits' => AigudeCreditsService::class,
         'functionality' => [
             'translation' => AigudeTranslationService::class,
         ],

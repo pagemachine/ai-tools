@@ -60,6 +60,11 @@ class ServerService
         return $this->serverConfig[$type]['name'] ?? 'Unknown';
     }
 
+    public function getCreditsClassOfServerType(string $type)
+    {
+        return $this->serverConfig[$type]['credits'] ?? null;
+    }
+
     public function getFunctionalityOfServerType(string $type): array
     {
         return array_keys($this->serverConfig[$type]['functionality']);

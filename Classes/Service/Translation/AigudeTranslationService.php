@@ -14,7 +14,6 @@ class AigudeTranslationService implements TranslationServiceInterface
     protected ServerAigude $server;
     protected $requestFactory;
     protected string $authToken = '';
-    protected string $basicAuth = '';
 
     private array $languages = [
         'ace' => 'ace_Arab',  // ace_Latn
@@ -258,7 +257,6 @@ class AigudeTranslationService implements TranslationServiceInterface
         $response = $this->requestFactory->request($url, 'POST', [
             'headers' => [
                 'apikey' => $this->authToken,
-                'Authorization' => 'Basic ' . $this->basicAuth,
                 'Content-Type' => 'application/json',
             ],
             'body' => json_encode($formData),
