@@ -16,6 +16,7 @@ use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\PersistenceManagerInterface;
+use TYPO3\CMS\Extbase\Service\ImageService;
 
 class ImageMetaDataService
 {
@@ -23,6 +24,7 @@ class ImageMetaDataService
     private readonly MetaDataRepository $metaDataRepository;
     protected ResourceFactory $resourceFactory;
     protected PersistenceManagerInterface $persistenceManager;
+    protected ImageService $imageService;
 
     public function __construct()
     {
@@ -31,6 +33,7 @@ class ImageMetaDataService
         $this->metaDataRepository = GeneralUtility::makeInstance(MetaDataRepository::class);
         $this->resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);
         $this->persistenceManager = GeneralUtility::makeInstance(PersistenceManagerInterface::class);
+        $this->imageService = GeneralUtility::makeInstance(ImageService::class);
     }
 
     /**
@@ -41,7 +44,8 @@ class ImageMetaDataService
     public function generateImageDescription(FileInterface $fileObject, string $textPrompt = ''): string
     {
         $serverClass = $this->serverService->getActiveServerClassByFunctionality('image_recognition');
-        return $serverClass->sendFileToApi($fileObject, $textPrompt);
+        $processedImage = $this->getScaledImage($fileObject);
+        return $serverClass->sendFileToApi($processedImage, $textPrompt);
     }
 
     /**
@@ -178,5 +182,21 @@ class ImageMetaDataService
         }
 
         return $metadataEntries;
+    }
+
+    public function getScaledImage(FileInterface $fileObject): FileInterface
+    {
+        $tempDeferred = $GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['processors']['DeferredBackendImageProcessor'];
+        unset($GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['processors']['DeferredBackendImageProcessor']);
+
+        $processedImage = $this->imageService->applyProcessingInstructions($fileObject, [
+            'maxWidth' => 1920,
+            'height' => 1080,
+            'fileExtension' => 'jpg',
+        ]);
+
+        $GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['processors']['DeferredBackendImageProcessor'] = $tempDeferred;
+
+        return $processedImage;
     }
 }
