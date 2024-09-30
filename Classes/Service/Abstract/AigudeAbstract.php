@@ -30,6 +30,7 @@ abstract class AigudeAbstract
 
     protected function request($url, $method, $options = [])
     {
+        $options['http_errors'] = false;
         $response = $this->requestFactory->request($url, $method, $options);
 
         if ($response->getStatusCode() === 200) {
@@ -39,6 +40,6 @@ abstract class AigudeAbstract
             return $json;
         }
 
-        throw new \Exception('API request failed');
+        throw new \Exception('API request failed (code '.$response->getStatusCode().')');
     }
 }

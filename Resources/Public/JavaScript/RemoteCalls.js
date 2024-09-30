@@ -21,6 +21,10 @@ define(['jquery'], function ($) {
       xhr.onreadystatechange = function() {
         if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
           var response = JSON.parse(this.responseText);
+          if (response.error) {
+            reject(response.error);
+            return;
+          }
           resolve(response);
         } else if (this.status !== 200) {
           reject('Error: status ' + this.status);
@@ -45,9 +49,9 @@ define(['jquery'], function ($) {
           top.TYPO3.Notification.success('Generated Metadata', 'Generated Metadata successful', 5);
           return response;
         }
-        top.TYPO3.Notification.error('Error', 'Error while generating Metadata (empty response)', 5);
         throw 'Error: empty response';
       }).catch(error => {
+        top.TYPO3.Notification.error('Error', '(Meta) Error: ' + error, 5);
         throw error;
       });
   }
@@ -67,9 +71,9 @@ define(['jquery'], function ($) {
           top.TYPO3.Notification.success('Saved Metadata successful', 'Saved Metadata successful', 5);
           return response;
         }
-        top.TYPO3.Notification.error('Error', 'Error while saving Metadata (empty response)', 5);
         throw 'Error: empty response';
       }).catch(error => {
+        top.TYPO3.Notification.error('Error', '(Saving) Error: ' + error, 5);
         throw error;
       });
   }

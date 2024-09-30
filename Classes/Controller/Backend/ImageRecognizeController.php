@@ -196,6 +196,25 @@ class ImageRecognizeController extends ActionController
 
         $parsedBody = $request->getParsedBody();
         $queryParams = $request->getQueryParams();
+        $action = $parsedBody['action'] ?? $queryParams['action'] ?? null;
+
+        if (!is_null($action)) {
+            try {
+                return $this->ajaxData($request);
+            } catch (Exception $e) {
+                return $this->responseFactory->createResponse()
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withBody($this->streamFactory->createStream(json_encode(['error' => $e->getMessage()], JSON_THROW_ON_ERROR)));
+            }
+        }
+
+        return $this->ajaxData($request);
+    }
+
+    protected function ajaxData(ServerRequestInterface $request): ResponseInterface
+    {
+        $parsedBody = $request->getParsedBody();
+        $queryParams = $request->getQueryParams();
 
         $fileObjects = $this->getFileObjectFromRequestTarget($request);
 
