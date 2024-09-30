@@ -91,4 +91,9 @@ class OpenAiImageRecognitionService implements ImageRecognitionServiceInterface
 
         throw new \Exception('API request failed');
     }
+
+    public function sendCreditsRequestToApi(FileInterface $fileObject, string $textPrompt = ''): string
+    {
+        return '';
+    }
 }

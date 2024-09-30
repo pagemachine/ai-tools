@@ -10,10 +10,18 @@ use TYPO3\CMS\Core\Resource\FileInterface;
 interface ImageRecognitionServiceInterface
 {
     public function __construct(Server $server);
+
     /**
      * Sends the file to the image recognition API
      *
      * @return string
      */
     public function sendFileToApi(FileInterface $fileObject, string $textPrompt = ''): string;
+
+    /**
+     * Returns the price for the action
+     *
+     * @return string
+     */
+    public function sendCreditsRequestToApi(FileInterface $fileObject, string $textPrompt = ''): string;
 }

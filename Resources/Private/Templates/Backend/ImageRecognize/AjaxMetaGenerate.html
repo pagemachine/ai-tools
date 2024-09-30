@@ -262,7 +262,11 @@
 
                             <core:icon identifier="actions-cpu" size="small" />
                             Generate
-                            <aitools:backend.Credits />
+                            <aitools:backend.Credits
+                                type="imageRecognition"
+                                file-identifier="{fileObject.file.combinedIdentifier}"
+                                text-prompt="temp"
+                            />
                         </button>
 
                         <button

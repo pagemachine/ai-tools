@@ -49,6 +49,18 @@ class ImageMetaDataService
     }
 
     /**
+     * Process the Image recognition request
+     * @return string
+     * @throws \Exception
+     */
+    public function priceForImageDescription(FileInterface $fileObject, string $textPrompt = ''): string
+    {
+        $serverClass = $this->serverService->getActiveServerClassByFunctionality('image_recognition');
+        $processedImage = $this->getScaledImage($fileObject);
+        return $serverClass->sendCreditsRequestToApi($processedImage, $textPrompt);
+    }
+
+    /**
      * generate MetaData for this File and redirect back to ajaxMetaGenerate
      * @param string|null $altText
      * @return int true if metadata was saved

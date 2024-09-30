@@ -44,4 +44,26 @@ class AigudeImageRecognitionService extends AigudeAbstract implements ImageRecog
         $text[0] = strtoupper($text[0]);
         return $text;
     }
+
+    public function sendCreditsRequestToApi(FileInterface $fileObject, string $textPrompt = ''): string
+    {
+        // Use img2desc_translate until img2desc_translate is a separate service
+        // $url = $this->domain . '/img2desc/calculate';
+        $url = $this->domain . '/img2desc_translate/calculate';
+
+        $formData = [
+            'width' => $fileObject->getProperty('width'),
+            'height' => $fileObject->getProperty('height'),
+        ];
+
+        $json = $this->request($url, 'POST', [
+            'headers' => [
+                'apikey' => $this->authToken,
+                'Content-Type' => 'application/json',
+            ],
+            'body' => json_encode($formData),
+        ]);
+
+        return (string) $json['credits_needed'] . ' Credits';
+    }
 }
