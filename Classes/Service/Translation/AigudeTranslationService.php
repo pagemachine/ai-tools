@@ -4,17 +4,10 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Service\Translation;
 
-use Pagemachine\AItools\Domain\Model\Server;
-use Pagemachine\AItools\Domain\Model\ServerAigude;
-use TYPO3\CMS\Core\Http\RequestFactory;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Pagemachine\AItools\Service\Abstract\AigudeAbstract;
 
-class AigudeTranslationService implements TranslationServiceInterface
+class AigudeTranslationService extends AigudeAbstract implements TranslationServiceInterface
 {
-    protected ServerAigude $server;
-    protected $requestFactory;
-    protected string $authToken = '';
-
     private array $languages = [
         'ace' => 'ace_Arab',  // ace_Latn
         'acm' => 'acm_Arab',
@@ -214,19 +207,6 @@ class AigudeTranslationService implements TranslationServiceInterface
         'zu' => 'zul_Latn',
     ];
 
-
-    public function __construct(Server $server)
-    {
-        if ($server instanceof ServerAigude) {
-            $this->server = $server;
-        } else {
-            throw new \InvalidArgumentException('Expected instance of ServerAigude');
-        }
-
-        $this->requestFactory = GeneralUtility::makeInstance(RequestFactory::class);
-        $this->authToken = $this->server->getApikey();
-    }
-
     /**
      * Retrieves the script code for a given language code.
      * Used for mapping AI language codes to TYPO3 Language codes.
@@ -245,7 +225,7 @@ class AigudeTranslationService implements TranslationServiceInterface
         $sourceLang = $this->getLanguageScript($sourceLang);
         $targetLang = $this->getLanguageScript($targetLang);
 
-        $url = 'https://credits.kong.pagemachine.de/translate';
+        $url = $this->domain.'/translate';
 
         // Prepare the form data
         $formData = [
@@ -254,19 +234,12 @@ class AigudeTranslationService implements TranslationServiceInterface
             'target_lang' => $targetLang,
         ];
 
-        $response = $this->requestFactory->request($url, 'POST', [
+        return $this->request($url, 'POST', [
             'headers' => [
                 'apikey' => $this->authToken,
                 'Content-Type' => 'application/json',
             ],
             'body' => json_encode($formData),
         ]);
-
-        if ($response->getStatusCode() === 200) {
-            $result = $response->getBody()->getContents();
-            return json_decode((string)$result, true);
-        }
-
-        throw new \Exception('API request failed');
     }
 }

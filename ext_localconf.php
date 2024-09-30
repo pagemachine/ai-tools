@@ -6,6 +6,7 @@ use Pagemachine\AItools\ContextMenu\ItemProviders\AiToolItemProvider;
 use Pagemachine\AItools\FormEngine\FieldWizard\AlternativeGenerator;
 use Pagemachine\AItools\Hooks\DataHandlerHooks;
 use Pagemachine\AItools\Service\Credits\AigudeCreditsService;
+use Pagemachine\AItools\Service\ImageRecognition\AigudeImageRecognitionService;
 use Pagemachine\AItools\Service\ImageRecognition\CustomImageRecognitionService;
 use Pagemachine\AItools\Service\ImageRecognition\OpenAiImageRecognitionService;
 use Pagemachine\AItools\Service\Translation\AigudeTranslationService;
@@ -22,6 +23,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ai_tools']['servers'] = [
         'credits' => AigudeCreditsService::class,
         'functionality' => [
             'translation' => AigudeTranslationService::class,
+            'image_recognition' => AigudeImageRecognitionService::class,
         ],
     ],
     'openai' => [
