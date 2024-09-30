@@ -77,47 +77,51 @@ define(['jquery'], function ($) {
   RemoteCalls.initGeneratorButton = function() {
     const elements = $('.t3js-alternative-generator-trigger').not('.click-handled');
     elements.addClass('click-handled');
-    elements.on('click', async function(e) {
+    elements.on('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
 
-      const fileIdentifier = $(this).data('file-identifier');
-      const targetLanguage = $(this).data('target-language');
-      const target = $($(this).data('output-target'));
-      const showTarget = $(this).data('show-target');
-
-      let textPrompt = $(this).data('text-prompt');
-      if ($(this).data('text-prompt-field')) {
-        textPrompt = $($(this).data('text-prompt-field')).val();
-      }
-
-      $(this).prop('disabled', true);
-      $(this).addClass('generating');
-
-      target.prop('disabled', true);
-      target.addClass('t3js-ai-tools-generating');
-
-      const results = await RemoteCalls.callAjaxMetaGenerateAction(
-        fileIdentifier,
-        targetLanguage,
-        textPrompt
-      ).finally(() => {
-        $(this).prop('disabled', false);
-        $(this).removeClass('generating');
-
-        target.prop('disabled', false);
-        target.removeClass('t3js-ai-tools-generating');
-
-        if (showTarget) {
-          $(showTarget).show();
-        }
-      });
-
-      console.log('Prompt generated', results);
-
-      target.val(results.alternative);
-      target.trigger('change');
+      RemoteCalls.triggerGeneratorButton($(this));
     });
+  };
+
+  RemoteCalls.triggerGeneratorButton = async function(element) {
+    const fileIdentifier = element.data('file-identifier');
+    const targetLanguage = element.data('target-language');
+    const target = $(element.data('output-target'));
+    const showTarget = element.data('show-target');
+
+    let textPrompt = element.data('text-prompt');
+    if (element.data('text-prompt-field')) {
+      textPrompt = $(element.data('text-prompt-field')).val();
+    }
+
+    element.prop('disabled', true);
+    element.addClass('generating');
+
+    target.prop('disabled', true);
+    target.addClass('t3js-ai-tools-generating');
+
+    const results = await RemoteCalls.callAjaxMetaGenerateAction(
+      fileIdentifier,
+      targetLanguage,
+      textPrompt
+    ).finally(() => {
+      element.prop('disabled', false);
+      element.removeClass('generating');
+
+      target.prop('disabled', false);
+      target.removeClass('t3js-ai-tools-generating');
+
+      if (showTarget) {
+        $(showTarget).show();
+      }
+    });
+
+    console.log('Prompt generated', results);
+
+    target.val(results.alternative);
+    target.trigger('change');
   };
 
   return RemoteCalls;

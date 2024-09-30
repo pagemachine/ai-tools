@@ -78,12 +78,55 @@
         <f:then>
             <div class="row">
                 <div class="col-xs-12">
-                    <f:render section="form-group-select" arguments="{label: 'Global AI Prompt', class: 'globalTextPrompt', name: 'globalTextPrompt', options: allTextPrompts, value: textPrompt, optionLabelField: 'description', optionValueField: 'prompt'}" />
+                    <div class="box-pagemachine-ai-tools">
+                        <f:render
+                            section="form-group-select"
+                            arguments="{
+                                label: 'Global AI Prompt',
+                                class: 'globalTextPrompt',
+                                id: 'globalTextPrompt',
+                                name: 'globalTextPrompt',
+                                options: allTextPrompts,
+                                value: textPrompt,
+                                optionLabelField: 'description',
+                                optionValueField: 'prompt'
+                            }"
+                        />
 
-                    <label for="skipExistingDescriptions">Skip existing descriptions <input type="checkbox" id="skipExistingDescriptions" name="skipExistingDescriptions" class="skipExistingDescriptions" value="1" checked /></label><br />
-                    <button onclick="callAjaxMetaGenerateActionForAll(this, false)" class="btn btn-primary">Generate Meta-Data for all Images</button>
-                    <button onclick="callAjaxMetaGenerateActionForAll(this, true)" class="btn btn-primary">Generate, Save + Translate Meta-Data for all Images</button>
-                    <progress value="0" max="{fileObjects -> f:count()}" id="progressBar" class="progressBar"></progress>
+                        <label for="skipExistingDescriptions">
+                            <input
+                                type="checkbox"
+                                id="skipExistingDescriptions"
+                                name="skipExistingDescriptions"
+                                class="skipExistingDescriptions"
+                                value="1"
+                                checked
+                            />
+                            Skip existing
+                        </label>
+                        <br />
+
+                        <button
+                            href="#"
+                            class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-generate-all"
+                            data-translate="0"
+                        >
+                            <core:icon identifier="actions-cpu" size="small" />
+                            Generate alternative text for {fileObjects -> f:count()} Images
+                            <aitools:backend.Credits />
+                        </button>
+                        <button
+                            href="#"
+                            class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-generate-all"
+                            data-translate="1"
+                        >
+                            <core:icon identifier="actions-cpu" size="small" />
+                            Generate alternative text for {fileObjects -> f:count()} Images and translate into all languages
+                            <aitools:backend.Credits />
+                        </button>
+                        <br />
+                        <progress value="0" max="{fileObjects -> f:count()}" id="progressBar" class="progressBar"></progress>
+                    </div>
                 </div>
             </div>
             <div class="help-block">&nbsp;</div>
@@ -105,7 +148,7 @@
     <h1>Generate File Metadata "{fileObject.file.name}"</h1>
     <f:flashMessages queueIdentifier="ai-tools.template.flashMessages"/>
 
-    <div class="typo3-TCEforms imageEntry imageEntry-{fileObject.file.properties.identifier_hash}">
+    <div class="typo3-TCEforms imageEntry imageEntry-{fileObject.file.properties.identifier_hash}" data-alternative="{fileObject.meta.alternative}">
         <div role="tabpanel">
             <ul class="nav nav-tabs t3js-tabs" role="tablist" id="tabs" data-store-last-tab="1">
             </ul>

@@ -43,6 +43,12 @@
     color: white;
 }
 
+.box-pagemachine-ai-tools {
+    border: 1px solid #ef81df;
+    background-color: #ffcafd;
+    padding: 10px 15px;
+}
+
 .t3js-ai-tools-generating {
     background: linear-gradient(90deg, #f9f1f8 0%, rgb(255, 193, 244) 50%, #f9f1f8 100%);
     animation: movingGenerationAiTools 3s ease infinite;
