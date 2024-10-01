@@ -40,6 +40,20 @@ abstract class AigudeAbstract
             return $json;
         }
 
+        $error = null;
+        try {
+            $result = $response->getBody()->getContents();
+            $json = json_decode((string)$result, true);
+            if (isset($json['detail'])) {
+                $error = $json['detail'];
+            }
+        } catch (\Exception) {
+        }
+
+        if (!is_null($error)) {
+            throw new \Exception($error);
+        }
+
         throw new \Exception('API request failed (code '.$response->getStatusCode().')');
     }
 }

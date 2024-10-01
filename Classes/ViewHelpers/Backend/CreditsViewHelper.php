@@ -4,18 +4,13 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\ViewHelpers\Backend;
 
-use Pagemachine\AItools\Service\ImageMetaDataService;
-use TYPO3\CMS\Core\Resource\AbstractFile;
-use TYPO3\CMS\Core\Resource\FileInterface;
-use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper;
 
 class CreditsViewHelper extends AbstractTagBasedViewHelper
 {
-    protected ImageMetaDataService $imageMetaDataService;
-    protected ResourceFactory $resourceFactory;
-
     public function initializeArguments(): void
     {
         parent::initializeArguments();
@@ -24,56 +19,46 @@ class CreditsViewHelper extends AbstractTagBasedViewHelper
         $this->registerArgument('text-prompt', 'string', 'The text prompt to send to the API', false, '');
     }
 
-    protected function imageRecognition(): string
-    {
-        $fileIdentifer = $this->arguments['file-identifier'];
-        if ($fileIdentifer) {
-            $fileObject = $this->resourceFactory->retrieveFileOrFolderObject($fileIdentifer);
-            if ($fileObject instanceof FileInterface) {
-                if ($fileObject->getType() !== AbstractFile::FILETYPE_IMAGE) {
-                    return '';
-                }
-
-                return $this->imageMetaDataService->priceForImageDescription($fileObject, $this->arguments['text-prompt']);
-            }
-        }
-
-        return '';
-    }
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->imageMetaDataService = GeneralUtility::makeInstance(ImageMetaDataService::class);
-        $this->resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);
-    }
-
     public function render(): string
     {
-        $text = '';
-
-        switch ($this->arguments['type']) {
-            case 'imageRecognition':
-                $text = $this->imageRecognition();
-                break;
-        }
-
-
-        if (empty($text)) {
-            return '';
-        }
+        $ajaxUri = $this->getAjaxUri();
+        GeneralUtility::makeInstance(PageRenderer::class)->loadRequireJsModule(
+            'TYPO3/CMS/AiTools/CreditsViewHelper',
+            'function (CreditsViewHelper) { CreditsViewHelper("'. htmlspecialchars($ajaxUri, ENT_QUOTES, 'UTF-8').'"); }'
+        );
 
         $this->tag->addAttribute(
             'class',
-            'label label-default'
+            'label label-default t3js-ai-tools-credits-view-helper'
         );
 
-        $this->tag->setContent($text);
+        $this->tag->addAttribute(
+            'data-type',
+            $this->arguments['type']
+        );
+
+        $this->tag->addAttribute(
+            'data-file-identifier',
+            $this->arguments['file-identifier']
+        );
+
+        $this->tag->addAttribute(
+            'data-text-prompt',
+            $this->arguments['text-prompt']
+        );
+
+        $this->tag->addAttribute(
+            'style',
+            'display: none;'
+        );
 
         return $this->tag->render();
+    }
+
+    protected function getAjaxUri(): string
+    {
+        $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+        $uri = $uriBuilder->buildUriFromRoute('ajax_aitools_ai_tools_credits', [], UriBuilder::ABSOLUTE_PATH);
+        return (string)$uri;
     }
 }

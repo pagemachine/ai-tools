@@ -1,5 +1,6 @@
 <?php
 
+use Pagemachine\AItools\Controller\Backend\CreditsController;
 use Pagemachine\AItools\Controller\Backend\ImageRecognizeController;
 
 /**
@@ -17,5 +18,9 @@ return [
     'aitools_ai_tools_images' => [
         'path' => '/aitoolsimages/metagen',
         'target' => ImageRecognizeController::class . '::ajaxMetaGenerateAction',
+    ],
+    'aitools_ai_tools_credits' => [
+        'path' => '/aitools/credits',
+        'target' => CreditsController::class . '::ajaxCreditsAction',
     ],
 ];

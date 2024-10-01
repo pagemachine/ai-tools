@@ -81,8 +81,8 @@ class Server extends AbstractEntity
 
         try {
             return $credits->sendCreditsRequestToApi();
-        } catch (\Exception $e) {
-            return $e->getMessage();
+        } catch (\Exception) {
+            return '';
         }
     }
 

@@ -11,12 +11,12 @@ define(['jquery'], function ($) {
    */
   var RemoteCalls = {};
 
-  RemoteCalls.ajaxCall = async function(parameters) {
+  RemoteCalls.ajaxCall = async function(parameters, url = ajaxUrl) {
     var paramString = Object.keys(parameters).map(key => key + '=' + encodeURIComponent(parameters[key])).join('&');
 
     return new Promise((resolve, reject) => {
       var xhr = new XMLHttpRequest();
-      xhr.open('POST', ajaxUrl, true);
+      xhr.open('POST', url, true);
       xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
       xhr.onreadystatechange = function() {
         if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
@@ -75,6 +75,21 @@ define(['jquery'], function ($) {
       }).catch(error => {
         top.TYPO3.Notification.error('Error', '(Saving) Error: ' + error, 5);
         throw error;
+      });
+  }
+
+  RemoteCalls.callAjaxCreditsAction = async function(url, data) {
+    const params = {
+      action: 'credits',
+      ...data
+    };
+
+    return RemoteCalls.ajaxCall(params, url)
+      .then(response => {
+        if (response) {
+          return response;
+        }
+        throw 'Error: empty response';
       });
   }
 
