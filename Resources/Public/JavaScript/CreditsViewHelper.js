@@ -6,9 +6,9 @@
 define(['jquery', 'TYPO3/CMS/AiTools/RemoteCalls'], function ($, RemoteCalls) {
   'use strict';
 
-  return function (url) {
+  return function (url, selector) {
     $(async () => {
-      const elements = document.querySelectorAll('.t3js-ai-tools-credits-view-helper');
+      const elements = document.querySelectorAll(selector);
 
       for(let element of elements) {
         const data = {
@@ -18,7 +18,7 @@ define(['jquery', 'TYPO3/CMS/AiTools/RemoteCalls'], function ($, RemoteCalls) {
           textPrompt: element.getAttribute('data-text-prompt'),
         };
 
-        console.log(data);
+        console.log('Credits', data);
 
         if (data.type) {
           await RemoteCalls.callAjaxCreditsAction(url, data).then(response => {

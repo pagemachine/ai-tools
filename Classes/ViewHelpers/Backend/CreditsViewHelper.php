@@ -22,9 +22,11 @@ class CreditsViewHelper extends AbstractTagBasedViewHelper
     public function render(): string
     {
         $ajaxUri = $this->getAjaxUri();
-        GeneralUtility::makeInstance(PageRenderer::class)->loadRequireJsModule(
-            'TYPO3/CMS/AiTools/CreditsViewHelper',
-            'function (CreditsViewHelper) { CreditsViewHelper("'. htmlspecialchars($ajaxUri, ENT_QUOTES, 'UTF-8').'"); }'
+        $hash = md5(uniqid('credits_', true));
+
+        $this->tag->addAttribute(
+            'id',
+            'credits-button-' . $hash
         );
 
         $this->tag->addAttribute(
@@ -52,7 +54,17 @@ class CreditsViewHelper extends AbstractTagBasedViewHelper
             'display: none;'
         );
 
-        return $this->tag->render();
+        $output = $this->tag->render();
+
+        $output .= '
+            <script>
+                require(["TYPO3/CMS/AiTools/CreditsViewHelper"], function(CreditsViewHelper) {
+                    CreditsViewHelper("' . htmlspecialchars($ajaxUri, ENT_QUOTES, 'UTF-8') . '", "#credits-button-' . $hash . '");
+                });
+            </script>
+        ';
+
+        return $output;
     }
 
     protected function getAjaxUri(): string
