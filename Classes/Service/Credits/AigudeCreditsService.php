@@ -15,6 +15,7 @@ class AigudeCreditsService extends AigudeAbstract implements CreditsServiceInter
         $url = $this->domain . '/remaining_credits';
 
         $json = $this->request($url, 'GET', [
+            'timeout' => 1,
             'headers' => [
                 'apikey' => $this->authToken,
                 'Content-Type' => 'application/json',
