@@ -30,6 +30,7 @@ require(['jquery', 'TYPO3/CMS/AiTools/RemoteCalls', 'TYPO3/CMS/Backend/Modal', '
 
       const fileIdentifier = $(this).data('file-identifier');
       const targetLanguage = $(this).data('target-language');
+      const translationHash = $(this).data('translation-hash');
       const target = $($(this).data('output-target'));
       const buttons = $($(this).data('button-target'));
       const translate = Number($(this).data('translate'));
@@ -55,6 +56,13 @@ require(['jquery', 'TYPO3/CMS/AiTools/RemoteCalls', 'TYPO3/CMS/Backend/Modal', '
       $('.t3js-alternative-use-trigger').trigger('click');
 
       console.log('Saving Metadata', results);
+
+      if (translationHash) {
+        for (const translation of results.translations) {
+          const textTarget = $('#translate-' + translationHash + '-' + translation.languageId);
+          textTarget.text(translation.altTextTranslated);
+        }
+      }
     });
   });
 

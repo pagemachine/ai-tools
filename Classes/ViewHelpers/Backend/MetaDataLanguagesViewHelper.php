@@ -37,6 +37,25 @@ class MetaDataLanguagesViewHelper extends AbstractViewHelper
         $fileObject = $this->arguments['fileObject'];
         $languages = $this->arguments['languages'];
 
-        return $imageMetaDataService->getMetaDataLanguages($fileObject, $languages);
+        $fileMeta = $imageMetaDataService->getMetaDataLanguages($fileObject, $languages);
+
+        $result = [];
+
+        foreach ($languages as $language) {
+            $meta = null;
+            foreach ($fileMeta as $fileMetaItem) {
+                if ($fileMetaItem['sys_language_uid'] === $language->getLanguageId()) {
+                    $meta = $fileMetaItem;
+                    break;
+                }
+            }
+
+            $result[] = [
+                'language' => $language,
+                'meta' => $meta,
+            ];
+        }
+
+        return $result;
     }
 }

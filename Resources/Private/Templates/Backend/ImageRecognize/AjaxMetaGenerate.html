@@ -43,11 +43,14 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: flex-start;
+            align-items: center;
+            gap: 15px;
         }
-        .otherLanguages li .icon {
-            vertical-align: middle;
+        .otherLanguages li .text-section {
+            flex-grow: 1;
+        }
+        .otherLanguages li .flag-section .icon {
             display: block;
-            margin-right: 10px;
             flex-shrink: 0;
             width: 30px;
             height: 30px;
@@ -178,9 +181,8 @@
                 </fieldset>
                 <f:render section="section-prompt" arguments="{_all}" />
                 <f:render section="section-generation" arguments="{_all}" />
-                <f:comment>
-                    <f:render section="section-translation" arguments="{_all}" />
-                </f:comment>
+                <f:render section="section-translation" arguments="{_all}" />
+
                 <fieldset class="form-section t3js-ai-tools-show-after-prompt-generation-{fileObject.file.properties.identifier_hash}" style="display: none;">
                     <div class="module-columns">
                         <div class="module-column">
@@ -208,6 +210,7 @@
                                     data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
                                     data-target-language="{targetLanguage}"
                                     data-button-target=".t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}"
+                                    data-translation-hash="{fileObject.file.properties.identifier_hash}"
                                     data-translate="1"
                                 >
                                     <core:icon identifier="actions-cpu" size="small" />
@@ -317,7 +320,7 @@
 </f:section>
 
 <f:section name="section-translation">
-    <fieldset class="form-section">
+    <fieldset class="form-section t3js-ai-tools-show-after-prompt-generation-{fileObject.file.properties.identifier_hash}" style="display: none;">
         <div class="module-columns">
             <div class="module-column">
                 <div class="form-group">
@@ -326,30 +329,58 @@
                     </label>
                 </div>
 
-                <button class="btn btn-default btn-pagemachine-ai-tools" onclick="return false;">
-                    <core:icon identifier="actions-cpu" size="small" />
-                    Update all translations
-                    <aitools:backend.Credits />
-                </button>
+                <f:comment>
+                    <button class="btn btn-default btn-pagemachine-ai-tools" onclick="return false;">
+                        <core:icon identifier="actions-cpu" size="small" />
+                        Update all translations
+                        <aitools:backend.Credits />
+                    </button>
+                </f:comment>
 
                 <div class="otherLanguages">
                     <ul>
-                        <f:for as="metaLanguage"
-                            each="{aitools:backend.metaDataLanguages(languages: siteLanguages, fileObject: fileObject.file)}">
-                            <li>
-                                <f:for as="siteLanguage" each="{siteLanguages}">
-                                    <f:if condition="{siteLanguage.languageId} == {metaLanguage.sys_language_uid}">
-                                        <f:then>
-                                            <aitools:backend.icon title="{siteLanguage.title}"
-                                                identifier="{siteLanguage.flagIdentifier}" size="large" />
-                                        </f:then>
-                                    </f:if>
-                                </f:for>
-                                <a
-                                    href="{be:uri.editRecord(uid:metaLanguage.uid, table:'sys_file_metadata', returnUrl:'{aitools:backend.generateMetadataEditLink(target: target)}')}">
-                                    {metaLanguage.alternative}
-                                </a>
-                            </li>
+                        <f:for
+                            as="metaLanguage"
+                            each="{aitools:backend.metaDataLanguages(languages: siteLanguages, fileObject: fileObject.file)}"
+                        >
+                            <f:if condition="{targetLanguage} != {metaLanguage.language.languageId}">
+                                <li>
+                                    <div class="flag-section">
+                                        <aitools:backend.icon
+                                            title="{metaLanguage.language.title}"
+                                            identifier="{metaLanguage.language.flagIdentifier}" size="large"
+                                        />
+                                    </div>
+                                    <div class="text-section">
+                                        <div class="t3js-formengine-label">
+                                            {metaLanguage.language.title}
+                                        </div>
+                                        <div id="translate-{fileObject.file.properties.identifier_hash}-{metaLanguage.language.languageId}">
+                                            <f:if condition="{metaLanguage.meta}">
+                                                <f:then>
+                                                    {metaLanguage.meta.alternative}
+                                                </f:then>
+                                                <f:else>
+                                                    No translation
+                                                </f:else>
+                                            </f:if>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <f:comment>
+                                            <button
+                                                href="#"
+                                                class="btn btn-default btn-pagemachine-ai-tools"
+                                            >
+                                                <core:icon identifier="actions-cpu" size="small" />
+                                                Generate
+                                                <aitools:backend.Credits />
+                                            </button>
+                                        </f:comment>
+                                    </div>
+
+                                </li>
+                            </f:if>
                         </f:for>
                     </ul>
                 </div>
