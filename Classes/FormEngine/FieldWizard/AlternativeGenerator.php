@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pagemachine\AItools\FormEngine\FieldWizard;
 
 use Pagemachine\AItools\Domain\Repository\PromptRepository;
+use Pagemachine\AItools\Service\SettingsService;
 use TYPO3\CMS\Backend\Form\AbstractNode;
 use TYPO3\CMS\Backend\Form\NodeFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -16,12 +17,14 @@ class AlternativeGenerator extends AbstractNode
     protected StandaloneView $templateView;
 
     protected PromptRepository $promptRepository;
+    protected SettingsService $settingsService;
 
     public function __construct(NodeFactory $nodeFactory, array $data)
     {
         parent::__construct($nodeFactory, $data);
 
         $this->promptRepository = GeneralUtility::makeInstance(PromptRepository::class);
+        $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
 
         $this->templateView = GeneralUtility::makeInstance(StandaloneView::class);
         $this->templateView->setLayoutRootPaths([GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Layouts/')]);
@@ -32,6 +35,10 @@ class AlternativeGenerator extends AbstractNode
     public function render()
     {
         $result = $this->initializeResultArray();
+
+        if (!$this->settingsService->checkPermission('generate_metadata')) {
+            return $result;
+        }
 
         $prompt = $this->promptRepository->getDefaultPromptText();
 
