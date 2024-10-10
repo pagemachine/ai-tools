@@ -224,6 +224,8 @@ class ImageRecognizeController extends ActionController
 
         $siteLanguages = $this->getAllSiteLanguages();
 
+        $modal = $parsedBody['modal'] ?? $queryParams['modal'] ?? false;
+
         $target_language = $parsedBody['target-language'] ?? $queryParams['target-language'] ?? null;
         if (is_null($target_language)) {
             throw new Exception("No target language", 1727169730);
@@ -291,6 +293,7 @@ class ImageRecognizeController extends ActionController
                 $view->assign('target', $target);
                 $view->assign('fileObjects', $fileObjects ?? null);
                 $view->assign('targetLanguage', (int) $target_language);
+                $view->assign('modal', $modal);
 
                 $view->assign(
                     'textPrompt',

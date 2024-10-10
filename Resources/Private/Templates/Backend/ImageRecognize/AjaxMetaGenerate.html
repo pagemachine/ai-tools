@@ -187,22 +187,28 @@
                     <div class="module-columns">
                         <div class="module-column">
                             <div class="form-group bottom">
-                                <button href="#" class="btn btn-default btn-primary t3js-alternative-use-trigger" style="display: none;">
-                                    <core:icon identifier="actions-save" size="small" />
-                                    Use
-                                </button>
-
-                                <button
-                                    class="btn btn-default btn-primary t3js-alternative-save-trigger t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}"
-                                    data-file-identifier="{fileObject.file.combinedIdentifier}"
-                                    data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
-                                    data-target-language="{targetLanguage}"
-                                    data-button-target=".t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}"
-                                    data-translate="0"
-                                >
-                                    <core:icon identifier="actions-save" size="small" />
-                                    save
-                                </button>
+                                <f:if condition="{modal}">
+                                    <f:then>
+                                        <button href="#"
+                                            class="btn btn-default btn-primary t3js-alternative-use-trigger"
+                                            data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
+                                        >
+                                            <core:icon identifier="actions-save" size="small" />
+                                            Use
+                                        </button>
+                                    </f:then>
+                                    <f:else>
+                                        <button
+                                            class="btn btn-default btn-primary t3js-alternative-save-trigger t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}"
+                                            data-file-identifier="{fileObject.file.combinedIdentifier}"
+                                            data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
+                                            data-target-language="{targetLanguage}"
+                                            data-button-target=".t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}" data-translate="0">
+                                            <core:icon identifier="actions-save" size="small" />
+                                            Save
+                                        </button>
+                                    </f:else>
+                                </f:if>
 
                                 <button
                                     class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-save-trigger t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}"

@@ -3,7 +3,12 @@
  *
  * @exports TYPO3/CMS/AiTools/AlternativeGenerator
  */
-define(['jquery', 'TYPO3/CMS/Backend/Modal', 'TYPO3/CMS/AiTools/RemoteCalls'], function ($, Modal, RemoteCalls) {
+define([
+  'jquery',
+  'TYPO3/CMS/Backend/Modal',
+  'TYPO3/CMS/AiTools/RemoteCalls',
+  'TYPO3/CMS/Backend/Utility/MessageUtility'
+], function ($, Modal, RemoteCalls, MessageUtility) {
   'use strict';
 
   /**
@@ -23,36 +28,49 @@ define(['jquery', 'TYPO3/CMS/Backend/Modal', 'TYPO3/CMS/AiTools/RemoteCalls'], f
     $('.t3js-alternative-generator-settings-trigger').off('click').on('click', AlternativeGenerator.clickSettingsHandler);
   };
 
+  let currentModal = null;
+  let triggerTaget = null;
   AlternativeGenerator.show = function (trigger) {
-    const currentModal = Modal.advanced({
+    currentModal = Modal.advanced({
       additionalCssClasses: ['modal-image-manipulation'],
       buttons: [
       ],
       staticBackdrop: true,
-      content: trigger.data('base') + '&target=' + encodeURIComponent(trigger.data('target')) + '&target-language=' + encodeURIComponent(trigger.data('target-language')),
-      type: Modal.types.ajax,
+      content: trigger.data('base') + '&modal=1&target=' + encodeURIComponent(trigger.data('target')) + '&target-language=' + encodeURIComponent(trigger.data('target-language')),
+      type: Modal.types.iframe,
       size: Modal.sizes.large,
       title: trigger.data('title'),
     });
+    triggerTaget = $(trigger.data('output-target'));
 
-    currentModal.css('pointer-events', 'none');
-
-    currentModal.on('modal-loaded', function () {
-      const use = currentModal.find('.t3js-alternative-use-trigger');
-      const save = currentModal.find('.t3js-alternative-save-trigger.btn-primary');
-      const target = $(trigger.data('output-target'));
-
-      use.show();
-      save.hide();
-
-      use.off('click').on('click', function (e) {
-        const value = currentModal.find('.textarea-altTextSuggestion').first().val();
-        target.val(value);
-        target.trigger('change');
-        currentModal.modal('hide');
-      });
-    });
+    if (currentModal.css) {
+      // Typo3 11
+      currentModal.css('pointer-events', 'none');
+    }
   };
+
+  window.addEventListener('message', function (e) {
+    if (!MessageUtility.MessageUtility.verifyOrigin(e.origin)) {
+      throw 'Denied message sent by ' + e.origin;
+    }
+
+    if (e.data.actionName === 'typo3:aiTools:updateField') {
+      if (typeof e.data.value === 'undefined') {
+        throw 'value not defined in message';
+      }
+
+      if (currentModal) {
+        triggerTaget.val(e.data.value);
+        if (currentModal.css) {
+          // Typo3 11
+          currentModal.modal('hide');
+        } else {
+          // Typo3 12
+          currentModal.hideModal();
+        }
+      }
+    }
+  });
 
   AlternativeGenerator.initializeTrigger();
 

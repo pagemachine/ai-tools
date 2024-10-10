@@ -1,4 +1,11 @@
-require(['jquery', 'TYPO3/CMS/AiTools/RemoteCalls', 'TYPO3/CMS/Backend/Modal', 'TYPO3/CMS/Backend/Severity'], function($, RemoteCalls, Modal, Severity) {
+
+require([
+  'jquery',
+  'TYPO3/CMS/AiTools/RemoteCalls',
+  'TYPO3/CMS/Backend/Modal',
+  'TYPO3/CMS/Backend/Severity',
+  'TYPO3/CMS/Backend/Utility/MessageUtility'
+], function($, RemoteCalls, Modal, Severity, MessageUtility) {
 
   $(() => {
     $('.textPromptSelect').on('change', function() {
@@ -52,6 +59,8 @@ require(['jquery', 'TYPO3/CMS/AiTools/RemoteCalls', 'TYPO3/CMS/Backend/Modal', '
         buttons.removeClass('saving');
         $(this).removeClass('generating');
       });
+
+      setValueInParent(value);
 
       $('.t3js-alternative-use-trigger').trigger('click');
 
@@ -137,6 +146,16 @@ require(['jquery', 'TYPO3/CMS/AiTools/RemoteCalls', 'TYPO3/CMS/Backend/Modal', '
     });
   });
 
+  $(() => {
+    $('.t3js-alternative-use-trigger').on('click', async function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const target = $($(this).data('output-target'));
+      setValueInParent(target.val());
+    });
+  });
+
 
   $(() => {
     RemoteCalls.initGeneratorButton();
@@ -177,4 +196,40 @@ require(['jquery', 'TYPO3/CMS/AiTools/RemoteCalls', 'TYPO3/CMS/Backend/Modal', '
     });
   }
 
+  function setValueInParent(value) {
+    const message = {
+      actionName: 'typo3:aiTools:updateField',
+      value: value,
+    };
+    MessageUtility.MessageUtility.send(message, getParent());
+  }
+
+  function getParent() {
+    if (this.opener === null) {
+      if (
+        typeof window.parent !== 'undefined' &&
+        typeof window.parent.document.list_frame !== 'undefined' &&
+        window.parent.document.list_frame.parent.document.querySelector('.t3js-modal-iframe') !== null
+      ) {
+        this.opener = window.parent.document.list_frame;
+      } else if (
+        typeof window.parent !== 'undefined' &&
+        typeof window.parent.frames.list_frame !== 'undefined' &&
+        window.parent.frames.list_frame.parent.document.querySelector('.t3js-modal-iframe') !== null
+      ) {
+        this.opener = window.parent.frames.list_frame;
+      } else if (
+        typeof window.frames !== 'undefined' &&
+        typeof window.frames.frameElement !== 'undefined' &&
+        window.frames.frameElement !== null &&
+        window.frames.frameElement.classList.contains('t3js-modal-iframe')
+      ) {
+        this.opener = (window.frames.frameElement).contentWindow.parent;
+      } else if (window.opener) {
+        this.opener = window.opener;
+      }
+    }
+
+    return this.opener;
+  }
 });
