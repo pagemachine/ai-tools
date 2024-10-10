@@ -13,14 +13,12 @@ class ServerService
 {
     private readonly array $serverConfig;
     private readonly SettingsService $settingsService;
-    private readonly ServerRepository $serverRepository;
 
     public function __construct()
     {
         $this->serverConfig = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ai_tools']['servers'];
 
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
-        $this->serverRepository = GeneralUtility::makeInstance(ServerRepository::class);
     }
 
     public function getServers(): array
@@ -78,7 +76,8 @@ class ServerService
             throw new \Exception('No valid '.$functionality.' service configured');
         }
 
-        $serverEntry = $this->serverRepository->findByUid($serviceUid);
+        $serverRepository = GeneralUtility::makeInstance(ServerRepository::class);
+        $serverEntry = $serverRepository->findByUid($serviceUid);
 
         if (!$serverEntry instanceof Server) {
             throw new \Exception('No valid '.$functionality.' service configured');
