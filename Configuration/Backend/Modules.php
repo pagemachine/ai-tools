@@ -30,7 +30,7 @@ return [
         'position' => ['before' => '*'],
         'access' => 'admin',
         'workspaces' => 'live',
-        'iconIdentifier' => 'module-install-setting',
+        'iconIdentifier' => 'module-install-settings',
         'path' => '/module/aitools/AItoolsSettings',
         'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf',
         'extensionName' => 'AItools',
