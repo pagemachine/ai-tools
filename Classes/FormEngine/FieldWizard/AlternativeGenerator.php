@@ -8,6 +8,11 @@ use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Pagemachine\AItools\Service\SettingsService;
 use TYPO3\CMS\Backend\Form\AbstractNode;
 use TYPO3\CMS\Backend\Form\NodeFactory;
+use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
+use TYPO3\CMS\Core\Resource\AbstractFile;
+use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
+use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
@@ -32,9 +37,33 @@ class AlternativeGenerator extends AbstractNode
         $this->templateView->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Templates/FieldWizard/AlternativeGenerator.html'));
     }
 
+    protected function isActive($identifier): bool
+    {
+        try {
+            $file = GeneralUtility::makeInstance(ResourceFactory::class)->retrieveFileOrFolderObject($identifier);
+        } catch (ResourceDoesNotExistException) {
+            return false;
+        }
+
+        if (! $file instanceof File) {
+            return false;
+        }
+
+        if ($file->getType() !== AbstractFile::FILETYPE_IMAGE) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function render()
     {
         $result = $this->initializeResultArray();
+        $target = $this->data['databaseRow']['file'][0];
+
+        if (!$this->isActive($target)) {
+            return $result;
+        }
 
         if (!$this->settingsService->checkPermission('generate_metadata')) {
             return $result;
@@ -42,9 +71,10 @@ class AlternativeGenerator extends AbstractNode
 
         $prompt = $this->promptRepository->getDefaultPromptText();
 
+
         $arguments = [
-            'target' => $this->data['databaseRow']['file'][0],
-            'target-language' => $this-> data['databaseRow']['sys_language_uid'],
+            'target' => $target,
+            'target-language' => $this->data['databaseRow']['sys_language_uid'],
             'title' => $this->data['recordTitle'],
             'input-field-selector' => '[data-formengine-input-name="' . $this->data["parameterArray"]["itemFormElName"] . '"]',
             'prompt' => $prompt,
