@@ -1,4 +1,166 @@
-require(['TYPO3/CMS/Backend/Modal', 'TYPO3/CMS/Backend/Severity'], function(Modal, Severity) {
+
+require([
+  'jquery',
+  'TYPO3/CMS/AiTools/RemoteCalls',
+  'TYPO3/CMS/Backend/Modal',
+  'TYPO3/CMS/Backend/Severity',
+  'TYPO3/CMS/Backend/Utility/MessageUtility'
+], function($, RemoteCalls, Modal, Severity, MessageUtility) {
+
+  $(() => {
+    $('.textPromptSelect').on('change', function() {
+      const selectedValue = $(this).val();
+      $($(this).data('target')).val(selectedValue);
+    });
+  });
+
+  $(() => {
+    $('.t3js-alternative-use-current-trigger').on('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const target = $($(this).data('output-target'));
+      const text = $(this).data('current-text');
+      const showTarget = $(this).data('show-target');
+
+      target.val(text);
+      if (showTarget) {
+        $(showTarget).show();
+      }
+    });
+  });
+
+  $(() => {
+    $('.t3js-alternative-save-trigger').on('click', async function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const fileIdentifier = $(this).data('file-identifier');
+      const targetLanguage = $(this).data('target-language');
+      const translationHash = $(this).data('translation-hash');
+      const target = $($(this).data('output-target'));
+      const buttons = $($(this).data('button-target'));
+      const translate = Number($(this).data('translate'));
+
+      const value = target.val();
+
+      buttons.prop('disabled', true);
+      buttons.addClass('saving');
+      $(this).addClass('generating');
+
+
+      const results = await RemoteCalls.callAjaxSaveMetaDataAction(
+        fileIdentifier,
+        targetLanguage,
+        value,
+        translate
+      ).finally(() => {
+        buttons.prop('disabled', false);
+        buttons.removeClass('saving');
+        $(this).removeClass('generating');
+      });
+
+      setValueInParent(value);
+
+      $('.t3js-alternative-use-trigger').trigger('click');
+
+      console.log('Saving Metadata', results);
+
+      if (translationHash) {
+        for (const translation of results.translations) {
+          const textTarget = $('#translate-' + translationHash + '-' + translation.languageId);
+          textTarget.text(translation.altTextTranslated);
+        }
+      }
+    });
+  });
+
+  $(() => {
+    $('.t3js-alternative-generate-all').on('click', async function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      var imageEntryBlocks = document.querySelectorAll('.imageEntry');
+      var progressBar = $('.progressBar').first();
+
+      const translate = Boolean($(this).data('translate'));
+      const skipExistingDescriptions = document.getElementById('skipExistingDescriptions').checked;
+
+      if (!skipExistingDescriptions) {
+        const userConfirmed = await showModalConfirmation('This will overwrite existing descriptions. Are you sure you want to continue?');
+        if (!userConfirmed) {
+          return;
+        }
+      }
+
+      $('.t3js-alternative-generate-all').prop('disabled', true);
+      $('.t3js-alternative-generate-all').addClass('generating');
+
+      const filteredImageBlocks = [...imageEntryBlocks].filter((imageEntry) => {
+        const currentAlternative = $(imageEntry).data('alternative');
+        return !skipExistingDescriptions || !currentAlternative
+      });
+
+      progressBar.attr('max', filteredImageBlocks.length);
+      progressBar.val(0);
+
+      for (let imageEntry of filteredImageBlocks) {
+        try {
+          const button = $(imageEntry).find('.t3js-alternative-generator-trigger').first();
+          const save = $(imageEntry).find('.t3js-alternative-save-trigger[data-translate="0"]').first();
+          const saveTranslate = $(imageEntry).find('.t3js-alternative-save-trigger[data-translate="1"]').first();
+
+          await RemoteCalls.triggerGeneratorButton(button);
+
+          if (translate) {
+            if (!saveTranslate.length) {
+              console.error('No saveTranslate button found');
+              return;
+            }
+            saveTranslate.trigger('click');
+          } else {
+            if (!save.length) {
+              console.error('No save button found');
+              return;
+            }
+            save.trigger('click');
+          }
+
+          $(imageEntry).css('border', '1px solid green');
+
+        } catch (error) {
+          console.error('Error while generating metadata', error);
+          $(imageEntry).css('border', '1px solid red');
+        }
+
+        progressBar.val(progressBar.val() + 1);
+      }
+
+      $('.t3js-alternative-generate-all').prop('disabled', false);
+      $('.t3js-alternative-generate-all').removeClass('generating');
+
+    });
+
+    $('.globalTextPrompt').on('change', function() {
+      $('.textPromptSelect').val($(this).val()).trigger('change');
+    });
+  });
+
+  $(() => {
+    $('.t3js-alternative-use-trigger').on('click', async function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const target = $($(this).data('output-target'));
+      setValueInParent(target.val());
+    });
+  });
+
+
+  $(() => {
+    RemoteCalls.initGeneratorButton();
+  });
+
   async function showModalConfirmation(message) {
     return new Promise((resolve) => {
       if (typeof Modal !== 'undefined' && Modal.confirm) {
@@ -34,207 +196,40 @@ require(['TYPO3/CMS/Backend/Modal', 'TYPO3/CMS/Backend/Severity'], function(Moda
     });
   }
 
-  // Export the function to global scope
-  window.showModalConfirmation = showModalConfirmation;
-});
-
-async function callAjaxMetaGenerateActionForAll(button, saveAndTranslate) {
-  var imageEntryBlocks = document.querySelectorAll('.imageEntry');
-  var progressBar = document.querySelectorAll('.progressBar')[0];
-  var skipExistingDescriptions = document.querySelectorAll('.skipExistingDescriptions')[0];
-
-  // show confirmation dialog if skipExistingDescriptions is checked and saveAndTranslate is true
-  if (!skipExistingDescriptions.checked && saveAndTranslate) {
-    const userConfirmed = await showModalConfirmation('This will overwrite existing descriptions. Are you sure you want to continue?');
-    if (!userConfirmed) {
-      return;
-    }
+  function setValueInParent(value) {
+    const message = {
+      actionName: 'typo3:aiTools:updateField',
+      value: value,
+    };
+    MessageUtility.MessageUtility.send(message, getParent());
   }
 
-  progressBar.max = imageEntryBlocks.length;
-  progressBar.value = 0;
-  button.disabled = true;
-  for (let imageEntry of imageEntryBlocks) {
-    let textPromptField = imageEntry.querySelector('.textPrompt');
-    let genButton = imageEntry.querySelector('.generate-btn');
-    let saveAndTranslateButton = imageEntry.querySelector('.save-translate-btn');
-    let altTextSuggestion = imageEntry.querySelector('.textarea-altTextSuggestion');
-    let fileIdentifierField = imageEntry.querySelector('.fileIdentifierField');
-
-    // skip if altText is already filled and skipExistingDescriptions is checked
-    let altText = imageEntry.querySelector('.textarea-altText');
-    if (skipExistingDescriptions.checked && altText.value !== '') {
-      progressBar.value += 1;
-      continue;
-    }
-
-    console.log('Progress before:', progressBar.value);
-
-    try {
-      if (saveAndTranslate) {
-        // generate, save and translate alt-text directly.
-        await new Promise((resolve, reject) => {
-          genButton.addEventListener('ajaxComplete', resolve, {once: true});
-          genButton.addEventListener('ajaxError', reject, {once: true});
-          callAjaxMetaGenerateAction(fileIdentifierField.value, altText, textPromptField, genButton, imageEntry)
-        });
-        await new Promise((resolve, reject) => {
-          saveAndTranslateButton.addEventListener('ajaxComplete', resolve, {once: true});
-          genButton.addEventListener('ajaxError', reject, {once: true});
-          callAjaxMetaSaveAction(fileIdentifierField.value, altText, true, saveAndTranslateButton, imageEntry)
-        });
-      } else {
-        // only generate alt-text and write into suggestion field.
-        await new Promise((resolve, reject) => {
-          genButton.addEventListener('ajaxComplete', resolve, {once: true});
-          genButton.addEventListener('ajaxError', reject, {once: true});
-          callAjaxMetaGenerateAction(fileIdentifierField.value, altTextSuggestion, textPromptField, genButton, imageEntry)
-        });
+  function getParent() {
+    if (this.opener === null) {
+      if (
+        typeof window.parent !== 'undefined' &&
+        typeof window.parent.document.list_frame !== 'undefined' &&
+        window.parent.document.list_frame.parent.document.querySelector('.t3js-modal-iframe') !== null
+      ) {
+        this.opener = window.parent.document.list_frame;
+      } else if (
+        typeof window.parent !== 'undefined' &&
+        typeof window.parent.frames.list_frame !== 'undefined' &&
+        window.parent.frames.list_frame.parent.document.querySelector('.t3js-modal-iframe') !== null
+      ) {
+        this.opener = window.parent.frames.list_frame;
+      } else if (
+        typeof window.frames !== 'undefined' &&
+        typeof window.frames.frameElement !== 'undefined' &&
+        window.frames.frameElement !== null &&
+        window.frames.frameElement.classList.contains('t3js-modal-iframe')
+      ) {
+        this.opener = (window.frames.frameElement).contentWindow.parent;
+      } else if (window.opener) {
+        this.opener = window.opener;
       }
-    } catch (error) {
-      console.error('Error handling AJAX request:', error);
-      top.TYPO3.Notification.error('Error', 'Error while generating Metadata', 5);
     }
 
-    progressBar.value += 1;
-    console.log('Progress after:', progressBar.value);
-  }
-  button.disabled = false;
-}
-
-function callAjaxMetaGenerateAction(fileIdentifier, textarea, textPromptField, button, blockElement) {
-  var oldText = textarea.value;
-  var textPrompt = textPromptField.value;
-  var originalButtonText = button.textContent;
-  button.textContent = 'Generating...';
-  button.disabled = true;
-  var savedSuccess = false;
-
-  let imageBlockDebugImageRecognizedText = blockElement.querySelector('.debugImageRecognizedText')
-
-  top.TYPO3.Notification.info('Generating Metadata', 'Generating Metadata...', 5);
-
-  var xhr = new XMLHttpRequest();
-  var params = 'action=generateMetaData&target=' + encodeURIComponent(fileIdentifier) + '&textPrompt=' + encodeURIComponent(textPrompt);
-  xhr.open('POST', ajaxUrl, true);
-  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-  xhr.onreadystatechange = function() {
-    if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-      var response = JSON.parse(this.responseText);
-      if (response) {
-        textarea.value = response.alternative;
-        imageBlockDebugImageRecognizedText.textContent = response.baseAlternative;
-        textarea.dispatchEvent(new Event('input'));
-        top.TYPO3.Notification.success('Generated Metadata', 'Generated Metadata successful', 5);
-        savedSuccess = true;
-        button.dispatchEvent(new CustomEvent('ajaxComplete'));
-      } else {
-        top.TYPO3.Notification.error('Error', 'Error while saving Metadata (empty response)', 5);
-        button.dispatchEvent(new CustomEvent('ajaxError'));
-      }
-    } else if (this.status !== 200) {
-      top.TYPO3.Notification.error('Error', 'Error while generating Metadata (status:'+ this.status + ')', 5);
-      button.dispatchEvent(new CustomEvent('ajaxError'));
-    }
-    button.textContent = originalButtonText;
-    button.disabled = false;
-  }
-  xhr.send(params);
-}
-
-function callAjaxMetaSaveAction(fileIdentifier, textarea, doTranslate, button, blockElement) {
-  var originalButtonText = button.textContent;
-  button.textContent = 'Saving...';
-  button.disabled = true;
-  let textareaValue = textarea.value
-
-  var xhr = new XMLHttpRequest();
-  var params = 'action=saveMetaData&target=' + encodeURIComponent(fileIdentifier) + '&altText=' + encodeURIComponent(textareaValue) + '&translate=' + (doTranslate ? '1' : '0');
-  xhr.open('POST', ajaxUrl, true);
-  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-  xhr.onreadystatechange = function() {
-    if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-      var response = JSON.parse(this.responseText);
-      if (response && response.saved) {
-
-        // html list of all translations from response.translations
-        if (doTranslate) {
-          let otherLanguages = blockElement.querySelector('.otherLanguages');
-          otherLanguages.innerHTML = '';
-          let ul = document.createElement('ul');
-          response.translations.forEach((translation) => {
-            let li = document.createElement('li');
-            let icon = document.createElement('div');
-            let link = document.createElement('a');
-            icon.innerHTML = translation.flagHtml;
-            li.appendChild(icon.firstChild);
-
-            link.href = translation.editLink + '&returnUrl=' + encodeURIComponent(currentUrl);
-            link.textContent = ' ' + translation.altTextTranslated;
-            li.appendChild(link);
-            ul.appendChild(li);
-
-            otherLanguages.appendChild(ul);
-          });
-        }
-
-        top.TYPO3.Notification.success('Saved Metadata', 'Saved Metadata successful', 5);
-        button.dispatchEvent(new CustomEvent('ajaxComplete'));
-      } else {
-        top.TYPO3.Notification.error('Error', 'Error while saving Metadata (empty response)', 5);
-        button.dispatchEvent(new CustomEvent('ajaxError'));
-      }
-    } else if (this.status !== 200) {
-      top.TYPO3.Notification.error('Error', 'Error while saving Metadata (status:'+ this.status + ')', 5);
-      button.dispatchEvent(new CustomEvent('ajaxError'));
-    }
-    button.textContent = originalButtonText;
-    button.disabled = false;
-  }
-  xhr.send(params);
-}
-
-function takeSuggestionSaveAction(fileIdentifier, textareaSuggestion, textarea, button, blockElement) {
-  textarea.value = textareaSuggestion.value;
-  textarea.dispatchEvent(new Event('input'));
-  callAjaxMetaSaveAction(fileIdentifier, textarea, false, button, blockElement);
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  var imageEntryBlocks = document.querySelectorAll('.imageEntry');
-
-  // set save button to disabled if altText is not changed
-  imageEntryBlocks.forEach((imageEntry) => {
-    let saveBtn = imageEntry.querySelector('.save-btn');
-    let altText = imageEntry.querySelector('textarea[name="altText"]');
-    altText.addEventListener('input', function() {
-      saveBtn.disabled = false;
-    });
-    saveBtn.disabled = true;
-
-    let textPromptSelect = imageEntry.querySelector('.textPromptSelect');
-    let textPrompt = imageEntry.querySelector('.textPrompt');
-    textPromptSelect.addEventListener('input', function() {
-      textPrompt.value = textPromptSelect.value;
-    });
-
-  });
-
-  // set all alTexts fields to globalTextPrompt if globalTextPrompt was changed
-  var globalTextPromptField = document.querySelector('.globalTextPrompt');
-  // check if there is a globalTextPromptField
-  if (globalTextPromptField) {
-    globalTextPromptField.addEventListener('input', function () {
-      var textPrompts = document.querySelectorAll('.textPrompt');
-      textPrompts.forEach((textPrompt) => {
-        textPrompt.value = globalTextPromptField.value;
-        textPrompt.dispatchEvent(new Event('input'));
-      });
-      var textPromptSelects = document.querySelectorAll('.textPromptSelect');
-      textPromptSelects.forEach((textPromptSelect) => {
-        textPromptSelect.value = globalTextPromptField.value;
-        textPromptSelect.dispatchEvent(new Event('input'));
-      });
-    });
+    return this.opener;
   }
 });

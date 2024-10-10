@@ -17,7 +17,7 @@ class ContextMenuActions {
       console.log("top.TYPO3.settings.ajaxUrls.aitools_ai_tools_images");
       console.log(top.TYPO3.settings.ajaxUrls.aitools_ai_tools_images);
       top.TYPO3.Backend.ContentContainer.setUrl(
-        top.TYPO3.settings.ajaxUrls.aitools_ai_tools_images + '&target=' + encodeURIComponent(uid) + '&returnUrl=' + ContextMenuActions.getReturnUrl()
+        top.TYPO3.settings.ajaxUrls.aitools_ai_tools_images + '&target-language=0&target=' + encodeURIComponent(uid) + '&returnUrl=' + ContextMenuActions.getReturnUrl()
       );
 
     }

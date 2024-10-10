@@ -9,6 +9,11 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 class Prompt extends AbstractEntity
 {
     /**
+     * @var bool
+     */
+    protected bool $hidden;
+
+    /**
      * @var string
      */
     protected string $prompt;
@@ -27,6 +32,16 @@ class Prompt extends AbstractEntity
      * @var bool
      */
     protected bool $default = false;
+
+    public function getHidden(): bool
+    {
+        return $this->hidden;
+    }
+
+    public function setHidden(bool $hidden): void
+    {
+        $this->hidden = $hidden;
+    }
 
     public function getPrompt(): string
     {

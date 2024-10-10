@@ -1,0 +1,12 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers" data-namespace-typo3-fluid="true">
+
+    <f:asset.script identifier="ajaxUrl_ai-tools" priority="1">
+        var ajaxUrl = "<f:be.uri route="ajax_aitools_ai_tools_images"></f:be.uri>";
+    </f:asset.script>
+
+    <div class="form-control-wrap">
+        <f:render section="Content"/>
+    </div>
+
+</html>

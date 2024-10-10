@@ -6,8 +6,6 @@ namespace Pagemachine\AItools\Service;
 
 use Doctrine\DBAL\Driver\Exception;
 use Pagemachine\AItools\Domain\Repository\MetaDataRepository;
-use Pagemachine\AItools\Service\ImageRecognition\CustomImageRecognitionService;
-use Pagemachine\AItools\Service\ImageRecognition\OpenAiImageRecognitionService;
 use T3G\AgencyPack\FileVariants\Service\ResourcesService;
 use TYPO3\CMS\Core\Resource\Exception\InvalidUidException;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
@@ -18,27 +16,24 @@ use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\PersistenceManagerInterface;
+use TYPO3\CMS\Extbase\Service\ImageService;
 
 class ImageMetaDataService
 {
-    protected SettingsService $settingsService;
-    private readonly ?CustomImageRecognitionService $customImageRecognitionService;
-    private readonly ?OpenAiImageRecognitionService $openAiImageRecognitionService;
+    protected ServerService $serverService;
     private readonly MetaDataRepository $metaDataRepository;
     protected ResourceFactory $resourceFactory;
     protected PersistenceManagerInterface $persistenceManager;
+    protected ImageService $imageService;
 
     public function __construct()
     {
-        $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
-
-        $this->customImageRecognitionService = GeneralUtility::makeInstance(CustomImageRecognitionService::class);
-        $this->openAiImageRecognitionService = GeneralUtility::makeInstance(OpenAiImageRecognitionService::class);
+        $this->serverService = GeneralUtility::makeInstance(ServerService::class);
 
         $this->metaDataRepository = GeneralUtility::makeInstance(MetaDataRepository::class);
-
         $this->resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);
         $this->persistenceManager = GeneralUtility::makeInstance(PersistenceManagerInterface::class);
+        $this->imageService = GeneralUtility::makeInstance(ImageService::class);
     }
 
     /**
@@ -48,12 +43,21 @@ class ImageMetaDataService
      */
     public function generateImageDescription(FileInterface $fileObject, string $textPrompt = ''): string
     {
-        $imageRecognitionService = $this->settingsService->getSetting('image_recognition_service');
-        return match ($imageRecognitionService) {
-            'openai' => $this->openAiImageRecognitionService->sendFileToApi(fileObject: $fileObject, textPrompt: $textPrompt),
-            'custom' => $this->customImageRecognitionService->sendFileToApi(fileObject: $fileObject, textPrompt: $textPrompt),
-            default => throw new \Exception('No valid image recognition service configured'),
-        };
+        $serverClass = $this->serverService->getActiveServerClassByFunctionality('image_recognition');
+        $processedImage = $this->getScaledImage($fileObject);
+        return $serverClass->sendFileToApi($processedImage, $textPrompt);
+    }
+
+    /**
+     * Process the Image recognition request
+     * @return string
+     * @throws \Exception
+     */
+    public function priceForImageDescription(FileInterface $fileObject, string $textPrompt = ''): string
+    {
+        $serverClass = $this->serverService->getActiveServerClassByFunctionality('image_recognition');
+        $processedImage = $this->getScaledImage($fileObject);
+        return $serverClass->sendCreditsRequestToApi($processedImage, $textPrompt);
     }
 
     /**
@@ -163,6 +167,7 @@ class ImageMetaDataService
     /**
      * Retrieve all language overlays for a file
      *
+     * @param File $fileObject
      * @param int[]|SiteLanguage[] $languages
      * @return array
      * @throws InvalidUidException
@@ -182,6 +187,28 @@ class ImageMetaDataService
         $fileMetadata = $fileObject->getMetaData()->get();
         $fileMetadataUid = $fileMetadata['uid'];
 
-        return $this->metaDataRepository->findAllFileVariantsByLanguageUid($fileMetadataUid, $siteLanguages);
+        $metadataEntries = $this->metaDataRepository->findAllFileVariantsByLanguageUid($fileMetadataUid, $siteLanguages);
+
+        if (in_array(0, $siteLanguages) || in_array(-1, $siteLanguages)) {
+            $metadataEntries[] = $fileMetadata;
+        }
+
+        return $metadataEntries;
+    }
+
+    public function getScaledImage(FileInterface $fileObject): FileInterface
+    {
+        $tempDeferred = $GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['processors']['DeferredBackendImageProcessor'];
+        unset($GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['processors']['DeferredBackendImageProcessor']);
+
+        $processedImage = $this->imageService->applyProcessingInstructions($fileObject, [
+            'maxWidth' => 1920,
+            'maxHeight' => 1080,
+            'fileExtension' => 'jpg',
+        ]);
+
+        $GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['processors']['DeferredBackendImageProcessor'] = $tempDeferred;
+
+        return $processedImage;
     }
 }
