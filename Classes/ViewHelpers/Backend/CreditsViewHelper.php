@@ -16,6 +16,7 @@ class CreditsViewHelper extends AbstractTagBasedViewHelper
         $this->registerArgument('type', 'string', 'The type of action to calculate the price to', false, '');
         $this->registerArgument('file-identifier', 'string', 'The file to calculate the price for', false, '');
         $this->registerArgument('text-prompt', 'string', 'The text prompt to send to the API', false, '');
+        $this->registerArgument('target-language', 'string', 'sys_language_uid', false, '');
     }
 
     public function render(): string
@@ -41,6 +42,11 @@ class CreditsViewHelper extends AbstractTagBasedViewHelper
         $this->tag->addAttribute(
             'data-file-identifier',
             $this->arguments['file-identifier']
+        );
+
+        $this->tag->addAttribute(
+            'data-target-language',
+            $this->arguments['target-language']
         );
 
         $this->tag->addAttribute(
