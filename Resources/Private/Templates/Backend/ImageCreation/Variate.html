@@ -1,0 +1,14 @@
+<f:layout name="Default" />
+
+<f:section name="Content">
+    <h1>Generate Images using OpenAI</h1>
+
+    <f:for each="{variationImageLinksFluid}" as="link" key="label">
+        <f:form enctype="multipart/form-data" id="save_form_{label}" action="save" name="result_aiimage" class="form-section">
+            <image style="display: block" src="{link}" alt="{variationImageFileFluid}-{label}" />
+            <f:form.textfield property="fileurl" id="fileurl" class="form-control" value="{link}" style="display: none"/>
+            <f:form.textfield property="filename" id="filename" class="form-control" value="{variationImageFileFluid}" style="display: none"/>
+            <f:form.submit value="Save Image" />
+        </f:form>
+    </f:for>
+</f:section>

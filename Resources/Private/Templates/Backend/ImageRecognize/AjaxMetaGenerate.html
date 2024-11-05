@@ -1,0 +1,484 @@
+<html
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    xmlns:aitools="http://typo3.org/ns/Pagemachine/AItools/ViewHelpers"
+    xmlns:vhs="http://typo3.org/ns/FluidTYPO3/Vhs/ViewHelpers"
+    data-namespace-typo3-fluid="true">
+
+<f:layout name="DefaultAjax" />
+
+<f:section name="Content">
+    <f:asset.css identifier="fieldwizard" href="EXT:ai_tools/Resources/Public/Css/FieldWizard.css" />
+    <style>
+        .side-by-side {
+            display: flex;
+            justify-content: space-between;
+        }
+        .w5 {
+            width: 49%;
+        }
+        .info-block {
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-left: 5px solid orange;
+            border-radius: 5px;
+            font-size: 1.25rem;
+        }
+
+
+        .otherLanguages ul {
+            list-style-type: none;
+            padding: 0;
+            margin: .5rem 0;
+        }
+        .otherLanguages li {
+            margin-bottom: 15px;
+            max-width: 636px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: flex-start;
+            align-items: center;
+            gap: 15px;
+        }
+        .otherLanguages li .text-section {
+            flex-grow: 1;
+        }
+        .otherLanguages li .flag-section .icon {
+            display: block;
+            flex-shrink: 0;
+            width: 30px;
+            height: 30px;
+        }
+        .otherLanguages li a {
+            text-decoration: none;
+            color: #000;
+            transition: color 0.3s;
+            flex-grow: 1;
+        }
+        .otherLanguages li a:hover {
+            color: #0056b3;
+        }
+        .otherLanguages li a::after {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .otherLanguages li a:hover::after {
+            opacity: 1;
+        }
+    </style>
+
+    <script>
+        var currentUrl = "{aitools:backend.generateMetadataEditLink(target: target)}";
+    </script>
+
+    <f:if condition="{fileObjects -> f:count()} > 1">
+        <f:then>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box-pagemachine-ai-tools">
+                        <f:render
+                            section="form-group-select"
+                            arguments="{
+                                label: 'Global AI Prompt',
+                                class: 'globalTextPrompt',
+                                id: 'globalTextPrompt',
+                                name: 'globalTextPrompt',
+                                options: allTextPrompts,
+                                value: textPrompt,
+                                optionLabelField: 'description',
+                                optionValueField: 'prompt'
+                            }"
+                        />
+
+                        <label for="skipExistingDescriptions">
+                            <input
+                                type="checkbox"
+                                id="skipExistingDescriptions"
+                                name="skipExistingDescriptions"
+                                class="skipExistingDescriptions"
+                                value="1"
+                                checked
+                            />
+                            Skip existing
+                        </label>
+                        <br />
+
+                        <button
+                            href="#"
+                            class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-generate-all"
+                            data-translate="0"
+                        >
+                            <core:icon identifier="actions-cpu" size="small" />
+                                Generate alternative text for <span class="t3-alternative-generate-all-total-images">{fileObjects -> f:count()}</span> Images
+
+                                <div
+                                    class="label label-default"
+                                    id="t3-alternative-generate-all-total-credits"
+                                    style="display: none;">
+                                </div>
+
+                            <aitools:backend.Credits />
+                        </button>
+                        <button
+                            href="#"
+                            class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-generate-all"
+                            data-translate="1"
+                        >
+                            <core:icon identifier="actions-cpu" size="small" />
+                            Generate alternative text for <span class="t3-alternative-generate-all-total-images">{fileObjects -> f:count()}</span> Images and translate into all languages
+                            <aitools:backend.Credits />
+                        </button>
+                        <br />
+                        <progress value="0" max="{fileObjects -> f:count()}" id="progressBar" class="progressBar"></progress>
+                    </div>
+                </div>
+            </div>
+            <div class="help-block">&nbsp;</div>
+        </f:then>
+        <f:else>
+            <f:if condition="{fileObjects -> f:count()} == 0">
+                <div class="info-block">No image.</div>
+            </f:if>
+        </f:else>
+    </f:if>
+
+    <f:for as="fileObject" each="{fileObjects}">
+        <f:render section="file-form-imagealt" arguments="{_all}" />
+        <div class="help-block">&nbsp;</div>
+    </f:for>
+</f:section>
+
+<f:section name="file-form-imagealt">
+    <h1>Generate File Metadata "{fileObject.file.name}"</h1>
+    <f:flashMessages queueIdentifier="ai-tools.template.flashMessages"/>
+
+    <div class="typo3-TCEforms imageEntry imageEntry-{fileObject.file.properties.identifier_hash}" data-alternative="{fileObject.meta.alternative}">
+        <div role="tabpanel">
+            <ul class="nav nav-tabs t3js-tabs" role="tablist" id="tabs" data-store-last-tab="1">
+            </ul>
+        </div>
+
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="DTM-image-describing-ai-{fileObject.file.properties.identifier_hash}">
+                <fieldset class="form-section">
+                    <div class="module-columns">
+                        <div class="module-column">
+                            <div class="form-group">
+                                <f:image image="{fileObject.file}" height="250" maxWidth="890"/>
+                            </div>
+                            <f:if condition="{fileObject.meta.alternative}">
+                                <div class="form-wizards-items-bottom">
+                                    <div class="t3-form-original-language">
+                                        <span class="t3js-icon icon icon-size-small icon-state-default icon-flags-multiple"
+                                            data-identifier="flags-multiple">
+                                            <span class="icon-markup">
+                                                <core:icon identifier="actions-clock" size="small" />
+                                            </span>
+                                        </span>
+                                        {fileObject.meta.alternative}
+                                    </div>
+                                </div>
+                            </f:if>
+                        </div>
+                    </div>
+                </fieldset>
+                <f:render section="section-prompt" arguments="{_all}" />
+                <f:render section="section-generation" arguments="{_all}" />
+                <f:render section="section-translation" arguments="{_all}" />
+
+                <fieldset class="form-section t3js-ai-tools-show-after-prompt-generation-{fileObject.file.properties.identifier_hash}" style="display: none;">
+                    <div class="module-columns">
+                        <div class="module-column">
+                            <div class="form-group bottom">
+                                <f:if condition="{modal}">
+                                    <f:then>
+                                        <button href="#"
+                                            class="btn btn-default btn-primary t3js-alternative-use-trigger"
+                                            data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
+                                        >
+                                            <core:icon identifier="actions-save" size="small" />
+                                            Use
+                                        </button>
+                                    </f:then>
+                                    <f:else>
+                                        <button
+                                            class="btn btn-default btn-primary t3js-alternative-save-trigger t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}"
+                                            data-file-identifier="{fileObject.file.combinedIdentifier}"
+                                            data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
+                                            data-target-language="{targetLanguage}"
+                                            data-button-target=".t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}" data-translate="0">
+                                            <core:icon identifier="actions-save" size="small" />
+                                            Save
+                                        </button>
+                                    </f:else>
+                                </f:if>
+
+                                <button
+                                    class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-save-trigger t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}"
+                                    data-file-identifier="{fileObject.file.combinedIdentifier}"
+                                    data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
+                                    data-target-language="{targetLanguage}"
+                                    data-button-target=".t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}"
+                                    data-translation-hash="{fileObject.file.properties.identifier_hash}"
+                                    data-translate="1"
+                                >
+                                    <core:icon identifier="actions-cpu" size="small" />
+                                    Save and translate into all other languages
+                                    <aitools:backend.Credits />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+</f:section>
+
+<f:section name="section-prompt">
+    <fieldset class="form-section">
+        <div class="module-columns">
+            <div class="module-column">
+                <f:form class="module-form" id="generateMetaDataForm-{fileObject.file.properties.identifier_hash}">
+                    <div class="form-group">
+                        <f:form.hidden name="action" value="generateMetaData" />
+                        <f:form.hidden name="target" value="{fileObject.file.combinedIdentifier}" class="fileIdentifierField" />
+                        <f:render section="form-group-select" arguments="{
+                            label: 'AI Prompt',
+                            class: 'textPromptSelect textPromptSelect-{fileObject.file.properties.identifier_hash}',
+                            target: '#textPrompt-{fileObject.file.properties.identifier_hash}',
+                            name: 'textPromptSelect',
+                            options: allTextPrompts,
+                            value: textPrompt,
+                            optionLabelField: 'description',
+                            optionValueField: 'prompt'
+                        }" />
+
+                        <f:render section="form-group-textarea" arguments="{
+                            label: '',
+                            additionalClasses: 'textPrompt',
+                            id: 'textPrompt-{fileObject.file.properties.identifier_hash}',
+                            name: 'textPrompt',
+                            value: textPrompt
+                        }" />
+
+                        <button
+                            href="#"
+                            class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-generator-trigger"
+                            data-file-identifier="{fileObject.file.combinedIdentifier}"
+                            data-text-prompt-field="#textPrompt-{fileObject.file.properties.identifier_hash}"
+                            data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
+                            data-target-language="{targetLanguage}"
+                            data-show-target=".t3js-ai-tools-show-after-prompt-generation-{fileObject.file.properties.identifier_hash}"
+                        >
+
+                            <core:icon identifier="actions-cpu" size="small" />
+                            Generate
+                            <aitools:backend.Credits
+                                type="imageRecognition"
+                                file-identifier="{fileObject.file.combinedIdentifier}"
+                                text-prompt="temp"
+                            />
+                        </button>
+
+                        <f:if condition="{fileObject.meta.alternative}">
+                            <button
+                                href="#"
+                                class="btn btn-default t3js-alternative-use-current-trigger"
+                                data-current-text="{fileObject.meta.alternative}"
+                                data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
+                                data-show-target=".t3js-ai-tools-show-after-prompt-generation-{fileObject.file.properties.identifier_hash}"
+                            >
+                                <core:icon identifier="actions-arrow-down-alt" size="small" />
+                                Continue with current alternative text
+                            </button>
+                        </f:if>
+                    </div>
+                </f:form>
+            </div>
+        </div>
+    </fieldset>
+</f:section>
+
+<f:section name="section-generation">
+    <fieldset class="form-section t3js-ai-tools-show-after-prompt-generation-{fileObject.file.properties.identifier_hash}" style="display: none;">
+        <div class="module-columns">
+            <div class="module-column">
+                <f:form class="module-form" id="saveMetaDataForm-{fileObject.file.properties.identifier_hash}">
+                    <div class="form-group">
+                        <f:form.hidden name="action" value="saveMetaData" />
+                        <f:form.hidden name="target" value="{fileObject.file.combinedIdentifier}" />
+                        <div class="form-group">
+                            <div class="side-by-side">
+                                <div class="w5">
+                                    <f:render section="form-group-textarea" arguments="{
+                                        label: 'Alternative Text',
+                                        name: 'altTextSuggestion',
+                                        fileObject: fileObject.file,
+                                        id: 'altTextSuggestion-{fileObject.file.properties.identifier_hash}',
+                                        original: fileObject.meta.alternative,
+                                        additionalClasses: 'altTextSuggestion textarea-pagemachine-ai-tools'
+                                    }" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="debugImageRecognizedText"></div>
+                    </div>
+                </f:form>
+            </div>
+        </div>
+    </fieldset>
+</f:section>
+
+<f:section name="section-translation">
+    <fieldset class="form-section t3js-ai-tools-show-after-prompt-generation-{fileObject.file.properties.identifier_hash}" style="display: none;">
+        <div class="module-columns">
+            <div class="module-column">
+                <div class="form-group">
+                    <label class="t3js-formengine-label">
+                        Translations
+                    </label>
+                </div>
+
+                <f:comment>
+                    <button class="btn btn-default btn-pagemachine-ai-tools" onclick="return false;">
+                        <core:icon identifier="actions-cpu" size="small" />
+                        Update all translations
+                        <aitools:backend.Credits />
+                    </button>
+                </f:comment>
+
+                <div class="otherLanguages">
+                    <ul>
+                        <f:for
+                            as="metaLanguage"
+                            each="{aitools:backend.metaDataLanguages(languages: siteLanguages, fileObject: fileObject.file)}"
+                        >
+                            <f:if condition="{targetLanguage} != {metaLanguage.language.languageId}">
+                                <li>
+                                    <div class="flag-section">
+                                        <aitools:backend.icon
+                                            title="{metaLanguage.language.title}"
+                                            identifier="{metaLanguage.language.flagIdentifier}" size="large"
+                                        />
+                                    </div>
+                                    <div class="text-section">
+                                        <div class="t3js-formengine-label">
+                                            {metaLanguage.language.title}
+                                        </div>
+                                        <div id="translate-{fileObject.file.properties.identifier_hash}-{metaLanguage.language.languageId}">
+                                            <f:if condition="{metaLanguage.meta}">
+                                                <f:then>
+                                                    {metaLanguage.meta.alternative}
+                                                </f:then>
+                                                <f:else>
+                                                    No translation
+                                                </f:else>
+                                            </f:if>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <f:comment>
+                                            <button
+                                                href="#"
+                                                class="btn btn-default btn-pagemachine-ai-tools"
+                                            >
+                                                <core:icon identifier="actions-cpu" size="small" />
+                                                Generate
+                                                <aitools:backend.Credits />
+                                            </button>
+                                        </f:comment>
+                                    </div>
+
+                                </li>
+                            </f:if>
+                        </f:for>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</f:section>
+
+<f:section name="form-group-textarea">
+    <div class="form-group t3js-formengine-validation-marker t3js-formengine-palette-field">
+        <f:if condition="{label}">
+            <label class="t3js-formengine-label">
+                {label}
+            </label>
+        </f:if>
+        <div class="formengine-field-item t3js-formengine-field-item"><div class="form-control-wrap" style="max-width: 636px">
+            <div class="form-wizards-wrap">
+                <div class="form-wizards-element">
+                    <f:form.textarea
+                        rows="3"
+                        additionalAttributes="{wrap:'virtual'}"
+                        name="{name}"
+                        value="{value}"
+                        id="{id}"
+                        class="form-control t3js-formengine-textarea formengine-textarea textarea-{name} textarea-{name}-{fileObject.file.properties.identifier_hash} {additionalClasses}"
+                        style="max-height: 500px; overflow-wrap: break-word; height: 110px;"
+                    />
+                </div>
+            </div>
+
+            <f:if condition="{original}">
+                <div class="form-wizards-items-bottom">
+                    <div class="t3-form-original-language">
+                        <span class="t3js-icon icon icon-size-small icon-state-default icon-flags-multiple"
+                            data-identifier="flags-multiple">
+                            <span class="icon-markup">
+                                <core:icon identifier="actions-clock" size="small" />
+                            </span>
+                        </span>
+                        {original}
+                    </div>
+                </div>
+            </f:if>
+
+        </div></div>
+    </div>
+</f:section>
+
+<f:section name="form-group-textfield">
+    <div class="form-group t3js-formengine-validation-marker t3js-formengine-palette-field">
+        <f:if condition="{label} != ''"><label class="t3js-formengine-label">
+            {label}
+        </label></f:if>
+        <div class="formengine-field-item t3js-formengine-field-item"><div class="form-control-wrap" style="max-width: 636px">
+            <div class="form-wizards-wrap">
+                <div class="form-wizards-element">
+                    <f:form.textfield name="{name}" value="{value}" placeholder="{placeholder}" class="form-control t3js-clearable {class}" />
+                </div>
+            </div>
+        </div></div>
+    </div>
+</f:section>
+
+<f:section name="form-group-select">
+    <div class="form-group t3js-formengine-validation-marker t3js-formengine-palette-field">
+        <f:if condition="{label} != ''"><label class="t3js-formengine-label">
+            {label}
+        </label></f:if>
+        <div class="formengine-field-item t3js-formengine-field-item"><div class="form-control-wrap" style="max-width: 636px">
+            <div class="form-wizards-wrap">
+                <div class="form-wizards-element">
+                    <f:form.select
+                        options="{options}"
+                        optionLabelField="{optionLabelField}"
+                        optionValueField="{optionValueField}"
+                        value="{value}"
+                        class="form-control form-select t3-js-jumpMenuBox {class}"
+                        additionalAttributes="{data: {target: target}}"
+                    />
+                </div>
+            </div>
+        </div></div>
+    </div>
+</f:section>

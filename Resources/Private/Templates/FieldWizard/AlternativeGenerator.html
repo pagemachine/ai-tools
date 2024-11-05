@@ -1,0 +1,43 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    xmlns:aitools="http://typo3.org/ns/Pagemachine/AItools/ViewHelpers"
+    xmlns:vhs="http://typo3.org/ns/FluidTYPO3/Vhs/ViewHelpers" data-namespace-typo3-fluid="true">
+
+
+<f:layout name="DefaultFieldWizard" />
+
+<f:section name="Content">
+    <button
+        href="#"
+        class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-generator-trigger"
+        data-file-identifier="{target}"
+        data-text-prompt="{prompt}"
+        data-target-language="{target-language}"
+        data-output-target="{input-field-selector}"
+    >
+        <core:icon identifier="actions-cpu" size="small" />
+        Generate
+        <aitools:backend.Credits
+            type="imageRecognition"
+            file-identifier="{target}"
+            target-language="{target-language}"
+            text-prompt="{prompt}"
+        />
+    </button>
+
+    <button
+        href="#"
+        class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-generator-settings-trigger"
+        data-title="{title}"
+        data-target="{target}"
+        data-target-language="{target-language}"
+        data-output-target="{input-field-selector}"
+        data-base="{f:be.uri(route: 'ajax_aitools_ai_tools_images')}"
+    >
+        <core:icon identifier="actions-cog-alt" size="small" />
+    </button>
+
+</f:section>
+
+</html>
