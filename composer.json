@@ -94,7 +94,7 @@
             "@composer global require typo3/tailor"
         ],
         "deploy:ter:upload": [
-            "composer global exec -v -- tailor ter:publish --comment \"$(git tag -l --format='%(contents)' $TAG)\" $TAG"
+            "composer global exec -v -- tailor ter:publish $TAG"
         ],
         "fix": [
             "@composer normalize",
