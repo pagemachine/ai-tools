@@ -81,6 +81,10 @@
             "git reset --hard",
             "git clean -xfd"
         ],
+        "composer:lint": [
+            "@composer validate --ansi",
+            "@composer normalize --no-update-lock --dry-run"
+        ],
         "deploy:ter": [
             "@build:cleanup",
             "@deploy:ter:setup",
@@ -91,10 +95,6 @@
         ],
         "deploy:ter:upload": [
             "composer global exec -v -- tailor ter:publish --comment \"$(git tag -l --format='%(contents)' $TAG)\" $TAG"
-        ],
-        "composer:lint": [
-            "@composer validate --ansi",
-            "@composer normalize --no-update-lock --dry-run"
         ],
         "fix": [
             "@composer normalize",
