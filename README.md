@@ -1,6 +1,27 @@
-## What does the extension do?
+# AI Tools ![CI](https://github.com/pagemachine/ai-tools/workflows/CI/badge.svg)
 
-This extension will let the TYPO3 backend users to generate images using the OpenAI service.
+A TYPO3 extension that leverages artificial intelligence to enhance website's content and accessibility.
+
+## Installation
+
+This extension is installable from various sources:
+
+1. Via [Composer](https://packagist.org/packages/pagemachine/ai-tools):
+
+        composer require pagemachine/ai-tools
+
+2. From the [TYPO3 Extension Repository](https://extensions.typo3.org/extension/ai_tools)
+3. From [Github](https://github.com/pagemachine/ai-tools/releases)
+
+## Features
+
+### Image Alt Tag Generation
+* Automatically generates meaningful alt tags for images using AI
+* Supports generation in multiple languages:
+    * Create alt tags in any supported language
+    * Translate existing alt tags to different languages
+* Improves website accessibility and SEO
+* Prompt management through the TYPO3 backend
 
 
 ## Testing
