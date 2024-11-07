@@ -3,7 +3,6 @@
     "description": "Use A.I. Tools in the TYPO3 backend",
     "license": "proprietary",
     "type": "typo3-cms-extension",
-    "version": "dev-0.0.5",
     "keywords": [
         "typo3",
         "extension",
