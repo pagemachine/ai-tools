@@ -1,6 +1,6 @@
 {
     "name": "pagemachine/ai-tools",
-    "description": "Use A.I. Tools in the TYPO3 backend",
+    "description": "A TYPO3 extension that leverages artificial intelligence to enhance content and accessibility",
     "license": "proprietary",
     "type": "typo3-cms-extension",
     "keywords": [
