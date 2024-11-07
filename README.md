@@ -1,6 +1,6 @@
 # AI Tools ![CI](https://github.com/pagemachine/ai-tools/workflows/CI/badge.svg)
 
-A TYPO3 extension that leverages artificial intelligence to enhance website's content and accessibility.
+A TYPO3 extension that leverages artificial intelligence to enhance content and accessibility.
 
 ## Installation
 

@@ -77,6 +77,21 @@
             "@composer require --no-progress --ansi --update-with-dependencies typo3/cms-core $TYPO3_VERSION",
             "@lint"
         ],
+        "build:cleanup": [
+            "git reset --hard",
+            "git clean -xfd"
+        ],
+        "deploy:ter": [
+            "@build:cleanup",
+            "@deploy:ter:setup",
+            "@deploy:ter:upload"
+        ],
+        "deploy:ter:setup": [
+            "@composer global require typo3/tailor"
+        ],
+        "deploy:ter:upload": [
+            "composer global exec -v -- tailor ter:publish --comment \"$(git tag -l --format='%(contents)' $TAG)\" $TAG"
+        ],
         "composer:lint": [
             "@composer validate --ansi",
             "@composer normalize --no-update-lock --dry-run"
