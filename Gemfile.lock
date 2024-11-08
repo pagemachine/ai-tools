@@ -36,8 +36,6 @@ GEM
       webrick (~> 1.7)
     jekyll-include-cache (0.2.1)
       jekyll (>= 3.7, < 5.0)
-    jekyll-relative-links (0.7.0)
-      jekyll (>= 3.3, < 5.0)
     jekyll-sass-converter (3.0.0)
       sass-embedded (~> 1.54)
     jekyll-seo-tag (2.8.0)
@@ -79,8 +77,8 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  jekyll-relative-links
-  just-the-docs
+  jekyll (~> 4.3.4)
+  just-the-docs (= 0.10.0)
 
 BUNDLED WITH
    2.4.19

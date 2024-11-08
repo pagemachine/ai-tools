@@ -16,6 +16,3 @@ search_enabled: true
 nav_sort: case_sensitive
 
 favicon_ico: "/docs/assets/favicon.svg"
-
-plugins:
-  - jekyll-relative-links
