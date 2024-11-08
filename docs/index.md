@@ -9,10 +9,10 @@ permalink: /
 
 Welcome to the AI Tools documentation. Here you'll find comprehensive guides and documentation to help you get started with AI Tools.
 
-* [Getting Started](/getting-started)
+* [Getting Started](getting-started.md)
 
     Installation, example configuration and setup
 
-* [Alt Text Generation](/alt-text-generation)
+* [Alt Text Generation](alt-text-generation.md)
 
     Learn how to automatically generate descriptive alt text for images.
