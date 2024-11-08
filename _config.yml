@@ -1,1 +1,3 @@
-theme: minima
+theme: minimal
+
+include: [docs]
