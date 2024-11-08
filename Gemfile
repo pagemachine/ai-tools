@@ -1,4 +1,5 @@
 source "https://rubygems.org"
 
-gem "just-the-docs"
+gem "jekyll", "~> 4.3.4"
+gem "just-the-docs", "0.10.0"
 gem 'jekyll-relative-links'

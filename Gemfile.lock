@@ -79,8 +79,9 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  jekyll (~> 4.3.4)
   jekyll-relative-links
-  just-the-docs
+  just-the-docs (= 0.10.0)
 
 BUNDLED WITH
    2.4.19
