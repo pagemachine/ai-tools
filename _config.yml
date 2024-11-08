@@ -1,3 +1,18 @@
-theme: minima
+theme: just-the-docs
+title: AI Tools
+description: Documentation for AI Tools
 
 include: [docs]
+
+# Theme settings
+aux_links:
+  "View on GitHub":
+    - "https://github.com/pagemachine/ai-tools"
+
+# Enable search
+search_enabled: true
+
+# Sort pages by order
+nav_sort: case_sensitive
+
+favicon_ico: "/docs/assets/favicon.svg"
