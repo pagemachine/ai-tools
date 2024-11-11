@@ -2,6 +2,10 @@
 
 A TYPO3 extension that leverages artificial intelligence to enhance content and accessibility.
 
+## Documentation
+
+The full documentation can be found [here](https://pagemachine.github.io/ai-tools/)
+
 ## Installation
 
 This extension is installable from various sources:
