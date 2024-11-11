@@ -15,7 +15,7 @@ composer require pagemachine/ai-tools
 
 ## Initial Configuration
 
-1. Create a new server entry in the `AI Tools` > `Servers` backendmodule
+1. Create a new server entry in the `AI Tools` > `Servers` backend module
 1. Fill in the required fields (API key, etc.) and save the server
 1. Select the prefered server for each task in the the `AI Tools` > `Settings` module and save
 1. Create predefined prompts in the `AI Tools` > `Templates` module
