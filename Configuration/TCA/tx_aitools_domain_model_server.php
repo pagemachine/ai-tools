@@ -74,6 +74,11 @@ return [
                 'eval' => 'trim,password',
                 'size' => 20,
                 'max' => 120,
+                'fieldInformation' => [
+                    'apiKeyInfo' => [
+                        'renderType' => 'ApiKeyInfoElement',
+                    ]
+                ]
             ],
         ],
         'endpoint' => [

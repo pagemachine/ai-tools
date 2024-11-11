@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Pagemachine\AItools\ContextMenu\ItemProviders\AiToolItemProvider;
+use Pagemachine\AItools\FormEngine\FieldInformation\ApiKeyInfoElement;
 use Pagemachine\AItools\FormEngine\FieldWizard\AlternativeGenerator;
 use Pagemachine\AItools\Hooks\DataHandlerHooks;
 use Pagemachine\AItools\Service\Credits\AigudeCreditsService;
@@ -22,6 +23,27 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ai_tools']['servers'] = [
             'image_recognition' => AigudeImageRecognitionService::class,
         ],
     ],
+    /*
+    'openai' => [
+        'name' => 'Open AI',
+        'functionality' => [
+            'image_recognition' => OpenAiImageRecognitionService::class,
+        ],
+    ],
+    'deepl' => [
+        'name' => 'DeepL',
+        'functionality' => [
+            'translation' => DeepLTranslationService::class,
+        ],
+    ],
+    'custom' => [
+        'name' => 'Custom',
+        'functionality' => [
+            'image_recognition' => CustomImageRecognitionService::class,
+            'translation' => CustomTranslationService::class,
+        ],
+    ],
+    */
 ];
 
 $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
@@ -38,4 +60,10 @@ $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1726477308] = [
     'nodeName' => 'AlternativeGenerator',
     'priority' => 30,
     'class' => AlternativeGenerator::class,
+];
+
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1731322595] = [
+    'nodeName' => 'ApiKeyInfoElement',
+    'priority' => 70,
+    'class' => ApiKeyInfoElement::class,
 ];
