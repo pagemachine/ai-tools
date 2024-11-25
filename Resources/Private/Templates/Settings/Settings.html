@@ -1,0 +1,58 @@
+<f:layout name="Default" />
+
+<f:section name="Content">
+    <style>
+        .form-group > h3:first-of-type {
+            margin-top: 0;
+        }
+        .form-group .form-control-wrap {
+            margin-top: 0.1rem;
+        }
+        .form-group label {
+            margin-top: 0.8rem;
+            margin-bottom: 0.2rem;
+        }
+        .form-group h3 + label {
+            margin-top: 0.2rem;
+        }
+        .form-group .form-control-wrap label {
+            margin-top: 0.1rem;
+        }
+    </style>
+
+    <h1>AI Tools Settings</h1>
+
+    <f:form enctype="multipart/form-data" id="EditSettingsController" action="save" name="settings">
+        <div class="tab-content" id="tabcontent-settings">
+            <ul class="nav nav-tabs t3js-tabs"></ul>
+            <div class="tab-pane fade show active" id="aiselectTab" role="tabpanel" aria-labelledby="aiselect-tab">
+                <fieldset class="form-section">
+                    <div class="form-group">
+                        <h3>Image Recognition</h3>
+                        <label for="image_recognition_service">Image Recognition Service:</label>
+                        <f:form.select name="image_recognition_service" id="image_recognition_service" value="{image_recognition_service}"
+                            class="form-control form-select">
+                            <f:form.select.option value="">Select Service</f:form.select.option>
+                            <f:for each="{imageOptions}" as="option">
+                                <f:form.select.option value="{option.uid}">{option.title} [{option.server}]</f:form.select.option>
+                            </f:for>
+                        </f:form.select>
+                    </div>
+                </fieldset>
+                <fieldset class="form-section">
+                    <div class="form-group">
+                        <h3>Translation</h3>
+                        <label for="translation_service">Translation Service:</label>
+                        <f:form.select name="translation_service" id="translation_service" value="{translation_service}"
+                            class="form-control form-select">
+                            <f:form.select.option value="">Select Service</f:form.select.option>
+                            <f:for each="{translationOptions}" as="option">
+                                <f:form.select.option value="{option.uid}">{option.title} [{option.server}]</f:form.select.option>
+                            </f:for>
+                        </f:form.select>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </f:form>
+</f:section>

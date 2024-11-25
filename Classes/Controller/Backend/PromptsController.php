@@ -15,6 +15,7 @@ use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 class PromptsController extends ActionController
 {
@@ -54,15 +55,21 @@ class PromptsController extends ActionController
 
         $requestUri = $this->request->getAttribute('normalizedParams')->getRequestUri();
 
-        $this->view->assignMultiple([
+        $template_variables = [
             'prompts' => $this->promptRepository->listAllPrompts(),
             'returnUrl' => $requestUri,
-        ]);
+        ];
 
-
-        $moduleTemplate->setContent($this->view->render());
         $this->setDocHeader($moduleTemplate, $requestUri);
-        return $this->htmlResponse($moduleTemplate->renderContent());
+
+        if (version_compare(GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version(), '13.0', '<')) {
+            $this->view->assignMultiple($template_variables);
+            $moduleTemplate->setContent($this->view->render());
+            return $this->htmlResponse($moduleTemplate->renderContent());
+        } else {
+            $moduleTemplate->assignMultiple($template_variables);
+            return $moduleTemplate->renderResponse('Prompts/List');
+        }
     }
 
     protected function getLanguageService(): LanguageService
