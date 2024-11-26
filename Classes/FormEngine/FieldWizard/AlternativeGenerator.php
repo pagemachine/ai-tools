@@ -92,7 +92,7 @@ class AlternativeGenerator extends AbstractNode
             $result['javaScriptModules'][] = JavaScriptModuleInstruction::create('@pagemachine/ai-tools/AlternativeGenerator.js');
         } else {
             $result['requireJsModules'][] = JavaScriptModuleInstruction::forRequireJS(
-                'TYPO3/CMS/AiTools/AlternativeGenerator'
+                'TYPO3/CMS/AiTools/Amd/AlternativeGenerator'
             );
         }
 

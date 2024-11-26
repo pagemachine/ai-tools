@@ -61,7 +61,7 @@ export function typo3Resolve() {
       }
       // Resolve "@typo3/ext-name/module-name.js" into "TYPO3/CMS/ExtName/ModuleName" for TYPO3 v11 (AMD) builds
       return code.replace(
-        /(["'])@typo3\/([^\/]+)\/(.+)\.js\1/g,
+        /(["'])@typo3\/([^\/]+)\/([^"']+)\.js\1/g,
         (match, quotes, extension, path) => lowerDashedToUpperCamelCase(`${quotes}TYPO3/CMS/${extension}/${path}${quotes}`)
       )
     }
@@ -79,7 +79,7 @@ export default {
       plugins: [terser()]
     },
     {
-      dir: './Resources/Public/JavaScript/amd',
+      dir: './Resources/Public/JavaScript/Amd',
       entryFileNames: (chunkInfo) => lowerDashedToUpperCamelCase('/' + chunkInfo.name).substring(1) + '.js',
       format: 'amd',
       plugins: [terser()]
