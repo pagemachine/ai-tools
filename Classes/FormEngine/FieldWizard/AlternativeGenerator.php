@@ -56,7 +56,7 @@ class AlternativeGenerator extends AbstractNode
         return true;
     }
 
-    public function render()
+    public function render(): array
     {
         $result = $this->initializeResultArray();
         $target = $this->data['databaseRow']['file'][0];
@@ -70,7 +70,6 @@ class AlternativeGenerator extends AbstractNode
         }
 
         $prompt = $this->promptRepository->getDefaultPromptText();
-
 
         $arguments = [
             'target' => $target,
@@ -88,9 +87,14 @@ class AlternativeGenerator extends AbstractNode
             'EXT:ai_tools/Resources/Public/Css/FieldWizard.css',
         ];
 
-        $result['requireJsModules'][] = JavaScriptModuleInstruction::forRequireJS(
-            'TYPO3/CMS/AiTools/AlternativeGenerator'
-        );
+        $typo3Version = new \TYPO3\CMS\Core\Information\Typo3Version();
+        if ($typo3Version->getMajorVersion() > 11) {
+            $result['javaScriptModules'][] = JavaScriptModuleInstruction::create('@pagemachine/ai-tools/AlternativeGenerator.js');
+        } else {
+            $result['requireJsModules'][] = JavaScriptModuleInstruction::forRequireJS(
+                'TYPO3/CMS/AiTools/AlternativeGenerator'
+            );
+        }
 
         return $result;
     }
