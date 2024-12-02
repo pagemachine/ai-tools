@@ -7,10 +7,6 @@
         includeJsFiles="{0: 'EXT:ai_tools/Resources/Public/JavaScript/AjaxMetaGenerate.js'}"
     />
 
-    <f:asset.script identifier="ajaxUrl_ai-tools" priority="1">
-        var ajaxUrl = "<f:be.uri route="ajax_aitools_ai_tools_images"></f:be.uri>";
-    </f:asset.script>
-
     <div id="aiimage-backend">
         <f:flashMessages queueIdentifier="aitoolsBackend" />
         <f:render section="Content"/>

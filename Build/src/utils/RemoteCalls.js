@@ -1,4 +1,8 @@
-export async function ajaxCall(parameters, url = ajaxUrl) {
+const URLS = {
+  images: TYPO3.settings.ajaxUrls['aitools_ai_tools_images'],
+};
+
+export async function ajaxCall(parameters, url) {
   var paramString = Object.keys(parameters).map(key => key + '=' + encodeURIComponent(parameters[key])).join('&');
 
   return new Promise((resolve, reject) => {
@@ -22,5 +26,23 @@ export async function ajaxCall(parameters, url = ajaxUrl) {
 }
 
 export async function callAjaxMetaGenerateAction(fileIdentifier, targetLanguage, textPrompt) {
-  return { alternative: 'test' };
+  const params = {
+    action: 'generateMetaData',
+    target: fileIdentifier,
+    "target-language": targetLanguage,
+    textPrompt: textPrompt
+  };
+
+  top.TYPO3.Notification.info('Generating Metadata', 'Generating Metadata...', 5);
+  return ajaxCall(params, URLS.images)
+    .then(response => {
+      if (response) {
+        top.TYPO3.Notification.success('Generated Metadata', 'Generated Metadata successful', 5);
+        return response;
+      }
+      throw 'Error: empty response';
+    }).catch(error => {
+      top.TYPO3.Notification.error('Error', '(Meta) Error: ' + error, 5);
+      throw error;
+    });
 }
