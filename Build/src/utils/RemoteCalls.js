@@ -22,5 +22,5 @@ export async function ajaxCall(parameters, url = ajaxUrl) {
 }
 
 export async function callAjaxMetaGenerateAction(fileIdentifier, targetLanguage, textPrompt) {
-  return 'yes';
+  return { alternative: 'test' };
 }
