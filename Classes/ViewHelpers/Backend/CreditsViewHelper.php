@@ -31,7 +31,7 @@ class CreditsViewHelper extends AbstractTagBasedViewHelper
 
         $this->tag->addAttribute(
             'class',
-            'label label-default t3js-ai-tools-credits-view-helper'
+            'badge badge-default label label-default t3js-ai-tools-credits-view-helper'
         );
 
         $this->tag->addAttribute(
