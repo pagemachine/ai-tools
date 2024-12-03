@@ -1,5 +1,6 @@
 const URLS = {
   images: TYPO3.settings.ajaxUrls['aitools_ai_tools_images'],
+  credits: TYPO3.settings.ajaxUrls['aitools_ai_tools_credits'],
 };
 
 export async function ajaxCall(parameters, url) {
@@ -46,3 +47,18 @@ export async function callAjaxMetaGenerateAction(fileIdentifier, targetLanguage,
       throw error;
     });
 }
+
+export async function callAjaxCreditsAction(data) {
+    const params = {
+      action: 'credits',
+      ...data
+    };
+
+    return ajaxCall(params, URLS.credits)
+      .then(response => {
+        if (response) {
+          return response;
+        }
+        throw 'Error: empty response';
+      });
+  }

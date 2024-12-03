@@ -71,6 +71,7 @@ export function typo3Resolve() {
 export default {
   input: [
     './Build/src/AlternativeGenerator.js',
+    './Build/src/CreditsViewHelper.js',
   ],
   output: [
     {
