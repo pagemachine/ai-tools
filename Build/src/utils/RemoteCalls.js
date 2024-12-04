@@ -49,16 +49,38 @@ export async function callAjaxMetaGenerateAction(fileIdentifier, targetLanguage,
 }
 
 export async function callAjaxCreditsAction(data) {
-    const params = {
-      action: 'credits',
-      ...data
-    };
+  const params = {
+    action: 'credits',
+    ...data
+  };
 
-    return ajaxCall(params, URLS.credits)
-      .then(response => {
-        if (response) {
-          return response;
-        }
-        throw 'Error: empty response';
-      });
-  }
+  return ajaxCall(params, URLS.credits)
+    .then(response => {
+      if (response) {
+        return response;
+      }
+      throw 'Error: empty response';
+    });
+}
+
+export async function callAjaxSaveMetaDataAction(fileIdentifier, targetLanguage, altText, translate = 0) {
+  const params = {
+    action: 'saveMetaData',
+    target: fileIdentifier,
+    "target-language": targetLanguage,
+    altText: altText,
+    translate: translate
+  };
+
+  return ajaxCall(params)
+    .then(response => {
+      if (response) {
+        top.TYPO3.Notification.success('Saved Metadata successful', 'Saved Metadata successful', 5);
+        return response;
+      }
+      throw 'Error: empty response';
+    }).catch(error => {
+      top.TYPO3.Notification.error('Error', '(Saving) Error: ' + error, 5);
+      throw error;
+    });
+}

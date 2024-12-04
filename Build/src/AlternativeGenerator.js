@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import Modal from '@typo3/backend/modal';
-import * as MessageUtility from '@typo3/backend/utility/message-utility';
+import { MessageUtility }  from '@typo3/backend/utility/message-utility';
 import GeneratorButton from './utils/GeneratorButton.js';
 import FormEngine from '@typo3/backend/form-engine.js';
 
@@ -14,7 +14,7 @@ class AlternativeGenerator {
   }
 
   initializeListener() {
-    window.addEventListener('message', function (e) {
+    window.addEventListener('message', (e) => {
       if (!MessageUtility.verifyOrigin(e.origin)) {
         throw 'Denied message sent by ' + e.origin;
       }
@@ -59,7 +59,7 @@ class AlternativeGenerator {
       size: Modal.sizes.large,
       title: trigger.data('title'),
     });
-    this.triggerTaget = $(trigger.data('output-target'));
+    this.triggerTarget = $(trigger.data('output-target'));
 
     if (currentModal.css) {
       // Typo3 11

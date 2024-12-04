@@ -300,27 +300,25 @@ class ImageRecognizeController extends ActionController
 
                 $moduleTemplate->getDocHeaderComponent()->disable();
 
-                $view->assign('siteLanguages', $siteLanguages);
-                $view->assign('action', $action);
-                $view->assign('target', $target);
-                $view->assign('fileObjects', $fileObjects ?? null);
-                $view->assign('targetLanguage', (int) $target_language);
-                $view->assign('modal', $modal);
+                $template_variables = [
+                    'siteLanguages' => $siteLanguages,
+                    'action' => $action,
+                    'target' => $target,
+                    'fileObjects' => $fileObjects ?? null,
+                    'targetLanguage' => (int) $target_language,
+                    'modal' => $modal,
+                    'textPrompt' => $defaultPrompt,
+                    'allTextPrompts' => $allPrompts,
+                ];
 
-                $view->assign(
-                    'textPrompt',
-                    $defaultPrompt
-                );
-                $view->assign(
-                    'allTextPrompts',
-                    $allPrompts
-                );
-
-                $moduleTemplate->setContent($view->render());
-
-                return $this->responseFactory->createResponse()
-                    ->withHeader('Content-Type', 'text/html; charset=utf-8')
-                    ->withBody($this->streamFactory->createStream($moduleTemplate->renderContent()));
+                if (version_compare(GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version(), '13.0', '<')) {
+                    $this->view->assignMultiple($template_variables);
+                    $moduleTemplate->setContent($view->render());
+                    return $this->htmlResponse($moduleTemplate->renderContent());
+                } else {
+                    $moduleTemplate->assignMultiple($template_variables);
+                    return $moduleTemplate->renderResponse('ImageRecognize/AjaxMetaGenerate');
+                }
         }
     }
 

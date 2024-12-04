@@ -72,6 +72,7 @@ export default {
   input: [
     './Build/src/AlternativeGenerator.js',
     './Build/src/CreditsViewHelper.js',
+    './Build/src/AjaxMetaGenerate.js',
   ],
   output: [
     {
