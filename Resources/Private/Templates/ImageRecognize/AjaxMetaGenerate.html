@@ -333,73 +333,68 @@
 </f:section>
 
 <f:section name="section-translation">
-    <fieldset class="form-section t3js-ai-tools-show-after-prompt-generation-{fileObject.file.properties.identifier_hash}" style="display: none;">
-        <div class="module-columns">
-            <div class="module-column">
-                <div class="form-group">
-                    <label class="t3js-formengine-label">
-                        Translations
-                    </label>
-                </div>
+    {f:variable(name: 'metaLanguages', value: '{aitools:backend.metaDataLanguages(languages: siteLanguages, fileObject: fileObject.file)}')}
+    <f:if condition="{metaLanguages -> f:count()} > 1">
+        <fieldset class="form-section t3js-ai-tools-show-after-prompt-generation-{fileObject.file.properties.identifier_hash}" style="display: none;">
+            <div class="module-columns">
+                <div class="module-column">
+                    <div class="form-group">
+                        <label class="t3js-formengine-label">
+                            Translations
+                        </label>
+                    </div>
 
-                <f:comment>
-                    <button class="btn btn-default btn-pagemachine-ai-tools" onclick="return false;">
-                        <core:icon identifier="actions-cpu" size="small" />
-                        Update all translations
-                        <aitools:backend.Credits />
-                    </button>
-                </f:comment>
-
-                <div class="otherLanguages">
-                    <ul>
-                        <f:for
-                            as="metaLanguage"
-                            each="{aitools:backend.metaDataLanguages(languages: siteLanguages, fileObject: fileObject.file)}"
-                        >
-                            <f:if condition="{targetLanguage} != {metaLanguage.language.languageId}">
-                                <li>
-                                    <div class="flag-section">
-                                        <aitools:backend.icon
-                                            title="{metaLanguage.language.title}"
-                                            identifier="{metaLanguage.language.flagIdentifier}" size="large"
-                                        />
-                                    </div>
-                                    <div class="text-section">
-                                        <div class="t3js-formengine-label">
-                                            {metaLanguage.language.title}
+                    <div class="otherLanguages">
+                        <ul>
+                            <f:for
+                                as="metaLanguage"
+                                each="{metaLanguages}"
+                            >
+                                <f:if condition="{targetLanguage} != {metaLanguage.language.languageId}">
+                                    <li>
+                                        <div class="flag-section">
+                                            <aitools:backend.icon
+                                                title="{metaLanguage.language.title}"
+                                                identifier="{metaLanguage.language.flagIdentifier}" size="large"
+                                            />
                                         </div>
-                                        <div id="translate-{fileObject.file.properties.identifier_hash}-{metaLanguage.language.languageId}">
-                                            <f:if condition="{metaLanguage.meta}">
-                                                <f:then>
-                                                    {metaLanguage.meta.alternative}
-                                                </f:then>
-                                                <f:else>
-                                                    No translation
-                                                </f:else>
-                                            </f:if>
+                                        <div class="text-section">
+                                            <div class="t3js-formengine-label">
+                                                {metaLanguage.language.title}
+                                            </div>
+                                            <div id="translate-{fileObject.file.properties.identifier_hash}-{metaLanguage.language.languageId}">
+                                                <f:if condition="{metaLanguage.meta}">
+                                                    <f:then>
+                                                        {metaLanguage.meta.alternative}
+                                                    </f:then>
+                                                    <f:else>
+                                                        No translation
+                                                    </f:else>
+                                                </f:if>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div>
-                                        <f:comment>
-                                            <button
-                                                href="#"
-                                                class="btn btn-default btn-pagemachine-ai-tools"
-                                            >
-                                                <core:icon identifier="actions-cpu" size="small" />
-                                                Generate
-                                                <aitools:backend.Credits />
-                                            </button>
-                                        </f:comment>
-                                    </div>
+                                        <div>
+                                            <f:comment>
+                                                <button
+                                                    href="#"
+                                                    class="btn btn-default btn-pagemachine-ai-tools"
+                                                >
+                                                    <core:icon identifier="actions-cpu" size="small" />
+                                                    Generate
+                                                    <aitools:backend.Credits />
+                                                </button>
+                                            </f:comment>
+                                        </div>
 
-                                </li>
-                            </f:if>
-                        </f:for>
-                    </ul>
+                                    </li>
+                                </f:if>
+                            </f:for>
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
-    </fieldset>
+        </fieldset>
+    </f:if>
 </f:section>
 
 <f:section name="form-group-textarea">
