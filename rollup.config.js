@@ -73,6 +73,7 @@ export default {
     './Build/src/AlternativeGenerator.js',
     './Build/src/CreditsViewHelper.js',
     './Build/src/AjaxMetaGenerate.js',
+    './Build/src/ContextMenuActions.js',
   ],
   output: [
     {
