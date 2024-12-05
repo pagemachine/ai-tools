@@ -17,6 +17,7 @@ use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Resource\AbstractFile;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\FileInterface;
@@ -32,6 +33,7 @@ use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
 use TYPO3\CMS\Extbase\Mvc\Request;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 use TYPO3\CMS\Fluid\View\TemplatePaths;
+use TYPO3\CMS\Core\Information\Typo3Version;
 
 class ImageRecognizeController extends ActionController
 {
@@ -294,9 +296,15 @@ class ImageRecognizeController extends ActionController
                     ->withBody($this->streamFactory->createStream(json_encode($data)));
 
             default:
-                $moduleTemplate = $this->moduleTemplateFactory->create($request);
-                // create custom fluid template html view
-                $view = $this->getView('AjaxMetaGenerate', $request);
+                if (version_compare(GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version(), '13.0', '<')) {
+                    $moduleTemplate = $this->moduleTemplateFactory->create($request);
+                    $view = $this->getView('AjaxMetaGenerate', $request);
+                } else {
+                    $attribute = new ExtbaseRequestParameters(ImageRecognizeController::class);
+                    $request = $request->withAttribute('extbase', $attribute);
+                    $extbaseRequest = GeneralUtility::makeInstance(Request::class, $request);
+                    $moduleTemplate = $this->moduleTemplateFactory->create($extbaseRequest);
+                }
 
                 $moduleTemplate->getDocHeaderComponent()->disable();
 
@@ -311,8 +319,22 @@ class ImageRecognizeController extends ActionController
                     'allTextPrompts' => $allPrompts,
                 ];
 
+                $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
+                $typo3Version = new Typo3Version();
+                if ($typo3Version->getMajorVersion() > 11) {
+                    $pageRenderer->loadJavaScriptModule(
+                        '@pagemachine/ai-tools/AjaxMetaGenerate.js',
+                    );
+                } else {
+                    $pageRenderer->loadRequireJsModule(
+                        'TYPO3/CMS/AiTools/Amd/AjaxMetaGenerate'
+                    );
+                }
+
+
                 if (version_compare(GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version(), '13.0', '<')) {
-                    $this->view->assignMultiple($template_variables);
+                    $view = $this->getView('AjaxMetaGenerate', $request);
+                    $view->assignMultiple($template_variables);
                     $moduleTemplate->setContent($view->render());
                     return $this->htmlResponse($moduleTemplate->renderContent());
                 } else {
