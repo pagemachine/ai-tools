@@ -242,7 +242,7 @@ class ImageRecognizeController extends ActionController
             case 'saveMetaData':
                 $altText = $parsedBody['altText'] ?? $queryParams['altText'] ?? '';
                 $doTranslate = $parsedBody['translate'] ?? $queryParams['translate'] ?? false;
-                $saved = $this->imageMetaDataService->saveMetaData($target, $altText, (int) $target_language);
+                $parentUid = $this->imageMetaDataService->saveMetaData($target, $altText, (int) $target_language);
 
                 $translations = [];
                 if ($doTranslate) {
@@ -251,7 +251,7 @@ class ImageRecognizeController extends ActionController
                         // only translate additional languages (skip current language)
                         if ($siteLanguage->getLanguageId() !== (int) $target_language) {
                             $altTextTranslated = $this->translationService->translateText($altText, $targetTwoLetterIsoCode, $this->getLocaleLanguageCode($siteLanguage));
-                            $metaDataUid = $this->imageMetaDataService->saveMetaData($target, $altTextTranslated, $siteLanguage->getLanguageId());
+                            $metaDataUid = $this->imageMetaDataService->saveMetaData($target, $altTextTranslated, $siteLanguage->getLanguageId(), $parentUid);
                             $translations[] = [
                                 'languageId' => $siteLanguage->getLanguageId(),
                                 'title' => $siteLanguage->getTitle(),

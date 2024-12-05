@@ -75,7 +75,7 @@ class ImageMetaDataService
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
      */
-    public function saveMetaData(string $target, string $altText = null, int $language = 0): int
+    public function saveMetaData(string $target, string $altText = null, int $language = 0, int $parentUid = 0): int
     {
         if (!empty($target)) {
             $fileObject = $this->resourceFactory->retrieveFileOrFolderObject($target);
@@ -92,6 +92,7 @@ class ImageMetaDataService
             $fileMetadata = $fileObject->getMetaData();
             $fileMetadata->offsetSet('alternative', $altText);
             $fileMetadata->save();
+            $metaDataUid = $fileMetadata['uid'];
         } else {
             $fileObjectUid = $fileObject->getUid();
 
@@ -124,8 +125,8 @@ class ImageMetaDataService
                     $diffSourceJson = json_encode($fileObject->getProperties());
                     $translatedMetaDataRecord = $this->metaDataRepository->createMetaDataRecord($fileObjectUid, [
                         'sys_language_uid' => $language,
-                        'l10n_parent' => $fileMetadataUid,
-                        't3_origuid' => $fileMetadataUid,
+                        'l10n_parent' => $parentUid,
+                        't3_origuid' => $parentUid,
                         'width' => $fileObject->getProperty('width'),
                         'height' => $fileObject->getProperty('height'),
                         'alternative' => $altText,
