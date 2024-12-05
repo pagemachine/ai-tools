@@ -43,9 +43,10 @@ class AlternativeGenerator {
   }
 
   triggerUpdate(target) {
+    target.get(0).dispatchEvent(new Event('change'));
     if (typeof FormEngine !== 'undefined' && FormEngine.Validation) {
-      FormEngine.Validation.markFieldAsChanged(target);
-      FormEngine.Validation.validateField(target);
+      FormEngine.Validation.validateField(target.get(0));
+      FormEngine.Validation.markFieldAsChanged(target.get(0));
     }
   }
 
