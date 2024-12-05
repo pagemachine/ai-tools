@@ -72,7 +72,7 @@ export async function callAjaxSaveMetaDataAction(fileIdentifier, targetLanguage,
     translate: translate
   };
 
-  return ajaxCall(params)
+  return ajaxCall(params, URLS.images)
     .then(response => {
       if (response) {
         top.TYPO3.Notification.success('Saved Metadata successful', 'Saved Metadata successful', 5);

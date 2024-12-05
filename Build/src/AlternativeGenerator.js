@@ -26,6 +26,8 @@ class AlternativeGenerator {
 
         if (this.currentModal) {
           this.triggerTarget.val(e.data.value);
+          this.triggerTarget.trigger('change');
+          this.triggerUpdate(this.triggerTarget);
           this.currentModal.hideModal();
         }
       }
@@ -35,12 +37,16 @@ class AlternativeGenerator {
   initializeTrigger() {
     const generator = new GeneratorButton();
     generator.updateHook = (target, results) => {
-      if (typeof FormEngine !== 'undefined' && FormEngine.Validation) {
-        FormEngine.Validation.markFieldAsChanged(target);
-        FormEngine.Validation.validateField(target);
-      }
+      this.triggerUpdate(target);
     };
     $('.t3js-alternative-generator-settings-trigger').off('click').on('click', (e) => this.clickSettingsHandler(e));
+  }
+
+  triggerUpdate(target) {
+    if (typeof FormEngine !== 'undefined' && FormEngine.Validation) {
+      FormEngine.Validation.markFieldAsChanged(target);
+      FormEngine.Validation.validateField(target);
+    }
   }
 
   clickSettingsHandler(event) {
