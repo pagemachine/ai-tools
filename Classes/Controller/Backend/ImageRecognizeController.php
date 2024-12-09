@@ -322,7 +322,7 @@ class ImageRecognizeController extends ActionController
                 $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
                 $typo3Version = new Typo3Version();
                 if ($typo3Version->getMajorVersion() > 11) {
-                    $pageRenderer->loadJavaScriptModule(
+                    $pageRenderer->loadJavaScriptModule( // @phpstan-ignore-line
                         '@pagemachine/ai-tools/AjaxMetaGenerate.js',
                     );
                 } else {
@@ -338,8 +338,8 @@ class ImageRecognizeController extends ActionController
                     $moduleTemplate->setContent($view->render()); // @phpstan-ignore-line
                     return $this->htmlResponse($moduleTemplate->renderContent()); // @phpstan-ignore-line
                 } else {
-                    $moduleTemplate->assignMultiple($template_variables);
-                    return $moduleTemplate->renderResponse('ImageRecognize/AjaxMetaGenerate');
+                    $moduleTemplate->assignMultiple($template_variables); // @phpstan-ignore-line
+                    return $moduleTemplate->renderResponse('ImageRecognize/AjaxMetaGenerate'); // @phpstan-ignore-line
                 }
         }
     }

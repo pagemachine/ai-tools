@@ -232,10 +232,10 @@ class ImageCreationController extends ActionController
             };
         } else {
             return match ($severity) {
-                'info' => ContextualFeedbackSeverity::INFO,
-                'ok' => ContextualFeedbackSeverity::OK,
-                'warning' => ContextualFeedbackSeverity::WARNING,
-                'error' => ContextualFeedbackSeverity::ERROR,
+                'info' => ContextualFeedbackSeverity::INFO, // @phpstan-ignore-line
+                'ok' => ContextualFeedbackSeverity::OK, // @phpstan-ignore-line
+                'warning' => ContextualFeedbackSeverity::WARNING, // @phpstan-ignore-line
+                'error' => ContextualFeedbackSeverity::ERROR, // @phpstan-ignore-line
                 default => throw new Exception("Unknown severity $severity", 1733763034),
             };
         }

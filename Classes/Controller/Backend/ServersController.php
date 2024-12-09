@@ -80,8 +80,8 @@ class ServersController extends ActionController
             $moduleTemplate->setContent($this->view->render()); // @phpstan-ignore-line
             return $this->htmlResponse($moduleTemplate->renderContent()); // @phpstan-ignore-line
         } else {
-            $moduleTemplate->assignMultiple($template_variables);
-            return $moduleTemplate->renderResponse('Servers/List');
+            $moduleTemplate->assignMultiple($template_variables); // @phpstan-ignore-line
+            return $moduleTemplate->renderResponse('Servers/List'); // @phpstan-ignore-line
         }
     }
 

@@ -63,7 +63,7 @@ class CreditsViewHelper extends AbstractTagBasedViewHelper
 
         $typo3Version = new Typo3Version();
         if ($typo3Version->getMajorVersion() > 11) {
-            $pageRenderer->loadJavaScriptModule(
+            $pageRenderer->loadJavaScriptModule( // @phpstan-ignore-line
                 '@pagemachine/ai-tools/CreditsViewHelper.js',
             );
         } else {
