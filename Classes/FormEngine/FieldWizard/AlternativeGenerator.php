@@ -24,9 +24,9 @@ class AlternativeGenerator extends AbstractNode
     protected PromptRepository $promptRepository;
     protected SettingsService $settingsService;
 
-    public function __construct(NodeFactory $nodeFactory = Null, array $data = Null)
+    public function __construct(NodeFactory $nodeFactory = null, array $data = null)
     {
-        if ($nodeFactory !== Null) {
+        if ($nodeFactory !== null) {
             parent::__construct($nodeFactory, $data);
         }
 

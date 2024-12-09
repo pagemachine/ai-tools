@@ -14,7 +14,9 @@ use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\StorageRepository;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Http\ForwardResponse;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
@@ -135,7 +137,7 @@ class ImageCreationController extends ActionController
             $this->addFlashMessage(
                 'The image has been saved in ' . $saveTarget,
                 'Image saved',
-                FlashMessage::INFO,
+                $this->getSeverity('info'),
                 true
             );
             /** @phpstan-ignore-next-line Else branch is unreachable because previous condition is always true. */
@@ -143,7 +145,7 @@ class ImageCreationController extends ActionController
             $this->addFlashMessage(
                 'The image could not be saved',
                 'Image not saved',
-                FlashMessage::ERROR,
+                $this->getSeverity('error'),
                 true
             );
         }
@@ -177,7 +179,7 @@ class ImageCreationController extends ActionController
             $this->addFlashMessage(
                 $exceptionMsg,
                 'Warning',
-                FlashMessage::WARNING,
+                $this->getSeverity('warn'),
                 true
             );
         }
@@ -210,11 +212,32 @@ class ImageCreationController extends ActionController
             $this->addFlashMessage(
                 $exceptionMsg,
                 'Warning',
-                FlashMessage::WARNING,
+                $this->getSeverity('warn'),
                 true
             );
         }
 
         return $returnUrlArray;
+    }
+
+    private function getSeverity(string $severity)
+    {
+        if (version_compare(GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version(), '13.0', '<')) {
+            return match ($severity) {
+                'info' => FlashMessage::INFO, // @phpstan-ignore-line
+                'ok' => FlashMessage::OK, // @phpstan-ignore-line
+                'warning' => FlashMessage::WARNING, // @phpstan-ignore-line
+                'error' => FlashMessage::ERROR, // @phpstan-ignore-line
+                default => throw new Exception("Unknown severity $severity", 1733763034),
+            };
+        } else {
+            return match ($severity) {
+                'info' => ContextualFeedbackSeverity::INFO,
+                'ok' => ContextualFeedbackSeverity::OK,
+                'warning' => ContextualFeedbackSeverity::WARNING,
+                'error' => ContextualFeedbackSeverity::ERROR,
+                default => throw new Exception("Unknown severity $severity", 1733763034),
+            };
+        }
     }
 }

@@ -1,5 +1,6 @@
 {
   "private": true,
+  "name": "ai-tools",
   "type": "module",
   "scripts": {
     "build": "rollup -c",
