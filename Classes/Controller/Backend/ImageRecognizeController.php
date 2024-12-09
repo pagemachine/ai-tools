@@ -265,7 +265,7 @@ class ImageRecognizeController extends ActionController
 
                 $returnArray = [
                     'translations' => $translations,
-                    'saved' => (bool)$saved,
+                    'saved' => true,
                 ];
 
                 return $this->responseFactory->createResponse()

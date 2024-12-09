@@ -156,8 +156,8 @@ class ImageMetaDataService
                 $diffSourceJson = json_encode($fileObject->getProperties());
                 $translatedMetaDataRecord = $this->metaDataRepository->createMetaDataRecord($fileObjectUid, [
                     'sys_language_uid' => $language,
-                    'l10n_parent' => $fileObjectUid,
-                    't3_origuid' => $fileObjectUid,
+                    'l10n_parent' => $parentUid,
+                    't3_origuid' => $parentUid,
                     'width' => $fileObject->getProperty('width'),
                     'height' => $fileObject->getProperty('height'),
                     'alternative' => $altText,
