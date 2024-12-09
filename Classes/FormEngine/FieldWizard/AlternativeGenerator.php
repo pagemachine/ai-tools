@@ -8,6 +8,7 @@ use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Pagemachine\AItools\Service\SettingsService;
 use TYPO3\CMS\Backend\Form\AbstractNode;
 use TYPO3\CMS\Backend\Form\NodeFactory;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
 use TYPO3\CMS\Core\Resource\AbstractFile;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
@@ -27,7 +28,7 @@ class AlternativeGenerator extends AbstractNode
     public function __construct(NodeFactory $nodeFactory = null, array $data = null)
     {
         if ($nodeFactory !== null) {
-            parent::__construct($nodeFactory, $data);
+            parent::__construct($nodeFactory, $data); // @phpstan-ignore-line
         }
 
         $this->promptRepository = GeneralUtility::makeInstance(PromptRepository::class);
@@ -89,11 +90,11 @@ class AlternativeGenerator extends AbstractNode
             'EXT:ai_tools/Resources/Public/Css/FieldWizard.css',
         ];
 
-        $typo3Version = new \TYPO3\CMS\Core\Information\Typo3Version();
+        $typo3Version = new Typo3Version();
         if ($typo3Version->getMajorVersion() > 11) {
             $result['javaScriptModules'][] = JavaScriptModuleInstruction::create('@pagemachine/ai-tools/AlternativeGenerator.js');
         } else {
-            $result['requireJsModules'][] = JavaScriptModuleInstruction::forRequireJS(
+            $result['requireJsModules'][] = JavaScriptModuleInstruction::forRequireJS( // @phpstan-ignore-line
                 'TYPO3/CMS/AiTools/Amd/AlternativeGenerator'
             );
         }

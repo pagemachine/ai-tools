@@ -67,7 +67,7 @@ class CreditsViewHelper extends AbstractTagBasedViewHelper
                 '@pagemachine/ai-tools/CreditsViewHelper.js',
             );
         } else {
-            $pageRenderer->loadRequireJsModule(
+            $pageRenderer->loadRequireJsModule( // @phpstan-ignore-line
                 'TYPO3/CMS/AiTools/Amd/CreditsViewHelper'
             );
         }

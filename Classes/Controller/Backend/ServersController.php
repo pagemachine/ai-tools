@@ -77,8 +77,8 @@ class ServersController extends ActionController
 
         if (version_compare(GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version(), '13.0', '<')) {
             $this->view->assignMultiple($template_variables);
-            $moduleTemplate->setContent($this->view->render());
-            return $this->htmlResponse($moduleTemplate->renderContent());
+            $moduleTemplate->setContent($this->view->render()); // @phpstan-ignore-line
+            return $this->htmlResponse($moduleTemplate->renderContent()); // @phpstan-ignore-line
         } else {
             $moduleTemplate->assignMultiple($template_variables);
             return $moduleTemplate->renderResponse('Servers/List');

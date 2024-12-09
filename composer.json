@@ -29,7 +29,7 @@
         "aws/aws-sdk-php": "^3.0",
         "openai-php/client": "^0.6.0",
         "typo3/cms-backend": "^11.5 || ^12.4 || ^13.4",
-        "typo3/cms-core": "^13.4",
+        "typo3/cms-core": "^11.5 || ^12.4 || ^13.4",
         "typo3/cms-fluid": "^11.5 || ^12.4 || ^13.4"
     },
     "require-dev": {

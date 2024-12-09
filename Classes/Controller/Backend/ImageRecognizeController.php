@@ -326,7 +326,7 @@ class ImageRecognizeController extends ActionController
                         '@pagemachine/ai-tools/AjaxMetaGenerate.js',
                     );
                 } else {
-                    $pageRenderer->loadRequireJsModule(
+                    $pageRenderer->loadRequireJsModule( // @phpstan-ignore-line
                         'TYPO3/CMS/AiTools/Amd/AjaxMetaGenerate'
                     );
                 }
@@ -335,8 +335,8 @@ class ImageRecognizeController extends ActionController
                 if (version_compare(GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version(), '13.0', '<')) {
                     $view = $this->getView('AjaxMetaGenerate', $request);
                     $view->assignMultiple($template_variables);
-                    $moduleTemplate->setContent($view->render());
-                    return $this->htmlResponse($moduleTemplate->renderContent());
+                    $moduleTemplate->setContent($view->render()); // @phpstan-ignore-line
+                    return $this->htmlResponse($moduleTemplate->renderContent()); // @phpstan-ignore-line
                 } else {
                     $moduleTemplate->assignMultiple($template_variables);
                     return $moduleTemplate->renderResponse('ImageRecognize/AjaxMetaGenerate');
@@ -361,6 +361,6 @@ class ImageRecognizeController extends ActionController
             // @phpstan-ignore-next-line Stop PHPStan about complaining this line for TYPO3 v11
             return $siteLanguage->getLocale()->getLanguageCode();
         }
-        return $siteLanguage->getTwoLetterIsoCode();
+        return $siteLanguage->getTwoLetterIsoCode(); // @phpstan-ignore-line
     }
 }
