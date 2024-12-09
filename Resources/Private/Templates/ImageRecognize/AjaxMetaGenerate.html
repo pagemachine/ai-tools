@@ -265,37 +265,39 @@
                             value: textPrompt
                         }" />
 
-                        <button
-                            href="#"
-                            class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-generator-trigger"
-                            data-file-identifier="{fileObject.file.combinedIdentifier}"
-                            data-text-prompt-field="#textPrompt-{fileObject.file.properties.identifier_hash}"
-                            data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
-                            data-target-language="{targetLanguage}"
-                            data-show-target=".t3js-ai-tools-show-after-prompt-generation-{fileObject.file.properties.identifier_hash}"
-                        >
-
-                            <core:icon identifier="actions-cpu" size="small" />
-                            Generate
-                            <aitools:backend.Credits
-                                type="imageRecognition"
-                                file-identifier="{fileObject.file.combinedIdentifier}"
-                                text-prompt="temp"
-                            />
-                        </button>
-
-                        <f:if condition="{fileObject.meta.alternative}">
+                        <div class="form-group">
                             <button
                                 href="#"
-                                class="btn btn-default t3js-alternative-use-current-trigger"
-                                data-current-text="{fileObject.meta.alternative}"
+                                class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-generator-trigger"
+                                data-file-identifier="{fileObject.file.combinedIdentifier}"
+                                data-text-prompt-field="#textPrompt-{fileObject.file.properties.identifier_hash}"
                                 data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
+                                data-target-language="{targetLanguage}"
                                 data-show-target=".t3js-ai-tools-show-after-prompt-generation-{fileObject.file.properties.identifier_hash}"
                             >
-                                <core:icon identifier="actions-arrow-down-alt" size="small" />
-                                Continue with current alternative text
+
+                                <core:icon identifier="actions-cpu" size="small" />
+                                Generate
+                                <aitools:backend.Credits
+                                    type="imageRecognition"
+                                    file-identifier="{fileObject.file.combinedIdentifier}"
+                                    text-prompt="temp"
+                                />
                             </button>
-                        </f:if>
+
+                            <f:if condition="{fileObject.meta.alternative}">
+                                <button
+                                    href="#"
+                                    class="btn btn-default t3js-alternative-use-current-trigger"
+                                    data-current-text="{fileObject.meta.alternative}"
+                                    data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
+                                    data-show-target=".t3js-ai-tools-show-after-prompt-generation-{fileObject.file.properties.identifier_hash}"
+                                >
+                                    <core:icon identifier="actions-arrow-down-alt" size="small" />
+                                    Continue with current alternative text
+                                </button>
+                            </f:if>
+                        </div>
                     </div>
                 </f:form>
             </div>
