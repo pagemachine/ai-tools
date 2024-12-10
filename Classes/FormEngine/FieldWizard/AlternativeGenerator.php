@@ -27,7 +27,8 @@ class AlternativeGenerator extends AbstractNode
 
     public function __construct(NodeFactory $nodeFactory = null, array $data = null)
     {
-        if (is_null($nodeFactory)) {
+        $typo3Version = new Typo3Version();
+        if ($typo3Version->getMajorVersion() < 13) {
             parent::__construct($nodeFactory, $data); // @phpstan-ignore-line
         }
 
