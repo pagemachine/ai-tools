@@ -1,0 +1,7 @@
+.git* export-ignore
+Tests export-ignore
+docker-compose.yml export-ignore
+Gemfile* export-ignore
+phpcs.xml export-ignore
+phpstan.neon export-ignore
+rector.php export-ignore

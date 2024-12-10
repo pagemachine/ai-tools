@@ -2,13 +2,13 @@
 
 $EM_CONF[$_EXTKEY] = [
     'title' => 'AI Tools',
-    'description' => 'Use A.I. Tools in the TYPO3 backend. Generate Images, Image Variants and Describe Images.',
+    'description' => 'A TYPO3 extension that leverages artificial intelligence to enhance content and accessibility',
     'category' => 'module',
-    'author' => 'Sascha Löffler',
-    'author_email' => 'sloeffler@pagemachine.de',
+    'author' => 'Francisco Seipel',
+    'author_email' => 'fseipel@pagemachine.de',
     'author_company' => 'Pagemachine AG',
-    'state' => 'alpha',
-    'version' => '0.0.9',
+    'state' => 'stable',
+    'version' => '1.0.1',
     'constraints' => [
         'depends' => [
             'typo3' => '11.0.0-13.4.99',
