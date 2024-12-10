@@ -30,6 +30,6 @@ This extension is installable from various sources:
 
 ## Testing
 
-All tests can be executed with the shipped Docker Compose definition:
+All tests can be executed and all assets generated with the shipped Docker Compose definition:
 
     docker compose run --rm app composer build

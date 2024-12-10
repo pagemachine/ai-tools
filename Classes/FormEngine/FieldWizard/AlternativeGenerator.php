@@ -8,6 +8,7 @@ use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Pagemachine\AItools\Service\SettingsService;
 use TYPO3\CMS\Backend\Form\AbstractNode;
 use TYPO3\CMS\Backend\Form\NodeFactory;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
 use TYPO3\CMS\Core\Resource\AbstractFile;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
@@ -24,9 +25,12 @@ class AlternativeGenerator extends AbstractNode
     protected PromptRepository $promptRepository;
     protected SettingsService $settingsService;
 
-    public function __construct(NodeFactory $nodeFactory, array $data)
+    public function __construct(NodeFactory $nodeFactory = null, array $data = null)
     {
-        parent::__construct($nodeFactory, $data);
+        $typo3Version = new Typo3Version();
+        if ($typo3Version->getMajorVersion() < 13) {
+            parent::__construct($nodeFactory, $data); // @phpstan-ignore-line
+        }
 
         $this->promptRepository = GeneralUtility::makeInstance(PromptRepository::class);
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
@@ -56,7 +60,7 @@ class AlternativeGenerator extends AbstractNode
         return true;
     }
 
-    public function render()
+    public function render(): array
     {
         $result = $this->initializeResultArray();
         $target = $this->data['databaseRow']['file'][0];
@@ -70,7 +74,6 @@ class AlternativeGenerator extends AbstractNode
         }
 
         $prompt = $this->promptRepository->getDefaultPromptText();
-
 
         $arguments = [
             'target' => $target,
@@ -88,9 +91,14 @@ class AlternativeGenerator extends AbstractNode
             'EXT:ai_tools/Resources/Public/Css/FieldWizard.css',
         ];
 
-        $result['requireJsModules'][] = JavaScriptModuleInstruction::forRequireJS(
-            'TYPO3/CMS/AiTools/AlternativeGenerator'
-        );
+        $typo3Version = new Typo3Version();
+        if ($typo3Version->getMajorVersion() > 11) {
+            $result['javaScriptModules'][] = JavaScriptModuleInstruction::create('@pagemachine/ai-tools/AlternativeGenerator.js'); // @phpstan-ignore-line
+        } else {
+            $result['requireJsModules'][] = JavaScriptModuleInstruction::forRequireJS( // @phpstan-ignore-line
+                'TYPO3/CMS/AiTools/Amd/AlternativeGenerator'
+            );
+        }
 
         return $result;
     }

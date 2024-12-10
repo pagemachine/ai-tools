@@ -17,6 +17,8 @@ use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Information\Typo3Version;
+use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Resource\AbstractFile;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\FileInterface;
@@ -240,7 +242,7 @@ class ImageRecognizeController extends ActionController
             case 'saveMetaData':
                 $altText = $parsedBody['altText'] ?? $queryParams['altText'] ?? '';
                 $doTranslate = $parsedBody['translate'] ?? $queryParams['translate'] ?? false;
-                $saved = $this->imageMetaDataService->saveMetaData($target, $altText, (int) $target_language);
+                $parentUid = $this->imageMetaDataService->saveMetaData($target, $altText, (int) $target_language);
 
                 $translations = [];
                 if ($doTranslate) {
@@ -249,7 +251,7 @@ class ImageRecognizeController extends ActionController
                         // only translate additional languages (skip current language)
                         if ($siteLanguage->getLanguageId() !== (int) $target_language) {
                             $altTextTranslated = $this->translationService->translateText($altText, $targetTwoLetterIsoCode, $this->getLocaleLanguageCode($siteLanguage));
-                            $metaDataUid = $this->imageMetaDataService->saveMetaData($target, $altTextTranslated, $siteLanguage->getLanguageId());
+                            $metaDataUid = $this->imageMetaDataService->saveMetaData($target, $altTextTranslated, $siteLanguage->getLanguageId(), $parentUid);
                             $translations[] = [
                                 'languageId' => $siteLanguage->getLanguageId(),
                                 'title' => $siteLanguage->getTitle(),
@@ -263,7 +265,7 @@ class ImageRecognizeController extends ActionController
 
                 $returnArray = [
                     'translations' => $translations,
-                    'saved' => (bool)$saved,
+                    'saved' => true,
                 ];
 
                 return $this->responseFactory->createResponse()
@@ -294,33 +296,51 @@ class ImageRecognizeController extends ActionController
                     ->withBody($this->streamFactory->createStream(json_encode($data)));
 
             default:
-                $moduleTemplate = $this->moduleTemplateFactory->create($request);
-                // create custom fluid template html view
-                $view = $this->getView('AjaxMetaGenerate', $request);
+                if (version_compare(GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version(), '13.0', '<')) {
+                    $moduleTemplate = $this->moduleTemplateFactory->create($request);
+                    $view = $this->getView('AjaxMetaGenerate', $request);
+                } else {
+                    $attribute = new ExtbaseRequestParameters(ImageRecognizeController::class);
+                    $request = $request->withAttribute('extbase', $attribute);
+                    $extbaseRequest = GeneralUtility::makeInstance(Request::class, $request);
+                    $moduleTemplate = $this->moduleTemplateFactory->create($extbaseRequest);
+                }
 
                 $moduleTemplate->getDocHeaderComponent()->disable();
 
-                $view->assign('siteLanguages', $siteLanguages);
-                $view->assign('action', $action);
-                $view->assign('target', $target);
-                $view->assign('fileObjects', $fileObjects ?? null);
-                $view->assign('targetLanguage', (int) $target_language);
-                $view->assign('modal', $modal);
+                $template_variables = [
+                    'siteLanguages' => $siteLanguages,
+                    'action' => $action,
+                    'target' => $target,
+                    'fileObjects' => $fileObjects ?? null,
+                    'targetLanguage' => (int) $target_language,
+                    'modal' => $modal,
+                    'textPrompt' => $defaultPrompt,
+                    'allTextPrompts' => $allPrompts,
+                ];
 
-                $view->assign(
-                    'textPrompt',
-                    $defaultPrompt
-                );
-                $view->assign(
-                    'allTextPrompts',
-                    $allPrompts
-                );
+                $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
+                $typo3Version = new Typo3Version();
+                if ($typo3Version->getMajorVersion() > 11) {
+                    $pageRenderer->loadJavaScriptModule( // @phpstan-ignore-line
+                        '@pagemachine/ai-tools/AjaxMetaGenerate.js',
+                    );
+                } else {
+                    $pageRenderer->loadRequireJsModule( // @phpstan-ignore-line
+                        'TYPO3/CMS/AiTools/Amd/AjaxMetaGenerate'
+                    );
+                }
 
-                $moduleTemplate->setContent($view->render());
 
-                return $this->responseFactory->createResponse()
-                    ->withHeader('Content-Type', 'text/html; charset=utf-8')
-                    ->withBody($this->streamFactory->createStream($moduleTemplate->renderContent()));
+                if (version_compare(GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version(), '13.0', '<')) {
+                    $view = $this->getView('AjaxMetaGenerate', $request);
+                    $view->assignMultiple($template_variables);
+                    $moduleTemplate->setContent($view->render()); // @phpstan-ignore-line
+                    return $this->htmlResponse($moduleTemplate->renderContent()); // @phpstan-ignore-line
+                } else {
+                    $moduleTemplate->assignMultiple($template_variables); // @phpstan-ignore-line
+                    return $moduleTemplate->renderResponse('Backend/ImageRecognize/AjaxMetaGenerate'); // @phpstan-ignore-line
+                }
         }
     }
 
@@ -341,6 +361,6 @@ class ImageRecognizeController extends ActionController
             // @phpstan-ignore-next-line Stop PHPStan about complaining this line for TYPO3 v11
             return $siteLanguage->getLocale()->getLanguageCode();
         }
-        return $siteLanguage->getTwoLetterIsoCode();
+        return $siteLanguage->getTwoLetterIsoCode(); // @phpstan-ignore-line
     }
 }

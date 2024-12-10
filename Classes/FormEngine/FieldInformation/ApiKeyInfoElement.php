@@ -15,7 +15,7 @@ class ApiKeyInfoElement extends AbstractFormElement
         'deepl' => 'https://www.deepl.com/pro-api',
     ];
 
-    public function render()
+    public function render(): array
     {
         $type = $this->data['recordTypeValue'];
         $href = $this->urls[$type] ?? null;

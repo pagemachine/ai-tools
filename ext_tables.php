@@ -14,7 +14,7 @@ $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumeric
 if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0', '<')) {
     // for TYPO3 v11
 
-    ExtensionUtility::registerModule(
+    ExtensionUtility::registerModule( // @phpstan-ignore-line
         'AItools',
         'aitools',
         '',
@@ -27,7 +27,7 @@ if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0',
         ]
     );
 
-    ExtensionUtility::registerModule(
+    ExtensionUtility::registerModule( // @phpstan-ignore-line
         'AItools',
         'aitools',
         'prompts',
@@ -42,7 +42,7 @@ if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0',
         ]
     );
 
-    ExtensionUtility::registerModule(
+    ExtensionUtility::registerModule( // @phpstan-ignore-line
         'AItools',
         'aitools',
         'settings',
@@ -56,7 +56,7 @@ if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0',
             'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf',
         ]
     );
-    ExtensionUtility::registerModule(
+    ExtensionUtility::registerModule( // @phpstan-ignore-line
         'AItools',
         'aitools',
         'servers',

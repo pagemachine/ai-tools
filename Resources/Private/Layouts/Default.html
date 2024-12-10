@@ -1,18 +1,35 @@
-<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
-      xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers" data-namespace-typo3-fluid="true">
+<f:comment>Copy of Ext:backend/Resources/Private/Layouts/Module.html for typo3 11 compatibility</f:comment>
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
 
-    <f:be.pageRenderer
-        pageTitle="AI Tools"
-    />
+<f:render section="Before" arguments="{_all}" optional="true" />
 
-    <div class="container-fluid" id="aiimage-backend">
-
-        <div class="row">
-            <div class="col-xs-12">
-                <f:flashMessages />
-                <f:render section="Content"/>
+<div class="module {moduleClass}" data-module-id="{moduleId}" data-module-name="{moduleName}">
+    <f:if condition="{formTag}">
+        <f:then>
+            <f:format.raw>{formTag}</f:format.raw>
+        </f:then>
+    </f:if>
+    <f:if condition="{docHeader.enabled}">
+        <f:render partial="DocHeader" arguments="{docHeader:docHeader}" />
+    </f:if>
+    <div class="module-body t3js-module-body">
+        <f:if condition="{uiBlock}">
+            <div id="t3js-ui-block" class="ui-block">
+                <core:icon identifier="spinner-circle" size="large" />
             </div>
-        </div>
+        </f:if>
+        <f:flashMessages queueIdentifier="{flashMessageQueueIdentifier}" />
+
+        <f:render section="Content" arguments="{_all}" optional="true" />
+
     </div>
+    <f:if condition="{formTag}">
+        <f:then>
+            </form>
+        </f:then>
+    </f:if>
+</div>
+
+<f:render section="After" arguments="{_all}" optional="true" />
 
 </html>

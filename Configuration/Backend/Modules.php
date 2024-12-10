@@ -17,7 +17,7 @@ return [
         'workspaces' => 'live',
         'iconIdentifier' => 'actions-notebook',
         'path' => '/module/aitools/AItoolsPrompts',
-        'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf',
+        'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.templates',
         'extensionName' => 'AItools',
         'controllerActions' => [
             PromptsController::class => [

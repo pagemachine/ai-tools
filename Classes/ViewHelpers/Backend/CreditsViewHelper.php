@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\ViewHelpers\Backend;
 
-use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Core\Information\Typo3Version;
+use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper;
 
@@ -21,7 +22,6 @@ class CreditsViewHelper extends AbstractTagBasedViewHelper
 
     public function render(): string
     {
-        $ajaxUri = $this->getAjaxUri();
         $hash = md5(uniqid('credits_', true));
 
         $this->tag->addAttribute(
@@ -31,7 +31,7 @@ class CreditsViewHelper extends AbstractTagBasedViewHelper
 
         $this->tag->addAttribute(
             'class',
-            'label label-default t3js-ai-tools-credits-view-helper'
+            'badge badge-default label label-default t3js-ai-tools-credits-view-helper'
         );
 
         $this->tag->addAttribute(
@@ -59,23 +59,19 @@ class CreditsViewHelper extends AbstractTagBasedViewHelper
             'display: none;'
         );
 
-        $output = $this->tag->render();
+        $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
 
-        $output .= '
-            <script>
-                require(["TYPO3/CMS/AiTools/CreditsViewHelper"], function(CreditsViewHelper) {
-                    CreditsViewHelper("' . htmlspecialchars($ajaxUri, ENT_QUOTES, 'UTF-8') . '", "#credits-button-' . $hash . '");
-                });
-            </script>
-        ';
+        $typo3Version = new Typo3Version();
+        if ($typo3Version->getMajorVersion() > 11) {
+            $pageRenderer->loadJavaScriptModule( // @phpstan-ignore-line
+                '@pagemachine/ai-tools/CreditsViewHelper.js',
+            );
+        } else {
+            $pageRenderer->loadRequireJsModule( // @phpstan-ignore-line
+                'TYPO3/CMS/AiTools/Amd/CreditsViewHelper'
+            );
+        }
 
-        return $output;
-    }
-
-    protected function getAjaxUri(): string
-    {
-        $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-        $uri = $uriBuilder->buildUriFromRoute('ajax_aitools_ai_tools_credits', [], UriBuilder::ABSOLUTE_PATH);
-        return (string)$uri;
+        return $this->tag->render();
     }
 }
