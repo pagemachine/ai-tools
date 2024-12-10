@@ -68,7 +68,7 @@ class PromptsController extends ActionController
             return $this->htmlResponse($moduleTemplate->renderContent()); // @phpstan-ignore-line
         } else {
             $moduleTemplate->assignMultiple($template_variables); // @phpstan-ignore-line
-            return $moduleTemplate->renderResponse('Prompts/List'); // @phpstan-ignore-line
+            return $moduleTemplate->renderResponse('Backend/Prompts/List'); // @phpstan-ignore-line
         }
     }
 

@@ -27,7 +27,7 @@ class AlternativeGenerator extends AbstractNode
 
     public function __construct(NodeFactory $nodeFactory = null, array $data = null)
     {
-        if ($nodeFactory !== null) {
+        if (is_null($nodeFactory)) {
             parent::__construct($nodeFactory, $data); // @phpstan-ignore-line
         }
 
