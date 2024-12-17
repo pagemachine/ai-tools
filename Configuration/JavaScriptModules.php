@@ -9,6 +9,6 @@ return [
         'backend.contextmenu',
     ],
     'imports' => [
-        '@pagemachine/aitools/' => 'EXT:ai_tools/Resources/Public/JavaScript/',
+        '@pagemachine/ai-tools/' => 'EXT:ai_tools/Resources/Public/JavaScript/ECMAScript6/',
     ],
 ];

@@ -106,7 +106,7 @@ class AiToolItemProvider extends AbstractProvider
         $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
 
         $attributes = [
-            'data-callback-module' => '@pagemachine/aitools/context-menu-actions',
+            'data-callback-module' => '@pagemachine/ai-tools/ContextMenuActions',
         ];
         if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0', '<')) {
             // for TYPO3 v11

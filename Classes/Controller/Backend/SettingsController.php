@@ -14,6 +14,7 @@ use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Http\ForwardResponse;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException;
@@ -57,16 +58,25 @@ class SettingsController extends ActionController
     {
         $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
 
+        $template_variables = [
+            'imageOptions' => $this->serverRepository->getByFunctionality('image_recognition'),
+            'translationOptions' => $this->serverRepository->getByFunctionality('translation'),
+        ];
+
         foreach ($this->settingOptions as $option) {
-            $this->view->assign($option, $this->settingsService->getSetting($option));
+            $template_variables[$option] = $this->settingsService->getSetting($option);
         }
 
-        $this->view->assign('imageOptions', $this->serverRepository->getByFunctionality('image_recognition'));
-        $this->view->assign('translationOptions', $this->serverRepository->getByFunctionality('translation'));
-
-        $moduleTemplate->setContent($this->view->render());
         $this->setDocHeader($moduleTemplate);
-        return $this->htmlResponse($moduleTemplate->renderContent());
+
+        if (version_compare(GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version(), '13.0', '<')) {
+            $this->view->assignMultiple($template_variables);
+            $moduleTemplate->setContent($this->view->render()); // @phpstan-ignore-line
+            return $this->htmlResponse($moduleTemplate->renderContent()); // @phpstan-ignore-line
+        } else {
+            $moduleTemplate->assignMultiple($template_variables); // @phpstan-ignore-line
+            return $moduleTemplate->renderResponse('Backend/Settings/Settings'); // @phpstan-ignore-line
+        }
     }
 
     /**
