@@ -2,6 +2,7 @@
 
 use Pagemachine\AItools\Controller\Backend\CreditsController;
 use Pagemachine\AItools\Controller\Backend\ImageRecognizeController;
+use Pagemachine\AItools\Controller\Backend\ImageLabelController;
 
 /**
  * Definitions for routes provided by EXT:backend
@@ -22,5 +23,9 @@ return [
     'aitools_ai_tools_credits' => [
         'path' => '/aitools/credits',
         'target' => CreditsController::class . '::ajaxCreditsAction',
+    ],
+    'aitools_ai_tools_badwords' => [
+        'path' => '/aitools/badwords',
+        'target' => ImageLabelController::class . '::ajaxhandleBadwordAction',
     ],
 ];

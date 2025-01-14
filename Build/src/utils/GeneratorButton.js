@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import {callAjaxMetaGenerateAction} from './RemoteCalls.js';
+import { callAjaxMetaGenerateAction } from './RemoteCalls.js';
 
 class GeneratorButton {
   static CSS_CLASSES = {
@@ -36,6 +36,11 @@ class GeneratorButton {
       textPrompt = $(element.data('text-prompt-field')).val();
     }
 
+    let textLabel = element.data('text-imagelabel');
+    if (element.data('text-imagelabel-field')) {
+      textLabel = $(element.data('text-imagelabel-field')).val();
+    }
+
     element.prop('disabled', true);
     element.addClass(GeneratorButton.CSS_CLASSES.GENERATING);
 
@@ -46,10 +51,12 @@ class GeneratorButton {
       const results = await callAjaxMetaGenerateAction(
         fileIdentifier,
         targetLanguage,
-        textPrompt
+        textPrompt,
+        textLabel
       );
 
       console.log('Prompt generated', results);
+
       target.val(results.alternative);
       target.trigger('change');
 

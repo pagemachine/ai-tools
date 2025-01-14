@@ -12,12 +12,15 @@ class AigudeImageRecognitionService extends AigudeAbstract implements ImageRecog
 {
     private static string $cleanUpRegex = '/^(?:Certainly!\s*)?(?:The\s*|This\s*)?(?:main subject of the\s*)?(?:image\s)?(?:is\s*|prominently\s*|primarily\s*|predominantly\s*)?(?:shows|showing|displays|depicts|showcases|features|features)?\s*/';
 
-    public function sendFileToApi(FileInterface $fileObject, string $textPrompt = '', string $targetLanguage = 'en'): string
+    public function sendFileToApi(FileInterface $fileObject, string $textPrompt = '', string $bad_words = '', string $targetLanguage = 'en'): string
     {
         $urlParts = [];
 
         if (!empty($textPrompt)) {
             $urlParts[] = 'prompt=' . urlencode($textPrompt);
+        }
+        if (!empty($bad_words)) {
+            $urlParts[] = '&bad_words=' . urlencode($bad_words);
         }
         if (!empty($targetLanguage)) {
             $urlParts[] = '&target_lang=' . urlencode((string) LanguageScriptUtility::getLanguageScript($targetLanguage));

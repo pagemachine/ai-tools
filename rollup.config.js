@@ -74,6 +74,7 @@ export default {
     './Build/src/CreditsViewHelper.js',
     './Build/src/AjaxMetaGenerate.js',
     './Build/src/ContextMenuActions.js',
+    './Build/src/Listlabel.js',
   ],
   output: [
     {

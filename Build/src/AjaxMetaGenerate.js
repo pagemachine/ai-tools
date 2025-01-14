@@ -3,13 +3,95 @@ import Modal from '@typo3/backend/modal';
 import Severity from '@typo3/backend/severity';
 import { MessageUtility }  from '@typo3/backend/utility/message-utility';
 import GeneratorButton from './utils/GeneratorButton.js';
-import { callAjaxSaveMetaDataAction } from './utils/RemoteCalls.js';
+import { callAjaxSaveMetaDataAction, triggerBadwordButton } from './utils/RemoteCalls.js';
 
 $(() => {
   $('.textPromptSelect').on('change', function() {
     const selectedValue = $(this).val();
     $($(this).data('target')).val(selectedValue);
   });
+});
+
+$(() => {
+  const elements = $('.t3js-alternative-badword-trigger').not('.click-handled');
+  elements.addClass('click-handled');
+
+  elements.on('click', async function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      let badword = $(this).data('text-badword');
+      console.log(badword);
+
+      if ($(this).data('text-badword-field')) {
+          badword = $($(this).data('text-badword-field')).val().trim();
+      }
+
+      console.log("new: " + badword);
+
+      let imagelabelid = $($(this).data('text-imagelabelid-field')).val();
+      let badwordid = $(this).data('text-badwordid-field');
+      let action = $(this).data('text-action-field');
+      let funktion = $(this).data('text-funktion-field');
+
+      const results = await triggerBadwordButton(badword, imagelabelid, badwordid, action, funktion);
+  });
+});
+
+$(() => {
+  $('.textLabelSelect').on('change', function() {
+    const selectedValue = $(this).val();
+    $($(this).data('target')).val(selectedValue);
+  });
+});
+
+$(() => {
+  $('.badwordtabelbtn').on('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const uid = $(this).data('uid-field');
+    
+    toggletabel(uid, false);
+  })
+});
+
+$(() => {
+  $('.textLabelSelect').on('change', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const uid = $(this).data('fileid');
+    toggletabel(uid, true);
+  })
+});
+
+var lastlabels = [];
+function toggletabel(uid, element){
+  if(element &&(lastlabels[uid] == undefined || lastlabels[uid] == 0)){
+    return
+  }
+  let thislabel = document.getElementById('selectedimageLabel-' + uid).value;
+  let table = document.getElementById('table-' + thislabel + '-' + uid);
+  if(lastlabels[uid] != undefined && lastlabels[uid] > 0 && lastlabels[uid] != thislabel){
+          console.log(lastlabels[uid]);
+          var tmp = document.getElementById('table-' + lastlabels[uid] + '-' + uid);
+          tmp.style.display = 'none';
+  }
+  if(thislabel < 0){
+      return;
+  }
+  if ((table.style.display === 'none')) {
+      table.style.display = 'table';
+      lastlabels[uid] = thislabel;
+  } else {
+      table.style.display = 'none';
+      lastlabels[uid] = 0;
+  }
+}
+
+$(() => {
+  RemoteCalls.initBadwordButton();
 });
 
 $(() => {
@@ -139,6 +221,9 @@ $(() => {
 
   $('.globalTextPrompt').on('change', function() {
     $('.textPromptSelect').val($(this).val()).trigger('change');
+  });
+  $(".globalTextLabel").on("change", function() {
+    $(".textLabelSelect").val($(this).val()).trigger("change");
   });
 });
 

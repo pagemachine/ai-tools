@@ -24,6 +24,22 @@
 				<source>Default prompt</source>
 			</trans-unit>
 
+			<trans-unit id="tx_aitools_domain_model_imagelabel.templates">
+				<source>Labels/Badwords</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_imagelabel.titel">
+				<source>Image Labels</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_imagelabel.label">
+				<source>Label</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_imagelabel.description">
+				<source>Add to Prompt</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_imagelabel.badwords">
+				<source>Label Badwords</source>
+			</trans-unit>
+
 			<trans-unit id="tx_aitools_domain_model_server">
 				<source>Server</source>
 			</trans-unit>

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Pagemachine\AItools\Controller\Backend;
 
 use Exception;
+use Pagemachine\AItools\Domain\Repository\BadWordsRepository;
+use Pagemachine\AItools\Domain\Repository\ImageLabelRepository;
 use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Pagemachine\AItools\Service\ImageMetaDataService;
 use Pagemachine\AItools\Service\SettingsService;
@@ -42,6 +44,8 @@ class ImageRecognizeController extends ActionController
     protected SiteFinder $siteFinder;
     protected SettingsService $settingsService;
     protected PromptRepository $promptRepository;
+    protected ImageLabelRepository $imagelabelRepository;
+    protected BadWordsRepository $badwordsRepository;
 
     /**
      * @var string
@@ -64,6 +68,8 @@ class ImageRecognizeController extends ActionController
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
         $this->siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
         $this->promptRepository = GeneralUtility::makeInstance(PromptRepository::class);
+        $this->imagelabelRepository = GeneralUtility::makeInstance(ImageLabelRepository::class);
+        $this->badwordsRepository = GeneralUtility::makeInstance(BadWordsRepository::class);
     }
 
     protected function getFileMetaDataEditLink(int $uid, string $returnUrl = null): UriInterface
@@ -224,6 +230,12 @@ class ImageRecognizeController extends ActionController
 
         $defaultPrompt = $this->promptRepository->getDefaultPromptText();
 
+        $imageLabels = $this->imagelabelRepository->findAll();
+
+        $defaultLabel = $this->imagelabelRepository->getDefaultImageLabelId();
+
+        $badwords = $this->badwordsRepository->findAll();
+
         $siteLanguages = $this->getAllSiteLanguages();
 
         $modal = $parsedBody['modal'] ?? $queryParams['modal'] ?? false;
@@ -273,11 +285,26 @@ class ImageRecognizeController extends ActionController
                     ->withBody($this->streamFactory->createStream(json_encode($returnArray)));
             case 'generateMetaData':
                 $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt != null ? $defaultPrompt : '');
+                $selectedimageLabel = $parsedBody['imageLabel'] ?? $queryParams['imageLabel'] ?: ($defaultLabel != null ? $defaultLabel : -1);
+                $selectedimageLabel = $selectedimageLabel != "undefined" ? $selectedimageLabel : $defaultLabel;
+
+                $reqwords = [];
+                $reqlabel = "";
+
+                // Retrieve all bad words associated with the default label or the selected label
+                foreach ($badwords as $badword) {
+                    if ($badword->getImagelabelid() == $defaultLabel || $badword->getImagelabelid() == $selectedimageLabel) {
+                        $reqwords[] = $badword->getBadword();
+                    }
+                }
+
+                $joinedwords = implode(",", $reqwords);
                 $supportsTranslation = false; //d asd sad sadsa das dasd sad asd
                 if ($this->imageMetaDataService->supportsTranslation()) {
                     $altTextFromImageTranslated = $this->imageMetaDataService->generateImageDescription(
                         $fileObjects[0]['file'],
                         $textPrompt,
+                        $joinedwords,
                         $targetTwoLetterIsoCode
                     );
                     $data = ['alternative' => $altTextFromImageTranslated, 'baseAlternative' => $altTextFromImageTranslated];
@@ -285,6 +312,7 @@ class ImageRecognizeController extends ActionController
                     $altTextFromImage = $this->imageMetaDataService->generateImageDescription(
                         $fileObjects[0]['file'],
                         $textPrompt,
+                        $joinedwords,
                         'en'
                     );
                     $altText = $this->translationService->translateText($altTextFromImage, 'en', $targetTwoLetterIsoCode);
@@ -317,6 +345,9 @@ class ImageRecognizeController extends ActionController
                     'modal' => $modal,
                     'textPrompt' => $defaultPrompt,
                     'allTextPrompts' => $allPrompts,
+                    'imageLabels' => $imageLabels,
+                    'selectedimageLabel' => $defaultLabel,
+                    'badwords' => $badwords,
                 ];
 
                 $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
