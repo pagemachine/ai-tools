@@ -44,7 +44,7 @@ class ImageLabelController extends ActionController
      * Sets the module header with a new button.
      *
      * @param ModuleTemplate $moduleTemplate The module template
-     * @param string $requestUri The current request URI
+     * @param string         $requestUri     The current request URI
      */
     private function setDocHeader(ModuleTemplate $moduleTemplate, $requestUri): void
     {
@@ -54,15 +54,17 @@ class ImageLabelController extends ActionController
         $buttonBar = $moduleTemplate->getDocHeaderComponent()->getButtonBar();
 
         $newRecordButton = $buttonBar->makeLinkButton()
-            ->setHref((string)$uriBuilder->buildUriFromRoute(
-                'record_edit',
-                [
+            ->setHref(
+                (string)$uriBuilder->buildUriFromRoute(
+                    'record_edit',
+                    [
                     'edit' => [
                         'tx_aitools_domain_model_imagelabel' => ['new'],
                     ],
                     'returnUrl' => (string)$requestUri,
-                ]
-            ))
+                    ]
+                )
+            )
             ->setTitle('Add') // Set the button title
             ->setIcon($this->iconFactory->getIcon('actions-add', Icon::SIZE_SMALL));
 
@@ -82,11 +84,13 @@ class ImageLabelController extends ActionController
         $requestUri = $this->request->getAttribute('normalizedParams')->getRequestUri();
 
         // Pass data to the view
-        $this->view->assignMultiple([
+        $this->view->assignMultiple(
+            [
             'labels' => $this->imagelabelRepository->listAllLabels(), // List all ImageLabels
             'badwords' => $this->badwordsRepository->listAllBadWords(), // List all BadWords
             'returnUrl' => $requestUri,
-        ]);
+            ]
+        );
 
         $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
         $typo3Version = new Typo3Version();
@@ -113,7 +117,7 @@ class ImageLabelController extends ActionController
     /**
      * Handles AJAX requests for managing BadWords or ImageLabels.
      *
-     * @param ServerRequestInterface $request The incoming request
+     * @param  ServerRequestInterface $request The incoming request
      * @return ResponseInterface The JSON response
      */
     public function ajaxhandleBadwordAction(ServerRequestInterface $request): ResponseInterface
@@ -130,19 +134,26 @@ class ImageLabelController extends ActionController
         $isdefault = $requestbody['default'] ?? $queryParams['badword'] ?? null;
 
         // Validate required parameters based on the function type
-        if (!$funktion ||
-            ($funktion == "badword" && (!$badwords || !$imagelabelid || !$badwordid || !$action)) ||
-            ($funktion == "label" && (!$imagelabelid || !$action))) {
+        if (!$funktion
+            || ($funktion == "badword" && (!$badwords || !$imagelabelid || !$badwordid || !$action))
+            || ($funktion == "label" && (!$imagelabelid || !$action))
+        ) {
             // Return a 400 Bad Request response if parameters are missing
             return $this->responseFactory->createResponse()
                 ->withHeader('Content-Type', 'application/json; charset=utf-8')
-                ->withBody($this->streamFactory->createStream(json_encode([
-                    'error' => 'Missing parameters',
-                    'badwords' => $badwords,
-                    'badwordid' => $badwordid,
-                    'imagelabelid' => $imagelabelid,
-                    'action' => $action,
-                ])))
+                ->withBody(
+                    $this->streamFactory->createStream(
+                        json_encode(
+                            [
+                            'error' => 'Missing parameters',
+                            'badwords' => $badwords,
+                            'badwordid' => $badwordid,
+                            'imagelabelid' => $imagelabelid,
+                            'action' => $action,
+                            ]
+                        )
+                    )
+                )
                 ->withStatus(400);
         }
 
@@ -153,13 +164,19 @@ class ImageLabelController extends ActionController
                 // Return a 409 Conflict response if there is a duplicate
                 return $this->responseFactory->createResponse()
                     ->withHeader('Content-Type', 'application/json; charset=utf-8')
-                    ->withBody($this->streamFactory->createStream(json_encode([
-                        'error' => 'Duplicate',
-                        'badwords' => $badwords,
-                        'badwordid' => $badwordid,
-                        'imagelabelid' => $imagelabelid,
-                        'action' => $action,
-                    ])))
+                    ->withBody(
+                        $this->streamFactory->createStream(
+                            json_encode(
+                                [
+                                'error' => 'Duplicate',
+                                'badwords' => $badwords,
+                                'badwordid' => $badwordid,
+                                'imagelabelid' => $imagelabelid,
+                                'action' => $action,
+                                ]
+                            )
+                        )
+                    )
                     ->withStatus(409);
             }
         } elseif ($funktion == "label") {
@@ -170,20 +187,24 @@ class ImageLabelController extends ActionController
         // Return a success response
         return $this->responseFactory->createResponse()
             ->withHeader('Content-Type', 'application/json; charset=utf-8')
-            ->withBody($this->streamFactory->createStream(json_encode(
-                $funktion == "label" ?
-                [
-                    'success' => true,
-                    'imagelabelid' => $imagelabelid,
-                    'action' => $action,
-                ] : [
-                    'success' => true,
-                    'badwords' => $badwords,
-                    'imagelabelid' => $imagelabelid,
-                    'badwordid' => $badwordid,
-                    'action' => $action,
-                ]
-            )));
+            ->withBody(
+                $this->streamFactory->createStream(
+                    json_encode(
+                        $funktion == "label" ?
+                        [
+                        'success' => true,
+                        'imagelabelid' => $imagelabelid,
+                        'action' => $action,
+                        ] : [
+                        'success' => true,
+                        'badwords' => $badwords,
+                        'imagelabelid' => $imagelabelid,
+                        'badwordid' => $badwordid,
+                        'action' => $action,
+                        ]
+                    )
+                )
+            );
     }
 
     /**

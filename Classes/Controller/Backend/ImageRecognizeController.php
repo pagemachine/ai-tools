@@ -104,8 +104,9 @@ class ImageRecognizeController extends ActionController
 
     /**
      * Return custom Standalone View
+     *
      * @internal
-     * @return StandaloneView
+     * @return   StandaloneView
      */
     protected function getView(string $templateName = 'Default', $request = null): StandaloneView
     {
@@ -132,6 +133,7 @@ class ImageRecognizeController extends ActionController
 
     /**
      * Gets the file object from the request target value (which is the file combined identifier)
+     *
      * @throws ResourceDoesNotExistException
      */
     private function getFileObjectFromRequestTarget(ServerRequestInterface $request): ?array
@@ -165,6 +167,7 @@ class ImageRecognizeController extends ActionController
 
     /**
      * return all SiteLanguages
+     *
      * @return SiteLanguage[]
      */
     private function getAllSiteLanguages(): array
@@ -193,6 +196,7 @@ class ImageRecognizeController extends ActionController
 
     /**
      * Process the Image recognition request from Filelist (accessed by right click on file)
+     *
      * @return ResponseInterface
      * @throws \JsonException
      */
@@ -287,24 +291,16 @@ class ImageRecognizeController extends ActionController
                 $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt != null ? $defaultPrompt : '');
                 $selectedimageLabel = $parsedBody['imageLabel'] ?? $queryParams['imageLabel'] ?: ($defaultLabel != null ? $defaultLabel : -1);
                 $selectedimageLabel = $selectedimageLabel != "undefined" ? $selectedimageLabel : $defaultLabel;
-
-                $reqwords = [];
-                $reqlabel = "";
-
-                // Retrieve all bad words associated with the default label or the selected label
-                foreach ($badwords as $badword) {
-                    if ($badword->getImagelabelid() == $defaultLabel || $badword->getImagelabelid() == $selectedimageLabel) {
-                        $reqwords[] = $badword->getBadword();
-                    }
-                }
-
-                $joinedwords = implode(",", $reqwords);
+                $badwords = $parsedBody['badwords'] ?? $queryParams['badwords'] ?: "";
+                $badwords = $badwords != "undefined" ? $badwords : "";
+                    
+    
                 $supportsTranslation = false; //d asd sad sadsa das dasd sad asd
                 if ($this->imageMetaDataService->supportsTranslation()) {
                     $altTextFromImageTranslated = $this->imageMetaDataService->generateImageDescription(
                         $fileObjects[0]['file'],
                         $textPrompt,
-                        $joinedwords,
+                        $badwords,
                         $targetTwoLetterIsoCode
                     );
                     $data = ['alternative' => $altTextFromImageTranslated, 'baseAlternative' => $altTextFromImageTranslated];
@@ -312,7 +308,7 @@ class ImageRecognizeController extends ActionController
                     $altTextFromImage = $this->imageMetaDataService->generateImageDescription(
                         $fileObjects[0]['file'],
                         $textPrompt,
-                        $joinedwords,
+                        $badwords,
                         'en'
                     );
                     $altText = $this->translationService->translateText($altTextFromImage, 'en', $targetTwoLetterIsoCode);

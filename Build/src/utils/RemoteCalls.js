@@ -30,13 +30,14 @@ export async function ajaxCall(parameters, url) {
   });
 }
 
-export async function callAjaxMetaGenerateAction(fileIdentifier, targetLanguage, textPrompt, textLabel) {
+export async function callAjaxMetaGenerateAction(fileIdentifier, targetLanguage, textPrompt, textLabel, badwords) {
   const params = {
     action: 'generateMetaData',
     target: fileIdentifier,
     "target-language": targetLanguage,
     textPrompt: textPrompt,
-    imageLabel: textLabel
+    imageLabel: textLabel,
+    badwords: badwords
   };
 
   top.TYPO3.Notification.info('Generating Metadata', 'Generating Metadata...', 5);
@@ -92,7 +93,7 @@ export async function callAjaxSaveMetaDataAction(fileIdentifier, targetLanguage,
 
 export async function triggerBadwordButton(badword, imagelabelid, badwordid, action, funktion) {
   if ((funktion == "badword" || funktion == "metabadword") && (badword === "" || badword == ",")) {
-      await showModalConfirmation("You need to enter a badword to proceed.", "Parameters Missing");
+      await showModalConfirmation("You need to enter a stopword to proceed.", "Parameters Missing");
       return;
   }
 

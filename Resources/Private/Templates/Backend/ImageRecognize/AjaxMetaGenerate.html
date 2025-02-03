@@ -72,6 +72,62 @@
         .otherLanguages li a:hover::after {
             opacity: 1;
         }
+
+        .tag, .default-tag, .reset-tag, .global-reset-tag, .tmp-tag {
+            display: inline-block;
+            background-color: #ddd;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            color: #333;
+            margin: 5px;
+        }
+
+        .remove-tag {
+            margin-left: 8px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #eca1e0;;
+            border-radius: 50%;
+            padding: 2px 6px;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .remove-tag:hover {
+            background-color: #d885c5;
+        }
+
+        .reset-tag:hover, .global-reset-tag:hover {
+            background-color: #ccc;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .scroll-container {
+            width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 5px;
+            max-width: 636px;
+        }
+
+        .scroll-container .item {
+            display: inline-block;
+            width: 200px;
+            height: 100px;
+            margin-right: 10px;
+            background-color: lightgray;
+            text-align: center;
+            line-height: 100px;
+        }
     </style>
 
     <f:if condition="{fileObjects -> f:count()} > 1">
@@ -93,131 +149,75 @@
                             }"
                         />
 
-                        <f:render
-                            section="form-group-label-select"
-                            arguments="{
-                                label: 'Global AI Image Label',
-                                class: 'globalTextLabel',
-                                id: 'globalTextLabel',
-                                name: 'globalTextPrompt',
-                                options: imageLabels,
-                                value: selectedimageLabel,
-                                optionLabelField: 'imagelabel',
-                                optionValueField: 'uid'
-                            }"
-                        />
-
-                        <a href="#"
-                            style="margin-bottom: 10px;"
-                            class="btn btn-default badwordtabelbtn"
-                            data-uid-field="{fileObject.file.properties.identifier_hash}"
-                            >
-                            <core:icon identifier="actions-arrow-down-alt" size="small" />
-                        </a> 
-
-                        <div style="display: none;">
+                        <div class="input-container" style="max-width: 636px;">
                             <f:render section="form-group-label-select" arguments="{
-                                label: 'Image Label',
-                                class: 'textLabelSelect textLabelSelect-top',
-                                id: 'imageLabel-{fileObject.file.properties.identifier_hash}',
-                                target: '#selectedimageLabel-{fileObject.file.properties.identifier_hash}',
-                                fileid: '{fileObject.file.properties.identifier_hash}',
+                                label: 'Global Stop Words',
+                                class: 'globalTextLabel',
+                                id: 'imageLabel-123',
+                                target: '#selectedimageLabel-',
+                                fileid: '123',
                                 name: 'ImageLabelSelect', 
                                 options: imageLabels,
                                 value: selectedimageLabel,  
                                 optionLabelField: 'imagelabel',
                                 optionValueField: 'uid'
                             }" />
+                        
+                            <a href="#" style="margin-top: 13px;" class="hide-div btn btn-default btn-pagemachine-ai-tools" data-file="123"> v </a>
                         </div>
-
+                    
                         <input 
-                            style="max-width: 636px; margin-bottom: 10px;" 
+                            style="max-width: 636px; margin-bottom: 5px;" 
                             type="hidden" 
                             class="form-control" 
-                            id="selectedimageLabel-{fileObject.file.properties.identifier_hash}" 
+                            id="selectedimageLabel-123" 
                             name="selectedimageLabel" 
                             value="{selectedimageLabel}" 
                         />
-
-                        <div>
-                            <f:for each="{imageLabels}" key="domainName" as="imagelabel">
-                                <table class="table table-striped table-hover" id="table-{imagelabel.uid}-{fileObject.file.properties.identifier_hash}" style="display: none; width: 70%;">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 80%;">
-                                                <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_imagelabel.badwords" />
-                                            </th>
-                                            <th style="width: 20%;">
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <input 
-                                                        type="text"
-                                                        class="form-control" 
-                                                        id="badwordfield-{fileObject.file.properties.identifier_hash}" 
-                                                        name="selectedbadword"
-                                                        value=""  
-                                                        placeholder="Enter a badword (separate multiple words with commas)." 
-                                                        maxlength="255"/>
-                                            </td>
-                                            <td>
-                                                <button
-                                                    href="#"
-                                                    class="btn btn-default t3js-alternative-badword-trigger"
-                                                    data-text-badword-field="#badwordfield-{fileObject.file.properties.identifier_hash}"
-                                                    data-text-badwordid-field="123"
-                                                    data-text-imagelabelid-field="#selectedimageLabel-{fileObject.file.properties.identifier_hash}"
-                                                    data-text-action-field="add"
-                                                    data-text-funktion-field="metabadword"
-                                                >
-                                                    <core:icon identifier="actions-add" size="small" />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <f:for each="{badwords}" key="domainName" as="badword">
-                                                <tr>
-                                                    <f:if condition="{badword.badword} == {selectedimageLabel} || {badword.imagelabelid} == {imagelabel.uid}">
-                                                        <td style="width: 100%;">
-                                                            <input value="{badword.badword}" type="text" id="badwordfield-{badword.uid}-{fileObject.file.properties.identifier_hash}" class="form-control" placeholder="Enter badword" />
-                                                        </td>
-                                                        
-                                                        <input value="{imagelabel.uid}" type="hidden" id="imagelabel-{imagelabel.uid}-{badword.uid}-{fileObject.file.properties.identifier_hash}" class="form-control" placeholder="Enter badword" />
-                                                        
-                                                        <td>
-                                                            <div class="btn-group">
-                                                                <button
-                                                                    href="#"
-                                                                    class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-badword-trigger"
-                                                                    data-text-badword-field="#badwordfield-{badword.uid}-{fileObject.file.properties.identifier_hash}"
-                                                                    data-text-badwordid-field="{badword.uid}"
-                                                                    data-text-imagelabelid-field="#imagelabel-{imagelabel.uid}-{badword.uid}-{fileObject.file.properties.identifier_hash}"
-                                                                    data-text-action-field="set"
-                                                                    data-text-funktion-field="metabadword"
-                                                                >         
-                                                                    <core:icon identifier="actions-open" size="small" />      
-                                                                </button>
-                                                                <button
-                                                                    href="#"
-                                                                    class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-badword-trigger"
-                                                                    data-text-badword-field="#badwordfield-{badword.uid}-{fileObject.file.properties.identifier_hash}"
-                                                                    data-text-badwordid-field="{badword.uid}"
-                                                                    data-text-imagelabelid-field="#imagelabel-{imagelabel.uid}-{badword.uid}-{fileObject.file.properties.identifier_hash}"
-                                                                    data-text-action-field="cut"
-                                                                    data-text-funktion-field="metabadword"
-                                                                >         
-                                                                    <core:icon identifier="actions-delete" />    
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </f:if>
-                                                </tr>
-                                        </f:for> 
-                                    </tbody>
-                                </table>
-                            </f:for>
+    
+                        <div id="hide-div-123" style="display: none;">
+                            <div class="input-container" style="max-width: 636px;">
+                                <input
+                                    style="max-width: 636px;"
+                                    class="form-control"
+                                    id="tmp-add-badword-123"
+                                    placeholder="add a new badword for this request"
+                                />
+                                <a href="#" class="global-add-tag btn btn-default btn-pagemachine-ai-tools" data-file="123"> Add </a>
+                            </div>
+    
+                            <div id="tag-div-123" class="scroll-container">
+                                <a href="#" class="global-reset-tag" data-file ="123">
+                                    Reset
+                                </a>
+                                <f:for each="{badwords}" key="domainName" as="badword">
+                                    <f:if condition="{badword.imagelabelid} === {selectedimageLabel}">
+                                        <f:then>
+                                            <span 
+                                                class="default-tag" 
+                                                id="default-tag-{badword.uid}-123" 
+                                                data-imagelabelid="0" 
+                                                data-file="123"
+                                                data-value="{badword.badword}" >
+                                                {badword.badword}
+                                                <a href="#" class="remove-tag" data-id="#default-tag-{badword.uid}-123" data-file="123">X</a>
+                                            </span>
+                                        </f:then>
+                                        <f:else>
+                                            <span 
+                                                class="tag" 
+                                                id="tag-{badword.uid}-123" 
+                                                style="display: none;" 
+                                                data-imagelabelid="{badword.imagelabelid}" 
+                                                data-file="123" 
+                                                data-value="{badword.badword}">
+                                                {badword.badword}
+                                                <a href="#" class="remove-tag" data-id="#tag-{badword.uid}-123" data-file="123">X</a>
+                                            </span>
+                                        </f:else>
+                                    </f:if>                        
+                                </f:for>
+                            </div>
                         </div>
 
                         <label for="skipExistingDescriptions">
@@ -392,27 +392,23 @@
                             value: textPrompt
                         }" />
 
-                        <f:render section="form-group-label-select" arguments="{
-                            label: 'Image Label',
-                            class: 'textLabelSelect textLabelSelect-{fileObject.file.properties.identifier_hash}',
-                            id: 'imageLabel-{fileObject.file.properties.identifier_hash}',
-                            target: '#selectedimageLabel-{fileObject.file.properties.identifier_hash}',
-                            fileid: '{fileObject.file.properties.identifier_hash}',
-                            name: 'ImageLabelSelect', 
-                            options: imageLabels,
-                            value: selectedimageLabel,  
-                            optionLabelField: 'imagelabel',
-                            optionValueField: 'uid'
-                        }" />
+                        <div class="input-container" style="max-width: 636px;">
+                            <f:render section="form-group-label-select" arguments="{
+                                label: 'Stop Words',
+                                class: 'textLabelSelect textLabelSelect-{fileObject.file.properties.identifier_hash}',
+                                id: 'imageLabel-{fileObject.file.properties.identifier_hash}',
+                                target: '#selectedimageLabel-{fileObject.file.properties.identifier_hash}',
+                                fileid: '{fileObject.file.properties.identifier_hash}',
+                                name: 'ImageLabelSelect', 
+                                options: imageLabels,
+                                value: selectedimageLabel,  
+                                optionLabelField: 'imagelabel',
+                                optionValueField: 'uid'
+                            }" />
                         
-                        <a href="#"
-                            class="btn btn-default badwordtabelbtn"
-                            data-uid-field='{fileObject.file.properties.identifier_hash}'
-                            style="margin-bottom: 10px;"
-                            >
-                            <core:icon identifier="actions-arrow-down-alt" size="small" />
-                        </a> 
-
+                            <a href="#" style="margin-top: 13px;" class="hide-div btn btn-default btn-pagemachine-ai-tools" data-file="{fileObject.file.properties.identifier_hash}"> v </a>
+                        </div>
+                    
                         <input 
                             style="max-width: 636px; margin-bottom: 5px;" 
                             type="hidden" 
@@ -421,86 +417,50 @@
                             name="selectedimageLabel" 
                             value="{selectedimageLabel}" 
                         />
-
-                        <div>
-                            <f:for each="{imageLabels}" key="domainName" as="imagelabel">
-                                <table class="table table-striped table-hover" id="table-{imagelabel.uid}-{fileObject.file.properties.identifier_hash}" style="display: none; width: 70%;">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 80%;">
-                                                <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_imagelabel.badwords" />
-                                            </th>
-                                            <th style="width: 20%;">
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <input 
-                                                        type="text"
-                                                        class="form-control" 
-                                                        id="badwordfield-{imagelabel.uid}-{fileObject.file.properties.identifier_hash}" 
-                                                        name="selectedbadword"
-                                                        value=""  
-                                                        placeholder="Enter a badword (separate multiple words with commas)." 
-                                                        maxlength="255"/>
-                                            </td>
-                                            <td>
-                                                <button
-                                                    href="#"
-                                                    class="btn btn-default t3js-alternative-badword-trigger"
-                                                    data-text-badword-field="#badwordfield-{imagelabel.uid}-{fileObject.file.properties.identifier_hash}"
-                                                    data-text-badwordid-field="123"
-                                                    data-text-imagelabelid-field="#selectedimageLabel-{fileObject.file.properties.identifier_hash}"
-                                                    data-text-action-field="add"
-                                                    data-text-funktion-field="metabadword"
-                                                >
-                                                    <core:icon identifier="actions-add" size="small" />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <f:for each="{badwords}" key="domainName" as="badword">
-                                                <tr>
-                                                    <f:if condition="{badword.imagelabelid} == {imagelabel.uid}">
-                                                        <td style="width: 100%;">
-                                                            <input value="{badword.badword}" type="text" id="badwordfield-{badword.uid}-{fileObject.file.properties.identifier_hash}" class="form-control" placeholder="Enter badword" />
-                                                        </td>
-                                                        
-                                                        <input value="{imagelabel.uid}" type="hidden" id="imagelabel-{imagelabel.uid}-{badword.uid}-{fileObject.file.properties.identifier_hash}" class="form-control" placeholder="Enter badword" />
-                                                        
-                                                        <td>
-                                                            <div class="btn-group">
-                                                                <button
-                                                                    href="#"
-                                                                    class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-badword-trigger"
-                                                                    data-text-badword-field="#badwordfield-{badword.uid}-{fileObject.file.properties.identifier_hash}"
-                                                                    data-text-badwordid-field="{badword.uid}"
-                                                                    data-text-imagelabelid-field="#imagelabel-{imagelabel.uid}-{badword.uid}-{fileObject.file.properties.identifier_hash}"
-                                                                    data-text-action-field="set"
-                                                                    data-text-funktion-field="metabadword"
-                                                                >         
-                                                                    <core:icon identifier="actions-open" size="small" />      
-                                                                </button>
-                                                                <button
-                                                                    href="#"
-                                                                    class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-badword-trigger"
-                                                                    data-text-badword-field="#badwordfield-{badword.uid}-{fileObject.file.properties.identifier_hash}"
-                                                                    data-text-badwordid-field="{badword.uid}"
-                                                                    data-text-imagelabelid-field="#imagelabel-{imagelabel.uid}-{badword.uid}-{fileObject.file.properties.identifier_hash}"
-                                                                    data-text-action-field="cut"
-                                                                    data-text-funktion-field="metabadword"
-                                                                >         
-                                                                    <core:icon identifier="actions-delete" />    
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </f:if>
-                                                </tr>
-                                        </f:for> 
-                                    </tbody>
-                                </table>
-                            </f:for>
+    
+                        <div id="hide-div-{fileObject.file.properties.identifier_hash}" style="display: none;">
+                            <div class="input-container" style="max-width: 636px;">
+                                <input
+                                    style="max-width: 636px;"
+                                    class="add-container form-control"
+                                    id="tmp-add-badword-{fileObject.file.properties.identifier_hash}"
+                                    placeholder="add a new badword for this request"
+                                />
+                                <a href="#" class="add-tag btn btn-default btn-pagemachine-ai-tools" data-file="{fileObject.file.properties.identifier_hash}"> Add </a>
+                            </div>
+    
+                            <div id="tag-div-{fileObject.file.properties.identifier_hash}" class="scroll-container">
+                                <a href="#" class="reset-tag" data-file ="{fileObject.file.properties.identifier_hash}">
+                                    Reset
+                                </a>
+                                <f:for each="{badwords}" key="domainName" as="badword">
+                                    <f:if condition="{badword.imagelabelid} === {selectedimageLabel}">
+                                        <f:then>
+                                            <span 
+                                                class="default-tag" 
+                                                id="default-tag-{badword.uid}-{fileObject.file.properties.identifier_hash}" 
+                                                data-imagelabelid="0" 
+                                                data-file="{fileObject.file.properties.identifier_hash}"
+                                                data-value="{badword.badword}" >
+                                                {badword.badword}
+                                                <a href="#" class="remove-tag" data-id ="#default-tag-{badword.uid}-{fileObject.file.properties.identifier_hash}" data-file="{fileObject.file.properties.identifier_hash}">X</a>
+                                            </span>
+                                        </f:then>
+                                        <f:else>
+                                            <span 
+                                                class="tag" 
+                                                id="tag-{badword.uid}-{fileObject.file.properties.identifier_hash}" 
+                                                style="display: none;" 
+                                                data-imagelabelid="{badword.imagelabelid}" 
+                                                data-file="{fileObject.file.properties.identifier_hash}" 
+                                                data-value="{badword.badword}">
+                                                {badword.badword}
+                                                <a href="#" class="remove-tag" data-id ="#tag-{badword.uid}-{fileObject.file.properties.identifier_hash}" data-file="{fileObject.file.properties.identifier_hash}">X</a>
+                                            </span>
+                                        </f:else>
+                                    </f:if>                        
+                                </f:for>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -721,7 +681,7 @@
         <f:if condition="{label} != ''"><label class="t3js-formengine-label">
             {label}
         </label></f:if>
-        <div class="formengine-field-item t3js-formengine-field-item"><div class="form-control-wrap" style="max-width: 636px">
+        <div class="formengine-field-item t3js-formengine-field-item"><div class="form-control-wrap">
             <div class="form-wizards-wrap">
                 <div class="form-wizards-element">
                     <f:form.select
