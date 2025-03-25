@@ -47,11 +47,11 @@ class ImageMetaDataService
      * @return string
      * @throws \Exception
      */
-    public function generateImageDescription(FileInterface $fileObject, string $textPrompt = '', string $targetLanguage = 'en'): string
+    public function generateImageDescription(FileInterface $fileObject, string $textPrompt = '', string $bad_words = '', string $targetLanguage = 'en'): string
     {
         $serverClass = $this->serverService->getActiveServerClassByFunctionality('image_recognition');
         $processedImage = $this->getScaledImage($fileObject);
-        return $serverClass->sendFileToApi($processedImage, $textPrompt, $targetLanguage);
+        return $serverClass->sendFileToApi($processedImage, $textPrompt, $bad_words, $targetLanguage);
     }
 
     /**

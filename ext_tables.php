@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+use Pagemachine\AItools\Controller\Backend\ImageLabelController;
 use Pagemachine\AItools\Controller\Backend\PromptsController;
 use Pagemachine\AItools\Controller\Backend\ServersController;
 use Pagemachine\AItools\Controller\Backend\SettingsController;
@@ -39,6 +40,21 @@ if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0',
             'access' => 'user, group',
             'iconIdentifier' => 'actions-notebook',
             'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.templates',
+        ]
+    );
+
+    ExtensionUtility::registerModule( // @phpstan-ignore-line
+        'AItools',
+        'aitools',
+        'imagelabel',
+        '',
+        [
+            ImageLabelController::class => 'listlabel',
+        ],
+        [
+            'access' => 'user, group',
+            'iconIdentifier' => 'actions-notebook',
+            'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_imagelabel.templates',
         ]
     );
 

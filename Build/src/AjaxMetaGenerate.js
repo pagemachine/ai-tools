@@ -3,13 +3,127 @@ import Modal from '@typo3/backend/modal';
 import Severity from '@typo3/backend/severity';
 import { MessageUtility }  from '@typo3/backend/utility/message-utility';
 import GeneratorButton from './utils/GeneratorButton.js';
-import { callAjaxSaveMetaDataAction } from './utils/RemoteCalls.js';
+import { callAjaxSaveMetaDataAction} from './utils/RemoteCalls.js';
 
 $(() => {
   $('.textPromptSelect').on('change', function() {
     const selectedValue = $(this).val();
     $($(this).data('target')).val(selectedValue);
   });
+});
+
+$(() => {
+  $('.textLabelSelect').on('change', function() {
+    const selectedValue = $(this).val();
+    $($(this).data('target')).val(selectedValue);
+    toggletags(selectedValue, $(this).data("fileid"));
+  });
+});
+
+let hidden = true;
+$(() => {
+  $('.hide-div').on('click', function() {
+    if(!hidden){
+      $("#hide-div-" + $(this).data("file")).hide();
+    }
+    else{
+      $("#hide-div-" + $(this).data("file")).css("display", "block");
+    }
+    hidden = !hidden;
+  });
+});
+
+$(() => {
+  $('.reset-tag, .global-reset-tag').on('click', function() {
+    let file = $(this).data("file");
+    let uid = $("#selectedimageLabel-" + file).val()
+    toggletags(uid, file);
+    if(file == "123"){
+      $(".reset-tag").trigger("click");
+    }
+  });
+});
+
+function toggletags(selectedValue, fileid){
+  if(selectedValue == -1){
+    $("#tag-div-" + fileid).find(".tag , .default-tag").each(function() {
+        $(this).hide();
+    });
+  }
+  else{
+    $("#tag-div-" + fileid).css("display", "block");
+    $("#tag-div-" + fileid).find(".tag , .default-tag").each(function() {
+      let val = $(this).data("imagelabelid");
+      if (val == 0 || selectedValue == val) {
+        $(this).css("display", "inline-block");
+      } else {
+        $(this).hide();
+      }
+    });
+  }
+}
+
+let id = 0;
+$(document).on("click", ".add-tag, .global-add-tag", function() {
+  let fileKey = $(this).data("file");
+  let inputValue = $('#tmp-add-badword-' + fileKey).val();
+  console.log(inputValue + " " + fileKey);
+  if (!inputValue) return;
+
+  $("#tag-div-" + fileKey).children().eq(1).before(`
+    <span 
+      class="tmp-tag" 
+      id="tag-tmp-${id}-${fileKey}" 
+      data-value="${inputValue}" 
+      data-imagelabelid="0" 
+      data-file="${fileKey}">
+      ${inputValue}
+      <a href="#" class="remove-tag" data-id="#tag-tmp-${id}-${fileKey}" data-file="${fileKey}">X</a>
+    </span>
+  `);
+  
+  id += 1;
+
+  if(fileKey == "123"){
+    $(".add-container").each(function() {
+      $(this).val(inputValue);
+    });
+    $(".add-tag").trigger("click");
+    $(".add-container").each(function() {
+      $(this).val("");
+    });
+  }
+
+  $('#tmp-add-badword-' + fileKey).val("");
+});
+
+$(document).on("click", ".remove-tag", function() {
+  let rem = false;
+  if ($(this).hasClass("tmp-tag")) {
+    rem = true;
+  }
+  let tmp = $($(this).data("id")).data("value")
+  if($(this).data("file") == "123"){
+    $(".scroll-container").each(function() {
+      $(this).find(".default-tag, .tag, .tmp-tag").each(function() {
+          var dataValue = $(this).data("value");
+          if (dataValue === tmp) { 
+            if(rem){
+              $(this).remove();
+            }
+            else{
+              $(this).hide();
+            }
+          }
+      });
+  });
+  }
+  if(rem){
+    $($(this).data("id")).remove();
+  }
+  else{
+    $($(this).data("id")).hide();
+  }
 });
 
 $(() => {
@@ -139,6 +253,12 @@ $(() => {
 
   $('.globalTextPrompt').on('change', function() {
     $('.textPromptSelect').val($(this).val()).trigger('change');
+  });
+  $(".globalTextLabel").on("change", function() {
+    const selectedValue = $(this).val();
+    $($(this).data('target')).val(selectedValue);
+    toggletags(selectedValue, $(this).data("fileid"));
+    $(".textLabelSelect").val($(this).val()).trigger("change");
   });
 });
 

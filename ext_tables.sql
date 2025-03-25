@@ -5,6 +5,20 @@ CREATE TABLE tx_aitools_domain_model_prompt (
 	default tinyint(1) DEFAULT '0' NOT NULL,
 );
 
+CREATE TABLE tx_aitools_domain_model_imagelabel (
+    imagelabel TEXT,
+    description VARCHAR(255),
+    default tinyint(1) DEFAULT '0' NOT NULL,
+);
+
+CREATE TABLE tx_aitools_domain_model_badwords (
+    imagelabelid INT UNSIGNED NOT NULL,
+    badword VARCHAR(255) NOT NULL,
+	FOREIGN KEY (imagelabelid)                     
+        REFERENCES tx_aitools_domain_model_imagelabel(uid) 
+        ON DELETE CASCADE 
+);
+
 CREATE TABLE tx_aitools_domain_model_server (
 	title varchar(255),
 	type varchar(255),
