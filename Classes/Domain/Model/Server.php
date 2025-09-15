@@ -88,7 +88,7 @@ class Server extends AbstractEntity
 
     public function getApikey(): string
     {
-        return $this->apikey;
+        return $this->apikey ?? '';
     }
 
     public function setApikey(string $apikey): void
