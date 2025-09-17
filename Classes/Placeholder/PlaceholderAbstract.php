@@ -23,4 +23,22 @@ abstract class PlaceholderAbstract implements PlaceholderInterface
     {
         $this->file = $file;
     }
+
+    protected function getFileProperty(string $propertyName): string
+    {
+        if (!$this->file || !$this->file->hasProperty($propertyName)) {
+            return '';
+        }
+
+        return $this->file->getProperty($propertyName) ?? '';
+    }
+
+    protected function hasFileProperty(string $propertyName): bool
+    {
+        if (!$this->file) {
+            return false;
+        }
+
+        return $this->file->hasProperty($propertyName);
+    }
 }

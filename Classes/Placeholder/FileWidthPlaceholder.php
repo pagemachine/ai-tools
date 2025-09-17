@@ -6,11 +6,11 @@ class FileWidthPlaceholder extends PlaceholderAbstract
 {
     public function getValue(): string
     {
-        if (!$this->file || !$this->file->hasProperty('width')) {
+        if (!$this->file || !$this->hasFileProperty('width')) {
             return '';
         }
 
-        return $this->file->getProperty('width');
+        return $this->getFileProperty('width');
     }
 
     public function getExampleValue(): string

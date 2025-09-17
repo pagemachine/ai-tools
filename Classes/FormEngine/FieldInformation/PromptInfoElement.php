@@ -27,7 +27,7 @@ class PromptInfoElement extends AbstractFormElement
         }
 
         $promptText = $this->data['databaseRow']['prompt'];
-        $prompt = $placeholderService->applyPlaceholders($promptText, true);
+        $prompt = $placeholderService->applyPlaceholders($promptText);
 
         if ($prompt !== $promptText) {
             $html .= '<br>Prompt after applying placeholders:<br>';

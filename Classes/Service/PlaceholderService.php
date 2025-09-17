@@ -13,7 +13,7 @@ class PlaceholderService
         return $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ai_tools']['placeholder'] ?? [];
     }
 
-    public function applyPlaceholders(string $text, bool $useExamples = false, ?FileInterface $file = null): string
+    public function applyPlaceholders(string $text, ?array $config = null): string
     {
         $allPlaceholders = $this->getAllPlaceholders();
 
@@ -30,10 +30,12 @@ class PlaceholderService
                     /** @var PlaceholderInterface $placeholderInstance */
                     $placeholderInstance = GeneralUtility::makeInstance($placeholderClass);
 
-                    if ($useExamples) {
+                    if (!$config) {
                         $value = $placeholderInstance->getExampleValue();
                     } else {
-                        $placeholderInstance->setFile($file);
+                        if (isset($config['file']) && $config['file'] instanceof FileInterface) {
+                            $placeholderInstance->setFile($config['file']);
+                        }
                         $value = $placeholderInstance->getValue();
                     }
 

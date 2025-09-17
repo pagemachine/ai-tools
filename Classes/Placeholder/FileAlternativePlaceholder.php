@@ -6,11 +6,11 @@ class FileAlternativePlaceholder extends PlaceholderAbstract
 {
     public function getValue(): string
     {
-        if (!$this->file || !$this->file->hasProperty('alternative')) {
+        if (!$this->file || !$this->hasFileProperty('alternative')) {
             return '';
         }
 
-        return $this->file->getProperty('alternative');
+        return $this->getFileProperty('alternative');
     }
 
     public function getExampleValue(): string

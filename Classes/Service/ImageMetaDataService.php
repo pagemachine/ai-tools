@@ -54,7 +54,7 @@ class ImageMetaDataService
         $serverClass = $this->serverService->getActiveServerClassByFunctionality('image_recognition');
         $processedImage = $this->getScaledImage($fileObject);
 
-        $prompt = $this->placeholderService->applyPlaceholders($textPrompt, false, $fileObject);
+        $prompt = $this->placeholderService->applyPlaceholders($textPrompt, [ 'file' => $fileObject ]);
 
         return $serverClass->sendFileToApi($processedImage, $prompt, $targetLanguage);
     }

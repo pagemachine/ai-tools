@@ -6,11 +6,11 @@ class FileHeightPlaceholder extends PlaceholderAbstract
 {
     public function getValue(): string
     {
-        if (!$this->file || !$this->file->hasProperty('height')) {
+        if (!$this->file || !$this->hasFileProperty('height')) {
             return '';
         }
 
-        return $this->file->getProperty('height');
+        return $this->getFileProperty('height');
     }
 
     public function getExampleValue(): string

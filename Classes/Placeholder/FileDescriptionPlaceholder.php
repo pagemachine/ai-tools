@@ -6,11 +6,11 @@ class FileDescriptionPlaceholder extends PlaceholderAbstract
 {
     public function getValue(): string
     {
-        if (!$this->file || !$this->file->hasProperty('description')) {
+        if (!$this->file || !$this->hasFileProperty('description')) {
             return '';
         }
 
-        return $this->file->getProperty('description');
+        return $this->getFileProperty('description');
     }
 
     public function getExampleValue(): string

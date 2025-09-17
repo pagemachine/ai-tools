@@ -6,11 +6,11 @@ class FileTitlePlaceholder extends PlaceholderAbstract
 {
     public function getValue(): string
     {
-        if (!$this->file || !$this->file->hasProperty('title')) {
+        if (!$this->file || !$this->hasFileProperty('title')) {
             return '';
         }
 
-        return $this->file->getProperty('title');
+        return $this->getFileProperty('title');
     }
 
     public function getExampleValue(): string
