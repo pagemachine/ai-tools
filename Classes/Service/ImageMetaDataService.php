@@ -25,6 +25,7 @@ class ImageMetaDataService
     protected ResourceFactory $resourceFactory;
     protected PersistenceManagerInterface $persistenceManager;
     protected ImageService $imageService;
+    protected PlaceholderService $placeholderService;
 
     public function __construct()
     {
@@ -34,6 +35,7 @@ class ImageMetaDataService
         $this->resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);
         $this->persistenceManager = GeneralUtility::makeInstance(PersistenceManagerInterface::class);
         $this->imageService = GeneralUtility::makeInstance(ImageService::class);
+        $this->placeholderService = GeneralUtility::makeInstance(PlaceholderService::class);
     }
 
     public function supportsTranslation(): bool
@@ -51,7 +53,10 @@ class ImageMetaDataService
     {
         $serverClass = $this->serverService->getActiveServerClassByFunctionality('image_recognition');
         $processedImage = $this->getScaledImage($fileObject);
-        return $serverClass->sendFileToApi($processedImage, $textPrompt, $targetLanguage);
+
+        $prompt = $this->placeholderService->applyPlaceholders($textPrompt, false, $fileObject);
+
+        return $serverClass->sendFileToApi($processedImage, $prompt, $targetLanguage);
     }
 
     /**

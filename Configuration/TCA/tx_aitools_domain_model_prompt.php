@@ -47,6 +47,11 @@ return [
                 'cols' => '40',
                 'required' => true,
                 'rows' => '15',
+                'fieldInformation' => [
+                    'PromptInfo' => [
+                        'renderType' => 'PromptInfoElement',
+                    ]
+                ],
             ],
         ],
         'description' => [
