@@ -8,10 +8,13 @@ use Pagemachine\AItools\FormEngine\FieldInformation\PromptInfoElement;
 use Pagemachine\AItools\FormEngine\FieldWizard\AlternativeGenerator;
 use Pagemachine\AItools\Hooks\DataHandlerHooks;
 use Pagemachine\AItools\Placeholder\CurrentTimePlaceholder;
+use Pagemachine\AItools\Placeholder\FileAlternativePlaceholder;
+use Pagemachine\AItools\Placeholder\FileDescriptionPlaceholder;
 use Pagemachine\AItools\Placeholder\FileHeightPlaceholder;
 use Pagemachine\AItools\Placeholder\FileMimePlaceholder;
 use Pagemachine\AItools\Placeholder\FilenameNoExtensionPlaceholder;
 use Pagemachine\AItools\Placeholder\FilenamePlaceholder;
+use Pagemachine\AItools\Placeholder\FileTitlePlaceholder;
 use Pagemachine\AItools\Placeholder\FileWidthPlaceholder;
 use Pagemachine\AItools\Service\Credits\AigudeCreditsService;
 use Pagemachine\AItools\Service\ImageRecognition\AigudeImageRecognitionService;
@@ -57,6 +60,9 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ai_tools']['placeholder'] = [
     'current_time' => CurrentTimePlaceholder::class,
     'filename' => FilenamePlaceholder::class,
     'filename_no_ext' => FilenameNoExtensionPlaceholder::class,
+    'title' => FileTitlePlaceholder::class,
+    'description' => FileDescriptionPlaceholder::class,
+    'current_alt' => FileAlternativePlaceholder::class,
     'mime' => FileMimePlaceholder::class,
     'height' => FileHeightPlaceholder::class,
     'width' => FileWidthPlaceholder::class,
