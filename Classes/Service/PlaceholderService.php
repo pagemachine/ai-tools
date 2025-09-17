@@ -36,6 +36,9 @@ class PlaceholderService
                         if (isset($config['file']) && $config['file'] instanceof FileInterface) {
                             $placeholderInstance->setFile($config['file']);
                         }
+                        if (isset($config['fileReference'])) {
+                            $placeholderInstance->setFileReference($config['fileReference']);
+                        }
                         $value = $placeholderInstance->getValue();
                     }
 

@@ -34,4 +34,17 @@ interface PlaceholderInterface
      * @return void
      */
     public function setFile(FileInterface $file): void;
+
+    /**
+     * Get the file reference associated with the placeholder.
+     * @return Array|null
+     */
+    public function getFileReference(): ?Array;
+
+    /**
+     * Set the file reference associated with the placeholder.
+     * @param Array $fileReference
+     * @return void
+     */
+    public function setFileReference(Array $fileReference): void;
 }

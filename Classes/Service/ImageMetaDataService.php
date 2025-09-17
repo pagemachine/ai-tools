@@ -49,12 +49,14 @@ class ImageMetaDataService
      * @return string
      * @throws \Exception
      */
-    public function generateImageDescription(FileInterface $fileObject, string $textPrompt = '', string $targetLanguage = 'en'): string
+    public function generateImageDescription(FileInterface $fileObject, string $textPrompt = '', string $targetLanguage = 'en', int $language = 0): string
     {
         $serverClass = $this->serverService->getActiveServerClassByFunctionality('image_recognition');
         $processedImage = $this->getScaledImage($fileObject);
 
-        $prompt = $this->placeholderService->applyPlaceholders($textPrompt, [ 'file' => $fileObject ]);
+        /** @var File $fileObject */
+        $fileReference = $this->getMetaDataForLanguage($fileObject, $language);
+        $prompt = $this->placeholderService->applyPlaceholders($textPrompt, [ 'file' => $fileObject, 'fileReference' => $fileReference ]);
 
         return $serverClass->sendFileToApi($processedImage, $prompt, $targetLanguage);
     }
@@ -206,6 +208,21 @@ class ImageMetaDataService
         }
 
         return $metadataEntries;
+    }
+
+    /**
+     * Retrieve metadata for a specific language
+     *
+     * @param File $fileObject
+     * @param int $language
+     * @return array|null
+     * @throws InvalidUidException
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getMetaDataForLanguage(File $fileObject, int $language): ?array
+    {
+        $metadataEntries = $this->getMetaDataLanguages($fileObject, [$language]);
+        return $metadataEntries[0] ?? null;
     }
 
     public function getScaledImage(FileInterface $fileObject): FileInterface

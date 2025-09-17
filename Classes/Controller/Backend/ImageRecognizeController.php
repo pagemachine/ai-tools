@@ -278,14 +278,16 @@ class ImageRecognizeController extends ActionController
                     $altTextFromImageTranslated = $this->imageMetaDataService->generateImageDescription(
                         $fileObjects[0]['file'],
                         $textPrompt,
-                        $targetTwoLetterIsoCode
+                        $targetTwoLetterIsoCode,
+                        (int) $target_language
                     );
                     $data = ['alternative' => $altTextFromImageTranslated, 'baseAlternative' => $altTextFromImageTranslated];
                 } else {
                     $altTextFromImage = $this->imageMetaDataService->generateImageDescription(
                         $fileObjects[0]['file'],
                         $textPrompt,
-                        'en'
+                        'en',
+                        (int) $target_language
                     );
                     $altText = $this->translationService->translateText($altTextFromImage, 'en', $targetTwoLetterIsoCode);
                     $data = ['alternative' => $altText, 'baseAlternative' => $altTextFromImage];

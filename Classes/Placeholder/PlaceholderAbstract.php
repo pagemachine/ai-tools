@@ -14,6 +14,11 @@ abstract class PlaceholderAbstract implements PlaceholderInterface
      */
     protected $file;
 
+    /**
+     * @var Array|null
+     */
+    protected $fileReference;
+
     public function getFile(): FileInterface
     {
         return $this->file;
@@ -24,21 +29,51 @@ abstract class PlaceholderAbstract implements PlaceholderInterface
         $this->file = $file;
     }
 
+    public function getFileReference(): ?Array
+    {
+        return $this->fileReference;
+    }
+
+    public function setFileReference(Array $fileReference): void
+    {
+        $this->fileReference = $fileReference;
+    }
+
     protected function getFileProperty(string $propertyName): string
     {
-        if (!$this->file || !$this->file->hasProperty($propertyName)) {
-            return '';
+        if (is_array($this->fileReference) && array_key_exists($propertyName, $this->fileReference)) {
+            $value = $this->fileReference[$propertyName];
+            if (!empty($value)) {
+                return $value;
+            }
         }
 
-        return $this->file->getProperty($propertyName) ?? '';
+        if ($this->file && $this->file->hasProperty($propertyName)) {
+            $value = $this->file->getProperty($propertyName);
+            if (!empty($value)) {
+                return $value;
+            }
+        }
+
+        return '';
     }
 
     protected function hasFileProperty(string $propertyName): bool
     {
-        if (!$this->file) {
-            return false;
+        if (is_array($this->fileReference) && array_key_exists($propertyName, $this->fileReference)) {
+            $value = $this->fileReference[$propertyName];
+            if (!empty($value)) {
+                return true;
+            }
         }
 
-        return $this->file->hasProperty($propertyName);
+        if ($this->file && $this->file->hasProperty($propertyName)) {
+            $value = $this->file->getProperty($propertyName);
+            if (!empty($value)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
