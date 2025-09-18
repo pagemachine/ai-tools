@@ -18,7 +18,7 @@ class PlaceholderService
         $allPlaceholders = $this->getAllPlaceholders();
 
         $matchedPlaceholders = [];
-        preg_match_all('/%([a-zA-Z0-9_]+)(\|([a-zA-Z0-9_]+))?%/', $text, $matchedPlaceholders);
+        preg_match_all('/%([a-zA-Z0-9_]+)(\|([a-zA-Z0-9_|]+))?%/', $text, $matchedPlaceholders);
 
         if (!empty($matchedPlaceholders[0])) {
             foreach ($matchedPlaceholders[0] as $index => $placeholderText) {
@@ -42,11 +42,9 @@ class PlaceholderService
                         $value = $placeholderInstance->getValue();
                     }
 
-                    $value = trim($value, '"\'');
+                    $modifiers = $modifier ? explode('|', $modifier) : [];
 
-                    if ($modifier !== 'raw') {
-                        $value = '"' . $value . '"';
-                    }
+                    $value = $this->applyModifiers($value, $placeholderInstance, $modifiers);
 
                     $text = str_replace($placeholderText, $value, $text);
                 }
@@ -54,5 +52,49 @@ class PlaceholderService
         }
 
         return $text;
+    }
+
+    public function applyModifiers(string $value, PlaceholderInterface $placeholder, array $modifiers = []): string
+    {
+        $value = trim($value, '"\'');
+
+        $force_raw = false;
+        $force_q = false;
+        foreach ($modifiers as $mod) {
+            switch ($mod) {
+                case 'raw':
+                    $force_raw = true;
+                    break;
+                case 'q':
+                    $force_q = true;
+                    break;
+                case 'trim':
+                    $value = trim($value);
+                    break;
+                case 'lower':
+                    $value = strtolower($value);
+                    break;
+                case 'upper':
+                    $value = strtoupper($value);
+                    break;
+                case 'ucfirst':
+                    $value = ucfirst($value);
+                    break;
+            }
+        }
+
+        $addQuotes = $placeholder->shouldBeQuotedByDefault();
+        if ($force_raw) {
+            $addQuotes = false;
+        }
+        if ($force_q) {
+            $addQuotes = true;
+        }
+
+        if ($addQuotes) {
+            $value = '"' . $value . '"';
+        }
+
+        return $value;
     }
 }

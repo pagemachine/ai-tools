@@ -4,6 +4,8 @@ namespace Pagemachine\AItools\Placeholder;
 
 class FileHeightPlaceholder extends PlaceholderAbstract
 {
+    protected bool $shouldBeQuoted = false;
+
     public function getValue(): string
     {
         if (!$this->file || !$this->hasFileProperty('height')) {

@@ -47,4 +47,10 @@ interface PlaceholderInterface
      * @return void
      */
     public function setFileReference(Array $fileReference): void;
+
+    /**
+     * Indicates if the placeholder value should be quoted by default.
+     * @return bool
+     */
+    public function shouldBeQuotedByDefault(): bool;
 }

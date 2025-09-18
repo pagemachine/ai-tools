@@ -19,6 +19,8 @@ abstract class PlaceholderAbstract implements PlaceholderInterface
      */
     protected $fileReference;
 
+    protected bool $shouldBeQuoted = true;
+
     public function getFile(): FileInterface
     {
         return $this->file;
@@ -37,6 +39,11 @@ abstract class PlaceholderAbstract implements PlaceholderInterface
     public function setFileReference(Array $fileReference): void
     {
         $this->fileReference = $fileReference;
+    }
+
+    public function shouldBeQuotedByDefault(): bool
+    {
+        return $this->shouldBeQuoted;
     }
 
     protected function getFileProperty(string $propertyName): string

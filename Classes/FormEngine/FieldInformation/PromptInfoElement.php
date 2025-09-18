@@ -22,16 +22,36 @@ class PromptInfoElement extends AbstractFormElement
             $placeholder = GeneralUtility::makeInstance($placeholderClass);
             $html .= '<code>%' . htmlspecialchars($identifier) . '%</code>';
             $html .= ' → ';
-            $html .= '<span style="color: #888; font-size: 90%;">"' . htmlspecialchars($placeholder->getExampleValue()) . '"</span>';
+            $html .= '<span style="color: #888; font-size: 90%;">' . $placeholderService->applyModifiers(htmlspecialchars($placeholder->getExampleValue()), $placeholder) . '</span>';
             $html .= '<br>';
         }
+        $html .= '<br>';
+
+        $html .= 'Available modifiers:<br>';
+        $html .= '<span style="font-size: 90%; color: #666;">You can apply one or more modifiers to a placeholder by using the | character. Modifiers can be chained in any order.<br>';
+
+
+        $modifier = [
+            'q' => 'Force quoting',
+            'raw' => 'No quoting',
+            'trim' => 'Trim whitespace',
+            'lower' => 'Convert to lowercase',
+            'upper' => 'Convert to uppercase',
+            'ucfirst' => 'Uppercase the first character',
+        ];
+
+        foreach ($modifier as $key => $value) {
+            $html .= '<code>' . htmlspecialchars($key) . '</code> → <span style="color: #888; font-size: 90%;">' . htmlspecialchars($value) . '</span><br>';
+        }
+
+        $html .= 'Example: <code>%filename|raw|upper%</code></span><br><br>';
 
         $promptText = $this->data['databaseRow']['prompt'];
         $prompt = $placeholderService->applyPlaceholders($promptText);
 
         if ($prompt !== $promptText) {
-            $html .= '<br>Prompt after applying placeholders:<br>';
-            $html .= '<code style="white-space: pre;">' . htmlspecialchars($prompt) . '</code>';
+            $html .= 'Prompt after applying placeholders:<br>';
+            $html .= '<code style="white-space: pre;">' . htmlspecialchars($prompt) . '</code><br><br>';
         }
 
         $html .= '</div>';
