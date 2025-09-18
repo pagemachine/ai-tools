@@ -9,6 +9,7 @@ use Pagemachine\AItools\FormEngine\FieldWizard\AlternativeGenerator;
 use Pagemachine\AItools\Hooks\DataHandlerHooks;
 use Pagemachine\AItools\Placeholder\CurrentTimePlaceholder;
 use Pagemachine\AItools\Placeholder\FileAlternativePlaceholder;
+use Pagemachine\AItools\Placeholder\FileCategoriesPlaceholder;
 use Pagemachine\AItools\Placeholder\FileDescriptionPlaceholder;
 use Pagemachine\AItools\Placeholder\FileHeightPlaceholder;
 use Pagemachine\AItools\Placeholder\FileMimePlaceholder;
@@ -61,6 +62,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ai_tools']['placeholder'] = [
     'filename' => FilenamePlaceholder::class,
     'filename_no_ext' => FilenameNoExtensionPlaceholder::class,
     'title' => FileTitlePlaceholder::class,
+    'categories' => FileCategoriesPlaceholder::class,
     'description' => FileDescriptionPlaceholder::class,
     'current_alt' => FileAlternativePlaceholder::class,
     'mime' => FileMimePlaceholder::class,
