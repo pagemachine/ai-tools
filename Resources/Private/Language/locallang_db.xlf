@@ -11,6 +11,18 @@
 			<trans-unit id="tx_aitools_domain_model_prompt.prompt">
 				<source>Prompt</source>
 			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_prompt.prompt.placeholder.header">
+				<source>Available placeholders:</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_prompt.prompt.modifier.header">
+				<source>Available modifiers:</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_prompt.prompt.modifier.info">
+				<source>You can apply one or more modifiers to a placeholder by using the | character. Modifiers can be chained in any order.</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_prompt.prompt.applied.header">
+				<source>Prompt with applied placeholders:</source>
+			</trans-unit>
 			<trans-unit id="tx_aitools_domain_model_prompt.description">
 				<source>Title</source>
 			</trans-unit>

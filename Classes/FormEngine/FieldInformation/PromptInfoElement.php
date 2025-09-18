@@ -17,7 +17,7 @@ class PromptInfoElement extends AbstractFormElement
 
         $html = '<div class="form-control-wrap" style="font-weight: bold;">';
 
-        $html .= 'Available placeholders: <br>';
+        $html .= $this->getTranslation('placeholder.header') . '<br>';
         foreach ($placeholders as $identifier => $placeholderClass) {
             $placeholder = GeneralUtility::makeInstance($placeholderClass);
             $html .= '<code>%' . htmlspecialchars($identifier) . '%</code>';
@@ -27,8 +27,8 @@ class PromptInfoElement extends AbstractFormElement
         }
         $html .= '<br>';
 
-        $html .= 'Available modifiers:<br>';
-        $html .= '<span style="font-size: 90%; color: #666;">You can apply one or more modifiers to a placeholder by using the | character. Modifiers can be chained in any order.<br>';
+        $html .= $this->getTranslation('modifier.header') . '<br>';
+        $html .= '<span style="font-size: 90%; color: #666;">' . $this->getTranslation('modifier.info') . '<br>';
 
 
         $modifier = [
@@ -50,7 +50,7 @@ class PromptInfoElement extends AbstractFormElement
         $prompt = $placeholderService->applyPlaceholders($promptText);
 
         if ($prompt !== $promptText) {
-            $html .= 'Prompt after applying placeholders:<br>';
+            $html .= $this->getTranslation('applied.header') . '<br>';
             $html .= '<code style="white-space: pre;">' . htmlspecialchars($prompt) . '</code><br><br>';
         }
 
@@ -59,5 +59,10 @@ class PromptInfoElement extends AbstractFormElement
         return [
             'html' => $html,
         ];
+    }
+
+    protected function getTranslation($key): string
+    {
+        return $this->getLanguageService()->sL('LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.prompt.' . $key) ?: $key;
     }
 }
