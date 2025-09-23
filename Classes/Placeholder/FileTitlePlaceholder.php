@@ -13,6 +13,11 @@ class FileTitlePlaceholder extends PlaceholderAbstract
         return $this->getFileProperty('title');
     }
 
+    public function getLanguage(): ?string
+    {
+        return $this->getFilePropertyLanguage('title');
+    }
+
     public function getExampleValue(): string
     {
         return 'Picture of a car';

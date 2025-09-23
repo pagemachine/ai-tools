@@ -40,6 +40,9 @@ class PlaceholderService
                             $placeholderInstance->setFileReference($config['fileReference']);
                         }
                         $value = $placeholderInstance->getValue();
+                        $valueLang = $placeholderInstance->getLanguage();
+
+                        $value = $this->translatePlaceholderValue($value, $valueLang);
                     }
 
                     $modifiers = $modifier ? explode('|', $modifier) : [];
@@ -94,6 +97,21 @@ class PlaceholderService
         if ($addQuotes) {
             $value = '"' . $value . '"';
         }
+
+        return $value;
+    }
+
+    protected function translatePlaceholderValue(?string $value, ?string $sourceLanguage): string
+    {
+        if (empty($value) || empty($sourceLanguage)) {
+            return $value;
+        }
+
+        if ($sourceLanguage === 'en') {
+            return $value;
+        }
+
+        // TODO: Handle translation
 
         return $value;
     }

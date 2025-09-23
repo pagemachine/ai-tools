@@ -53,4 +53,10 @@ interface PlaceholderInterface
      * @return bool
      */
     public function shouldBeQuotedByDefault(): bool;
+
+    /**
+     * Get the language of the placeholder value. null if not translatable.
+     * @return null|string
+     */
+    public function getLanguage(): ?string;
 }

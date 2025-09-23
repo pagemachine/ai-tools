@@ -13,6 +13,11 @@ class FileAlternativePlaceholder extends PlaceholderAbstract
         return $this->getFileProperty('alternative');
     }
 
+    public function getLanguage(): ?string
+    {
+        return $this->getFilePropertyLanguage('alternative');
+    }
+
     public function getExampleValue(): string
     {
         return 'A red car parked on the street';

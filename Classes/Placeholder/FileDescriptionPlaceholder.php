@@ -13,6 +13,11 @@ class FileDescriptionPlaceholder extends PlaceholderAbstract
         return $this->getFileProperty('description');
     }
 
+    public function getLanguage(): ?string
+    {
+        return $this->getFilePropertyLanguage('description');
+    }
+
     public function getExampleValue(): string
     {
         return 'A beautiful scenery of mountains during sunset.';
