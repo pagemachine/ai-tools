@@ -22,7 +22,7 @@ class PromptInfoElement extends AbstractFormElement
             $placeholder = GeneralUtility::makeInstance($placeholderClass);
             $html .= '<code>%' . htmlspecialchars($identifier) . '%</code>';
             $html .= ' → ';
-            $html .= '<span style="color: #888; font-size: 90%;">' . $placeholderService->applyModifiers(htmlspecialchars($placeholder->getExampleValue()), $placeholder) . '</span>';
+            $html .= '<span style="color: #888; font-size: 90%;">' . $placeholderService->applyModifiers(htmlspecialchars((string) $placeholder->getExampleValue()), $placeholder) . '</span>';
             $html .= '<br>';
         }
         $html .= '<br>';
