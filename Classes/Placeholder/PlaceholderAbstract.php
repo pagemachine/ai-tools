@@ -105,7 +105,7 @@ abstract class PlaceholderAbstract implements PlaceholderInterface
         if ($this->file && $this->file->hasProperty($propertyName)) {
             $value = $this->file->getProperty($propertyName);
             if (!empty($value)) {
-                return $this->getLanguageCodeById($this->file->getProperty('sys_language_uid'));
+                return $this->getLanguageCodeById((int) $this->file->getProperty('sys_language_uid'));
             }
         }
 
