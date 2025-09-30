@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pagemachine\AItools\Service\ImageRecognition;
 
 use GuzzleHttp\Exception\BadResponseException;
+use Pagemachine\AItools\Domain\Model\PlaceholderResult;
 use Pagemachine\AItools\Domain\Model\Server;
 use Pagemachine\AItools\Domain\Model\ServerOpenai;
 use TYPO3\CMS\Core\Http\RequestFactory;
@@ -31,15 +32,7 @@ class OpenAiImageRecognitionService implements ImageRecognitionServiceInterface
         $this->apikey = $this->server->getApikey();
     }
 
-    /**
-     * Send file to OpenAI API
-     *
-     * @param FileInterface $fileObject
-     * @param string $textPrompt
-     * @return string
-     * @throws \Exception
-     */
-    public function sendFileToApi(FileInterface $fileObject, string $textPrompt = '', string $targetLanguage = 'en'): string
+    public function sendFileToApi(FileInterface $fileObject, PlaceholderResult $placeholderResult, string $targetLanguage = 'en'): string
     {
         $fileType = $fileObject->getMimeType();
         $fileContentBase64 = base64_encode($fileObject->getContents());
@@ -52,7 +45,7 @@ class OpenAiImageRecognitionService implements ImageRecognitionServiceInterface
                     'content' => [
                         [
                             'type' => 'text',
-                            'text' => $textPrompt,
+                            'text' => $placeholderResult->getText(),
                         ],
                         [
                             'type' => 'image_url',

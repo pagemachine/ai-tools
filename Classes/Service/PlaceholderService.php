@@ -2,6 +2,8 @@
 
 namespace Pagemachine\AItools\Service;
 
+use Pagemachine\AItools\Domain\Model\Placeholder;
+use Pagemachine\AItools\Domain\Model\PlaceholderResult;
 use Pagemachine\AItools\Placeholder\PlaceholderInterface;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -13,12 +15,14 @@ class PlaceholderService
         return $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ai_tools']['placeholder'] ?? [];
     }
 
-    public function applyPlaceholders(string $text, ?array $config = null): string
+    public function resolvePlaceholders(string $text, ?array $config = null): PlaceholderResult
     {
         $allPlaceholders = $this->getAllPlaceholders();
 
         $matchedPlaceholders = [];
         preg_match_all('/%([a-zA-Z0-9_]+)(\|([a-zA-Z0-9_|]+))?%/', $text, $matchedPlaceholders);
+
+        $placeholderValues = [];
 
         if (!empty($matchedPlaceholders[0])) {
             foreach ($matchedPlaceholders[0] as $index => $placeholderText) {
@@ -40,21 +44,54 @@ class PlaceholderService
                             $placeholderInstance->setFileReference($config['fileReference']);
                         }
                         $value = $placeholderInstance->getValue();
-                        $valueLang = $placeholderInstance->getLanguage();
-
-                        $value = $this->translatePlaceholderValue($value, $valueLang);
                     }
 
                     $modifiers = $modifier ? explode('|', $modifier) : [];
+                    if (!empty($value)) {
+                        $value = $this->applyModifiers($value, $placeholderInstance, $modifiers);
+                    }
 
-                    $value = $this->applyModifiers($value, $placeholderInstance, $modifiers);
-
-                    $text = str_replace($placeholderText, $value, $text);
+                    $placeholderValues[$placeholderText] = new Placeholder(
+                        $value,
+                        $identifier,
+                        $modifiers,
+                        $placeholderText,
+                        $placeholderInstance->getLanguage()
+                    );
                 }
             }
         }
 
+        return new PlaceholderResult($text, $placeholderValues);
+    }
+
+    public function applyPlaceholders(string $text, ?array $config = null): string
+    {
+        $resolved = $this->resolvePlaceholders($text, $config);
+
+        $text = $resolved->getText();
+        foreach ($resolved->getPlaceholders() as $placeholderText => $placeholder) {
+            $text = str_replace($placeholderText, $placeholder->getValue(), $text);
+        }
+
         return $text;
+    }
+
+    public function applyPlaceholdersWithoutTranslation(string $text, ?array $config = null): PlaceholderResult
+    {
+        $resolved = $this->resolvePlaceholders($text, $config);
+        $translatablePlaceholders = [];
+
+        $text = $resolved->getText();
+        foreach ($resolved->getPlaceholders() as $placeholderText => $placeholder) {
+            if (!$placeholder->getLanguage()) {
+                $text = str_replace($placeholderText, $placeholder->getValue(), $text);
+            } else {
+                $translatablePlaceholders[$placeholderText] = $placeholder;
+            }
+        }
+
+        return new PlaceholderResult($text, $translatablePlaceholders);
     }
 
     public function applyModifiers(string $value, PlaceholderInterface $placeholder, array $modifiers = []): string
@@ -97,21 +134,6 @@ class PlaceholderService
         if ($addQuotes) {
             $value = '"' . $value . '"';
         }
-
-        return $value;
-    }
-
-    protected function translatePlaceholderValue(?string $value, ?string $sourceLanguage): string
-    {
-        if (empty($value) || empty($sourceLanguage)) {
-            return $value;
-        }
-
-        if ($sourceLanguage === 'en') {
-            return $value;
-        }
-
-        // TODO: Handle translation
 
         return $value;
     }

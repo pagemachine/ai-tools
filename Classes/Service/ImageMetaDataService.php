@@ -56,9 +56,9 @@ class ImageMetaDataService
 
         /** @var File $fileObject */
         $fileReference = $this->getMetaDataForLanguage($fileObject, $language);
-        $prompt = $this->placeholderService->applyPlaceholders($textPrompt, [ 'file' => $fileObject, 'fileReference' => $fileReference ]);
+        $placeholdersResult = $this->placeholderService->applyPlaceholdersWithoutTranslation($textPrompt, [ 'file' => $fileObject, 'fileReference' => $fileReference ]);
 
-        return $serverClass->sendFileToApi($processedImage, $prompt, $targetLanguage);
+        return $serverClass->sendFileToApi($processedImage, $placeholdersResult, $targetLanguage);
     }
 
     /**

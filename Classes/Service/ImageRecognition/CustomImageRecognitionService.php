@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Service\ImageRecognition;
 
+use Pagemachine\AItools\Domain\Model\PlaceholderResult;
 use Pagemachine\AItools\Domain\Model\Server;
 use Pagemachine\AItools\Domain\Model\ServerCustom;
 use TYPO3\CMS\Core\Http\RequestFactory;
@@ -37,13 +38,13 @@ class CustomImageRecognitionService implements ImageRecognitionServiceInterface
         }
     }
 
-    public function sendFileToApi(FileInterface $fileObject, string $textPrompt = '', string $targetLanguage = 'en'): string
+    public function sendFileToApi(FileInterface $fileObject, PlaceholderResult $placeholderResult, string $targetLanguage = 'en'): string
     {
         /** @var string $url */
         $url = $this->server->getImageUrl();
 
-        if (!empty($textPrompt)) {
-            $url .= '?prompt=' . urlencode($textPrompt);
+        if (!empty($placeholderResult->getText())) {
+            $url .= '?prompt=' . urlencode($placeholderResult->getText());
         }
 
         $filePath = $fileObject->getForLocalProcessing(false);

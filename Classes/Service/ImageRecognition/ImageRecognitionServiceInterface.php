@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Service\ImageRecognition;
 
+use Pagemachine\AItools\Domain\Model\PlaceholderResult;
 use Pagemachine\AItools\Domain\Model\Server;
 use TYPO3\CMS\Core\Resource\FileInterface;
 
@@ -16,7 +17,7 @@ interface ImageRecognitionServiceInterface
      *
      * @return string
      */
-    public function sendFileToApi(FileInterface $fileObject, string $textPrompt = '', string $targetLanguage = 'en'): string;
+    public function sendFileToApi(FileInterface $fileObject, PlaceholderResult $placeholderResult, string $targetLanguage = 'en'): string;
 
     /**
      * Returns the price for the action
