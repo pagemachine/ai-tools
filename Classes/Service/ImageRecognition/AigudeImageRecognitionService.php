@@ -18,7 +18,7 @@ class AigudeImageRecognitionService extends AigudeAbstract implements ImageRecog
         $urlParts = ['api_version=2'];
 
         if (!empty($targetLanguage)) {
-            $urlParts[] = '&target_lang=' . urlencode((string) LanguageScriptUtility::getLanguageScript($targetLanguage));
+            $urlParts[] = '&target_lang=' . urlencode((string) $targetLanguage);
         }
 
         $url = $this->domain . '/img2desc_file/' . '?' . implode('&', $urlParts);
@@ -30,7 +30,7 @@ class AigudeImageRecognitionService extends AigudeAbstract implements ImageRecog
         $tokens = [];
         foreach ($placeholderResult->getPlaceholders() as $placeholder) {
             $lang = 'auto';
-            $langScript = LanguageScriptUtility::getLanguageScript($placeholder->getLanguage());
+            $langScript = $placeholder->getLanguage();
             if ($placeholder->getLanguage() && $langScript) {
                 $lang = $langScript;
             }
@@ -44,7 +44,7 @@ class AigudeImageRecognitionService extends AigudeAbstract implements ImageRecog
 
         $prompt_spec = [
             "prompt_template" => $placeholderResult->getText(),
-            "prompt_lang" =>  "auto",
+            "prompt_lang" =>  "en",
             "tokens" => $tokens,
         ];
 
