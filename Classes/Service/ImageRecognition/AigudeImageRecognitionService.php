@@ -6,7 +6,6 @@ namespace Pagemachine\AItools\Service\ImageRecognition;
 
 use Pagemachine\AItools\Domain\Model\PlaceholderResult;
 use Pagemachine\AItools\Service\Abstract\AigudeAbstract;
-use Pagemachine\AItools\Utility\LanguageScriptUtility;
 use TYPO3\CMS\Core\Resource\FileInterface;
 
 class AigudeImageRecognitionService extends AigudeAbstract implements ImageRecognitionServiceInterface
