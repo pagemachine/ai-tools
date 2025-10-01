@@ -34,10 +34,10 @@ class AigudeImageRecognitionService extends AigudeAbstract implements ImageRecog
                 $lang = $langScript;
             }
 
-            $tokens[$placeholder->getIdentifier()] = [
+            $tokens[$placeholder->getPlaceholderText()] = [
                 "value" => $placeholder->getValue(),
                 "lang" => $lang,
-                "translatable" => true,
+                "translatable" => (boolean) $placeholder->getLanguage(),
             ];
         }
 

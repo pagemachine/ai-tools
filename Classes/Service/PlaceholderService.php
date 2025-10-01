@@ -20,14 +20,15 @@ class PlaceholderService
         $allPlaceholders = $this->getAllPlaceholders();
 
         $matchedPlaceholders = [];
-        preg_match_all('/%([a-zA-Z0-9_]+)(\|([a-zA-Z0-9_|]+))?%/', $text, $matchedPlaceholders);
+        preg_match_all('/%(([a-zA-Z0-9_]+)(\|([a-zA-Z0-9_|]+))?)%/', $text, $matchedPlaceholders);
 
         $placeholderValues = [];
 
         if (!empty($matchedPlaceholders[0])) {
-            foreach ($matchedPlaceholders[0] as $index => $placeholderText) {
-                $identifier = $matchedPlaceholders[1][$index];
-                $modifier = $matchedPlaceholders[3][$index] ?? null;
+            foreach ($matchedPlaceholders[0] as $index => $placeholderFull) {
+                $placeholderText = $matchedPlaceholders[1][$index];
+                $identifier = $matchedPlaceholders[2][$index];
+                $modifier = $matchedPlaceholders[4][$index] ?? null;
 
                 if (isset($allPlaceholders[$identifier])) {
                     $placeholderClass = $allPlaceholders[$identifier];
