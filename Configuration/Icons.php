@@ -14,4 +14,16 @@ return [
         'provider' => BitmapIconProvider::class,
         'source' => 'EXT:ai_tools/Resources/Public/Icons/ext_icon.png',
     ],
+    'tx-aitools-module' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:ai_tools/Resources/Public/Icons/ext_module.svg',
+    ],
+    'tx-aitools-module-templates' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:ai_tools/Resources/Public/Icons/ext_module_templates.svg',
+    ],
+    'tx-aitools-module-settings' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:ai_tools/Resources/Public/Icons/ext_module_settings.svg',
+    ],
 ];
