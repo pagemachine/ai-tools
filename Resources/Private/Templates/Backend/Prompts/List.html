@@ -32,7 +32,7 @@
             <tbody>
                 <f:for each="{prompts}" key="domainName" as="prompt">
                     <tr>
-                        <td class="col-title">
+                        <td>
                             <core:iconForRecord table="tx_aitools_domain_model_prompt" row="{0: prompt.uid}" />
                             <f:if condition="{prompt.default}">
                                 🏠
@@ -42,9 +42,9 @@
                                 {prompt.description -> f:format.crop(maxCharacters:50)}
                             </be:link.editRecord>
                         </td>
-                        <td>
+                        <td >
                             <be:link.editRecord title="{prompt.prompt}" returnUrl="{returnUrl}" table="tx_aitools_domain_model_prompt" uid="{prompt.uid}">
-                                {prompt.prompt -> f:format.crop(maxCharacters:50)}
+                                <span >{prompt.prompt -> f:format.crop(maxCharacters:500)}</span>
                             </be:link.editRecord>
                         </td>
                         <td>
