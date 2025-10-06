@@ -168,21 +168,6 @@ return [
                 --palette--;;paletteGeneral, apikey
             ',
         ],
-        'openai' => [
-            'showitem' => '
-                --palette--;;paletteGeneral, apikey
-            ',
-        ],
-        'deepl' => [
-            'showitem' => '
-                --palette--;;paletteGeneral, endpoint, apikey, formality
-            ',
-        ],
-        'custom' => [
-            'showitem' => '
-                --palette--;;paletteGeneral, apikey, --palette--;;paletteKongAuth, --palette--;;paletteKongUrls,
-            ',
-        ],
     ],
     'palettes' => [
         'paletteGeneral' => [

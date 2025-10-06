@@ -11,8 +11,6 @@ class ApiKeyInfoElement extends AbstractFormElement
 
     private $urls = [
         'aigude' => 'https://aigude.io/',
-        'openai' => 'https://platform.openai.com/account/api-keys',
-        'deepl' => 'https://www.deepl.com/pro-api',
     ];
 
     public function render(): array

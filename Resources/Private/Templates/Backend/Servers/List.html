@@ -29,9 +29,6 @@
                     <th>
                         Contingent
                     </th>
-                    <th>
-                        Functionality
-                    </th>
                     <th></th>
                 </tr>
             </thead>
@@ -52,14 +49,6 @@
 
                         <td>
                             {server.credits}
-                        </td>
-
-                        <td>
-                            <f:for each="{server.functionality}" as="functionality">
-                                <span class="badge badge-default label label-default">
-                                    <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_server.{functionality}" />
-                                </span>
-                            </f:for>
                         </td>
 
                         <td>

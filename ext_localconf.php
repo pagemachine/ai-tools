@@ -34,27 +34,6 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ai_tools']['servers'] = [
             'image_recognition' => AigudeImageRecognitionService::class,
         ],
     ],
-    /*
-    'openai' => [
-        'name' => 'Open AI',
-        'functionality' => [
-            'image_recognition' => OpenAiImageRecognitionService::class,
-        ],
-    ],
-    'deepl' => [
-        'name' => 'DeepL',
-        'functionality' => [
-            'translation' => DeepLTranslationService::class,
-        ],
-    ],
-    'custom' => [
-        'name' => 'Custom',
-        'functionality' => [
-            'image_recognition' => CustomImageRecognitionService::class,
-            'translation' => CustomTranslationService::class,
-        ],
-    ],
-    */
 ];
 
 $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ai_tools']['placeholder'] = [
