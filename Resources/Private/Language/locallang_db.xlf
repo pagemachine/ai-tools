@@ -6,7 +6,7 @@
 				<source>Prompt Template</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_domain_model_prompt.templates">
-				<source>Templates</source>
+				<source>Prompts</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_domain_model_prompt.prompt">
 				<source>Prompt</source>
