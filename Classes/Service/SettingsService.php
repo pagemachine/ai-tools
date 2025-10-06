@@ -9,12 +9,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class SettingsService
 {
-    private readonly ServerRepository $serverRepository;
-
-    public function __construct()
-    {
-        $this->serverRepository = GeneralUtility::makeInstance(ServerRepository::class);
-    }
 
     /**
      * get setting
@@ -26,7 +20,8 @@ class SettingsService
         switch ($key) {
             case 'translation_service':
             case 'image_recognition_service':
-                $server = $this->serverRepository->getDefault();
+                $serverRepository = GeneralUtility::makeInstance(ServerRepository::class);
+                $server = $serverRepository->getDefault();
                 if ($server === null) {
                     return null;
                 }
