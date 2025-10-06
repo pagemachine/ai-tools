@@ -32,8 +32,7 @@
             <tbody>
                 <f:for each="{prompts}" key="domainName" as="prompt">
                     <tr>
-                        <td>
-                            <core:iconForRecord table="tx_aitools_domain_model_prompt" row="{0: prompt.uid}" />
+                        <td style="white-space: nowrap;">
                             <f:if condition="{prompt.default}">
                                 🏠
                             </f:if>

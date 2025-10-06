@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Service;
 
-use TYPO3\CMS\Core\Registry;
+use Pagemachine\AItools\Domain\Repository\ServerRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class SettingsService
 {
-    private readonly Registry $registry;
-
-    private string $namespace = 'ai_tools';
+    private readonly ServerRepository $serverRepository;
 
     public function __construct()
     {
-        $this->registry = GeneralUtility::makeInstance(Registry::class);
+        $this->serverRepository = GeneralUtility::makeInstance(ServerRepository::class);
     }
 
     /**
@@ -23,17 +21,19 @@ class SettingsService
      *
      * @return mixed|null
      */
-    public function getSetting(string $key): mixed
+    public function getSetting(string $key)
     {
-        return $this->registry->get($this->namespace, $key);
-    }
-
-    /**
-     * set setting
-     */
-    public function setSetting(string $key, mixed $value): void
-    {
-        $this->registry->set($this->namespace, $key, $value);
+        switch ($key) {
+            case 'translation_service':
+            case 'image_recognition_service':
+                $server = $this->serverRepository->getDefault();
+                if ($server === null) {
+                    return null;
+                }
+                return $server->getUid();
+            default:
+                throw new \InvalidArgumentException('Unknown settings key: ' . $key, 1759757766);
+        }
     }
 
     /**

@@ -30,6 +30,11 @@ class Server extends AbstractEntity
      */
     protected string $apikey;
 
+    /**
+     * @var bool
+     */
+    protected bool $default = false;
+
     public function getHidden(): bool
     {
         return $this->hidden;
@@ -94,5 +99,15 @@ class Server extends AbstractEntity
     public function setApikey(string $apikey): void
     {
         $this->apikey = $apikey;
+    }
+
+    public function isDefault(): bool
+    {
+        return $this->default;
+    }
+
+    public function setDefault(bool $default): void
+    {
+        $this->default = $default;
     }
 }

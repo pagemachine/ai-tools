@@ -35,7 +35,10 @@
             <tbody>
                 <f:for each="{servers}" key="domainName" as="server">
                     <tr>
-                        <td>
+                        <td style="white-space: nowrap;">
+                            <f:if condition="{server.default}">
+                                🏠
+                            </f:if>
                             {server.server -> f:format.crop(maxCharacters:50)}
                         </td>
                         <td class="col-title">
@@ -83,6 +86,12 @@
                                     data-button-close-text="{f:translate(key: 'LLL:EXT:backend/Resources/Private/Language/locallang_alt_doc.xlf:buttons.confirm.delete_record.no')}">
                                     <core:icon identifier="actions-delete" />
                                 </a>
+                                <f:if condition="{server.default} == 0">
+                                    <a class="btn btn-default btn-disabled"
+                                        href="{be:moduleLink(route:'tce_db', query:'data[tx_aitools_domain_model_server][{server.uid}][default]=1', arguments:'{redirect: returnUrl}')}">
+                                        set as Default
+                                    </a>
+                                </f:if>
                             </div>
                         </td>
                     </tr>

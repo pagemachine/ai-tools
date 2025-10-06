@@ -73,7 +73,7 @@ class ServerService
         $serviceUid = (integer) $this->settingsService->getSetting($functionality.'_service');
 
         if (empty($serviceUid)) {
-            throw new \Exception('No valid '.$functionality.' service configured');
+            throw new \Exception('No default server defined for ' . $functionality);
         }
 
         $serverRepository = GeneralUtility::makeInstance(ServerRepository::class);
