@@ -52,7 +52,7 @@
 				<source>API Key</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_domain_model_server.apikey.linktext">
-				<source>Get your API key here</source>
+				<source>Get your free API key here</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_domain_model_server.endpoint">
 				<source>Endpoint</source>
