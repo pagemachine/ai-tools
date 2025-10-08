@@ -7,8 +7,9 @@ class PlaceholderResult
     /**
      * @param string $text The processed text
      * @param array<string, Placeholder> $placeholders
+     * @param string|null $language
      */
-    public function __construct(private readonly string $text, private array $placeholders)
+    public function __construct(private readonly string $text, private array $placeholders, private ?string $language = null)
     {
     }
 
@@ -34,5 +35,10 @@ class PlaceholderResult
     public function hasPlaceholders(): bool
     {
         return !empty($this->placeholders);
+    }
+
+    public function getLanguage(): ?string
+    {
+        return $this->language;
     }
 }

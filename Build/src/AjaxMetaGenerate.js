@@ -7,8 +7,9 @@ import { callAjaxSaveMetaDataAction } from './utils/RemoteCalls.js';
 
 $(() => {
   $('.textPromptSelect').on('change', function() {
-    const selectedValue = $(this).val();
-    $($(this).data('target')).val(selectedValue);
+    const selectedValue = JSON.parse($(this).val());
+    $($(this).data('target')).val(selectedValue.prompt);
+    $($(this).data('target')).attr('data-text-prompt-language', selectedValue.language);
   });
 });
 

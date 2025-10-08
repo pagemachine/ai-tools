@@ -49,7 +49,7 @@ class ImageMetaDataService
      * @return string
      * @throws \Exception
      */
-    public function generateImageDescription(FileInterface $fileObject, string $textPrompt = '', string $targetLanguage = 'en', int $language = 0): string
+    public function generateImageDescription(FileInterface $fileObject, string $textPrompt = '', string $targetLanguage = 'en', int $language = 0, string $promptLanguage = 'auto'): string
     {
         $serverClass = $this->serverService->getActiveServerClassByFunctionality('image_recognition');
         $processedImage = $this->getScaledImage($fileObject);
@@ -58,7 +58,7 @@ class ImageMetaDataService
         $fileReference = $this->getMetaDataForLanguage($fileObject, $language);
         $placeholdersResult = $this->placeholderService->resolvePlaceholders($textPrompt, [ 'file' => $fileObject, 'fileReference' => $fileReference ]);
 
-        return $serverClass->sendFileToApi($processedImage, $placeholdersResult, $targetLanguage);
+        return $serverClass->sendFileToApi($processedImage, $placeholdersResult, $targetLanguage, $promptLanguage);
     }
 
     /**

@@ -23,7 +23,7 @@ class PromptRepository extends Repository
         return $query->execute();
     }
 
-    public function getDefaultPromptText(): string
+    public function getDefaultPrompt(): Prompt
     {
         $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
         if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0', '<')) {
@@ -38,12 +38,21 @@ class PromptRepository extends Repository
             $defaultPrompt = $this->findOneBy(['default' => true]);
         }
 
-        if ($defaultPrompt) {
-            $prompt = $defaultPrompt->getPrompt();
-        } else {
-            $prompt = 'Describe the essential content of the picture briefly and concisely. Limit the text to a very short sentence. Avoid elements such as "The picture shows" and descriptive adjectives.';
+        if (!$defaultPrompt) {
+            $tempPrompt = new Prompt();
+            $tempPrompt->setPrompt('Describe the essential content of the picture briefly and concisely. Limit the text to a very short sentence. Avoid elements such as "The picture shows" and descriptive adjectives.');
+            $tempPrompt->setDescription('Fallback prompt');
+            $tempPrompt->setType('alternative');
+            $tempPrompt->setDefault(true);
+            $tempPrompt->setLanguage('en_US');
+            $defaultPrompt = $tempPrompt;
         }
 
-        return $prompt;
+        return $defaultPrompt;
+    }
+
+    public function getDefaultPromptText(): string
+    {
+        return $this->getDefaultPrompt()->getPrompt();
     }
 }

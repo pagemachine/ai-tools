@@ -222,7 +222,7 @@ class ImageRecognizeController extends ActionController
 
         $allPrompts = $this->promptRepository->findAll();
 
-        $defaultPrompt = $this->promptRepository->getDefaultPromptText();
+        $defaultPrompt = $this->promptRepository->getDefaultPrompt();
 
         $siteLanguages = $this->getAllSiteLanguages();
 
@@ -272,14 +272,16 @@ class ImageRecognizeController extends ActionController
                     ->withHeader('Content-Type', 'application/json')
                     ->withBody($this->streamFactory->createStream(json_encode($returnArray)));
             case 'generateMetaData':
-                $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt != null ? $defaultPrompt : '');
+                $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt->getPrompt() != null ? $defaultPrompt->getPrompt() : '');
+                $promtLanguage = $parsedBody['textPromptLanguage'] ?? $queryParams['textPromptLanguage'] ?? 'auto';
                 $supportsTranslation = false; //d asd sad sadsa das dasd sad asd
                 if ($this->imageMetaDataService->supportsTranslation()) {
                     $altTextFromImageTranslated = $this->imageMetaDataService->generateImageDescription(
                         $fileObjects[0]['file'],
                         $textPrompt,
                         $targetTwoLetterIsoCode,
-                        (int) $target_language
+                        (int) $target_language,
+                        $promtLanguage
                     );
                     $data = ['alternative' => $altTextFromImageTranslated, 'baseAlternative' => $altTextFromImageTranslated];
                 } else {
@@ -287,7 +289,8 @@ class ImageRecognizeController extends ActionController
                         $fileObjects[0]['file'],
                         $textPrompt,
                         'en',
-                        (int) $target_language
+                        (int) $target_language,
+                        $promtLanguage
                     );
                     $altText = $this->translationService->translateText($altTextFromImage, 'en', $targetTwoLetterIsoCode);
                     $data = ['alternative' => $altText, 'baseAlternative' => $altTextFromImage];
@@ -317,8 +320,12 @@ class ImageRecognizeController extends ActionController
                     'fileObjects' => $fileObjects ?? null,
                     'targetLanguage' => (int) $target_language,
                     'modal' => $modal,
-                    'textPrompt' => $defaultPrompt,
-                    'allTextPrompts' => $allPrompts,
+                    'textPrompt' => $defaultPrompt->getPrompt(),
+                    'promptLanguage' => $defaultPrompt->getLanguage(),
+                    'allTextPrompts' => array_map(fn($prompt) => [
+                        'description' => $prompt->getDescription(),
+                        'prompt' => json_encode(['prompt' => $prompt->getPrompt(), 'language' => $prompt->getLanguage()])
+                    ], $allPrompts->toArray()),
                 ];
 
                 $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
