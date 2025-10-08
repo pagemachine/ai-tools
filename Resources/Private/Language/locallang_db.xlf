@@ -35,6 +35,12 @@
 			<trans-unit id="tx_aitools_domain_model_prompt.default">
 				<source>Default prompt</source>
 			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_prompt.language">
+				<source>Language</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_prompt.language.auto">
+				<source>Auto detect</source>
+			</trans-unit>
 
 			<trans-unit id="tx_aitools_domain_model_server">
 				<source>Server</source>
