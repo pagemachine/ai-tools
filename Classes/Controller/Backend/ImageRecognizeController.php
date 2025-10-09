@@ -324,7 +324,7 @@ class ImageRecognizeController extends ActionController
                     'promptLanguage' => $defaultPrompt->getLanguage(),
                     'allTextPrompts' => array_map(fn($prompt) => [
                         'description' => $prompt->getDescription(),
-                        'prompt' => json_encode(['prompt' => $prompt->getPrompt(), 'language' => $prompt->getLanguage()])
+                        'prompt' => json_encode(['prompt' => $prompt->getPrompt(), 'language' => $prompt->getLanguage()]),
                     ], $allPrompts->toArray()),
                 ];
 

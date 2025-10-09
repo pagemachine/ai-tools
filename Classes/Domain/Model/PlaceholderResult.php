@@ -9,7 +9,7 @@ class PlaceholderResult
      * @param array<string, Placeholder> $placeholders
      * @param string|null $language
      */
-    public function __construct(private readonly string $text, private array $placeholders, private ?string $language = null)
+    public function __construct(private readonly string $text, private array $placeholders, private readonly ?string $language = null)
     {
     }
 

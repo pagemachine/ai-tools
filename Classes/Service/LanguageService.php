@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Service;
 
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
@@ -76,7 +77,7 @@ class LanguageService
      * Get locale language code from site language
      * Compatible with TYPO3 v11-13
      *
-     * @param \TYPO3\CMS\Core\Site\Entity\SiteLanguage $siteLanguage
+     * @param SiteLanguage $siteLanguage
      * @return string
      */
     private function getLocaleLanguageCode($siteLanguage): string
