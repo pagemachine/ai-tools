@@ -43,7 +43,7 @@
 			</trans-unit>
 
 			<trans-unit id="tx_aitools_domain_model_server">
-				<source>Server</source>
+				<source>API Connection</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_domain_model_server.servers">
 				<source>Servers</source>
