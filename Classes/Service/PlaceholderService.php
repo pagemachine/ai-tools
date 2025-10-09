@@ -72,7 +72,7 @@ class PlaceholderService
 
         $text = $resolved->getText();
         foreach ($resolved->getPlaceholders() as $placeholderText => $placeholder) {
-            $text = str_replace($placeholderText, $placeholder->getValue(), $text);
+            $text = str_replace('%' . $placeholderText . '%', $placeholder->getValue(), $text);
         }
 
         return $text;
