@@ -48,12 +48,10 @@ class PlaceholderService
                     }
 
                     $modifiers = $modifier ? explode('|', $modifier) : [];
-                    if (!empty($value)) {
-                        $value = $this->applyModifiers($value, $placeholderInstance, $modifiers);
-                    }
 
                     $placeholderValues[$placeholderText] = new Placeholder(
-                        $value,
+                        $this->textSanitization($value),
+                        $this->applyModifiers($value, $placeholderInstance, $modifiers),
                         $identifier,
                         $modifiers,
                         $placeholderText,
@@ -72,7 +70,7 @@ class PlaceholderService
 
         $text = $resolved->getText();
         foreach ($resolved->getPlaceholders() as $placeholderText => $placeholder) {
-            $text = str_replace('%' . $placeholderText . '%', $placeholder->getValue(), $text);
+            $text = str_replace('%' . $placeholderText . '%', $placeholder->getValueWithModifiers(), $text);
         }
 
         return $text;
@@ -97,7 +95,7 @@ class PlaceholderService
 
     public function applyModifiers(string $value, PlaceholderInterface $placeholder, array $modifiers = []): string
     {
-        $value = trim($value, '"\'');
+        $value = $this->textSanitization($value);
 
         $force_raw = false;
         $force_q = false;
@@ -137,5 +135,16 @@ class PlaceholderService
         }
 
         return $value;
+    }
+
+    public function textSanitization(string $text): string
+    {
+        $text = preg_replace('/\s+/', ' ', $text);
+
+        $text = trim((string) $text, '"\'');
+
+        $text = trim($text);
+
+        return $text;
     }
 }
