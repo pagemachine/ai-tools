@@ -38,6 +38,8 @@ class PromptInfoElement extends AbstractFormElement
             'lower' => 'Convert to lowercase',
             'upper' => 'Convert to uppercase',
             'ucfirst' => 'Uppercase the first character',
+            'translatable' => 'Force translation',
+            'untranslatable' => 'Never translate',
         ];
 
         foreach ($modifier as $key => $value) {
