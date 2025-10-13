@@ -53,7 +53,7 @@ class PromptInfoElement extends AbstractFormElement
 
         if ($prompt !== $promptText) {
             $html .= $this->getTranslation('applied.header') . '<br>';
-            $html .= '<code style="white-space: pre;">' . htmlspecialchars($prompt) . '</code><br><br>';
+            $html .= '<code style="white-space: pre-wrap;">' . htmlspecialchars($prompt) . '</code><br><br>';
         }
 
         $html .= '</div>';
