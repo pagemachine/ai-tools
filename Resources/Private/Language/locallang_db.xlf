@@ -6,10 +6,22 @@
 				<source>Prompt Template</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_domain_model_prompt.templates">
-				<source>Templates</source>
+				<source>Prompts</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_domain_model_prompt.prompt">
 				<source>Prompt</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_prompt.prompt.placeholder.header">
+				<source>Available placeholders:</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_prompt.prompt.modifier.header">
+				<source>Available modifiers:</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_prompt.prompt.modifier.info">
+				<source>You can apply one or more modifiers to a placeholder by using the | character. Modifiers can be chained in any order.</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_prompt.prompt.applied.header">
+				<source>Prompt with applied placeholders:</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_domain_model_prompt.description">
 				<source>Title</source>
@@ -23,9 +35,15 @@
 			<trans-unit id="tx_aitools_domain_model_prompt.default">
 				<source>Default prompt</source>
 			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_prompt.language">
+				<source>Language</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_prompt.language.auto">
+				<source>Auto detect</source>
+			</trans-unit>
 
 			<trans-unit id="tx_aitools_domain_model_server">
-				<source>Server</source>
+				<source>API Connection</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_domain_model_server.servers">
 				<source>Servers</source>
@@ -40,7 +58,7 @@
 				<source>API Key</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_domain_model_server.apikey.linktext">
-				<source>Get your API key here</source>
+				<source>Get your free API key here</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_domain_model_server.endpoint">
 				<source>Endpoint</source>

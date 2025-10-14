@@ -33,6 +33,11 @@ class Prompt extends AbstractEntity
      */
     protected bool $default = false;
 
+    /**
+     * @var string
+     */
+    protected string $language = 'en_US';
+
     public function getHidden(): bool
     {
         return $this->hidden;
@@ -86,5 +91,15 @@ class Prompt extends AbstractEntity
     public function setDefault(bool $default): void
     {
         $this->default = $default;
+    }
+
+    public function getLanguage(): string
+    {
+        return $this->language;
+    }
+
+    public function setLanguage(string $language): void
+    {
+        $this->language = $language;
     }
 }

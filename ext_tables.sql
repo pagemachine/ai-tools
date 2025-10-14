@@ -3,11 +3,13 @@ CREATE TABLE tx_aitools_domain_model_prompt (
 	description varchar(255),
 	type varchar(255) DEFAULT '' NOT NULL,
 	default tinyint(1) DEFAULT '0' NOT NULL,
+	language varchar(10) DEFAULT 'en_US' NOT NULL,
 );
 
 CREATE TABLE tx_aitools_domain_model_server (
 	title varchar(255),
 	type varchar(255),
+	default tinyint(1) DEFAULT '0' NOT NULL,
 
 	apikey varchar(255),
 

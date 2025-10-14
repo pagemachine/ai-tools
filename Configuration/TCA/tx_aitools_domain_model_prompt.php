@@ -47,6 +47,11 @@ return [
                 'cols' => '40',
                 'required' => true,
                 'rows' => '15',
+                'fieldInformation' => [
+                    'PromptInfo' => [
+                        'renderType' => 'PromptInfoElement',
+                    ]
+                ],
             ],
         ],
         'description' => [
@@ -78,12 +83,22 @@ return [
                 'default' => 0,
             ],
         ],
+        'language' => [
+            'exclude' => true,
+            'label' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.language',
+            'config' => [
+                'type' => 'select',
+                'renderType' => 'selectSingle',
+                'default' => 'en_US',
+                'itemsProcFunc' => 'Pagemachine\\AItools\\Service\\LanguageService->getLanguageOptions',
+            ],
+        ],
     ],
     'types' => [
         '0' => [
             'showitem' => '
                 --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:general,
-                --palette--;;paletteHidden, default, type, description, prompt,
+                --palette--;;paletteHidden, default, type, description, prompt, language,
             ',
         ],
     ],

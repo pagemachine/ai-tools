@@ -15,8 +15,8 @@
 </f:section>
 
 <f:section name="table">
-    <div class="table-fit">
-        <table class="table table-striped table-hover">
+    <div class="panel panel-default">
+        <table class="table table-striped table-hover" style="margin: 0;">
             <thead>
                 <tr>
                     <th>
@@ -32,8 +32,7 @@
             <tbody>
                 <f:for each="{prompts}" key="domainName" as="prompt">
                     <tr>
-                        <td class="col-title">
-                            <core:iconForRecord table="tx_aitools_domain_model_prompt" row="{0: prompt.uid}" />
+                        <td style="white-space: nowrap;">
                             <f:if condition="{prompt.default}">
                                 🏠
                             </f:if>
@@ -42,9 +41,9 @@
                                 {prompt.description -> f:format.crop(maxCharacters:50)}
                             </be:link.editRecord>
                         </td>
-                        <td>
+                        <td >
                             <be:link.editRecord title="{prompt.prompt}" returnUrl="{returnUrl}" table="tx_aitools_domain_model_prompt" uid="{prompt.uid}">
-                                {prompt.prompt -> f:format.crop(maxCharacters:50)}
+                                <span >{prompt.prompt -> f:format.crop(maxCharacters:500)}</span>
                             </be:link.editRecord>
                         </td>
                         <td>
@@ -91,6 +90,16 @@
                 </f:for>
             </tbody>
         </table>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-sm-8">
+                    <be:link.newRecord table="tx_aitools_domain_model_prompt" returnUrl="{returnUrl}" class="btn btn-secondary">
+                        <core:icon identifier="actions-add" />
+                        New Prompt
+                    </be:link.newRecord>
+                </div>
+            </div>
+        </div>
     </div>
 </f:section>
 

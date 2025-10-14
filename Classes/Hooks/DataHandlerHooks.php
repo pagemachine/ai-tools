@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Hooks;
 
+use Pagemachine\AItools\Domain\Repository\ServerRepository;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -28,6 +29,24 @@ class DataHandlerHooks
                     ->update($table)
                     ->set('default', 0)
                     ->executeStatement();
+            }
+        } elseif ($table === 'tx_aitools_domain_model_server'
+            && array_key_exists('default', $fieldArray)
+        ) {
+            if ($fieldArray['default'] == 1) {
+                $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable($table);
+                $queryBuilder = $connection->createQueryBuilder();
+
+                $queryBuilder
+                    ->update($table)
+                    ->set('default', 0)
+                    ->executeStatement();
+            } elseif ($fieldArray['default'] == 0) {
+                $serverRepository = GeneralUtility::makeInstance(ServerRepository::class);
+                $defaultServer = $serverRepository->getDefault();
+                if ($defaultServer === null) {
+                    $fieldArray['default'] = 1;
+                }
             }
         }
     }

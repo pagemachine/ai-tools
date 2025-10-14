@@ -11,8 +11,6 @@ class ApiKeyInfoElement extends AbstractFormElement
 
     private $urls = [
         'aigude' => 'https://aigude.io/',
-        'openai' => 'https://platform.openai.com/account/api-keys',
-        'deepl' => 'https://www.deepl.com/pro-api',
     ];
 
     public function render(): array
@@ -29,7 +27,7 @@ class ApiKeyInfoElement extends AbstractFormElement
         $linkText = $this->getLanguageService()->sL('LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_server.apikey.linktext');
 
         return [
-            'html' => '<div class="form-control-wrap" style="font-weight: bold;">[<a href="' . htmlspecialchars((string) $href) . '" target="_blank">'. htmlspecialchars($linkText) . '</a>]</div>',
+            'html' => '<div class="form-control-wrap" style="font-weight: bold;">[<a href="' . htmlspecialchars((string) $href) . '" style="color: blue;" target="_blank">'. htmlspecialchars($linkText) . '</a>]</div>',
         ];
     }
 }

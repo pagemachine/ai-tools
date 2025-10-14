@@ -66,6 +66,14 @@ return [
                 'items' => $serverService->getTcaOptions(),
             ],
         ],
+        'default' => [
+            'exclude' => true,
+            'label' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.default',
+            'config' => [
+                'type' => 'check',
+                'default' => 0,
+            ],
+        ],
         'apikey' => [
             'exclude' => true,
             'label' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_server.apikey',
@@ -168,27 +176,12 @@ return [
                 --palette--;;paletteGeneral, apikey
             ',
         ],
-        'openai' => [
-            'showitem' => '
-                --palette--;;paletteGeneral, apikey
-            ',
-        ],
-        'deepl' => [
-            'showitem' => '
-                --palette--;;paletteGeneral, endpoint, apikey, formality
-            ',
-        ],
-        'custom' => [
-            'showitem' => '
-                --palette--;;paletteGeneral, apikey, --palette--;;paletteKongAuth, --palette--;;paletteKongUrls,
-            ',
-        ],
     ],
     'palettes' => [
         'paletteGeneral' => [
             'showitem' => '
                 --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:general,
-                type, hidden, --linebreak--,
+                type, hidden, default, --linebreak--,
                 title,
             ',
         ],

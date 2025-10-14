@@ -6,18 +6,23 @@
 <f:layout name="Default" />
 
 <f:section name="Content">
-    <h1>
-        <f:translate
-            key="LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_server" />
-    </h1>
-
-    <f:render section="table" arguments="{_all}" />
+    <f:if condition="{servers}">
+        <f:then>
+            <h1>
+                <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_server" />
+            </h1>
+            <f:render section="table" arguments="{_all}" />
+        </f:then>
+        <f:else>
+            <f:render section="initialization" arguments="{_all}" />
+        </f:else>
+    </f:if>
 
 </f:section>
 
 <f:section name="table">
-    <div class="table-fit">
-        <table class="table table-striped table-hover">
+    <div class="panel panel-default">
+        <table class="table table-striped table-hover" style="margin: 0;">
             <thead>
                 <tr>
                     <th>
@@ -27,10 +32,7 @@
                         <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_server.title" />
                     </th>
                     <th>
-                        Contingent
-                    </th>
-                    <th>
-                        Functionality
+                        Remaining credits
                     </th>
                     <th></th>
                 </tr>
@@ -38,7 +40,10 @@
             <tbody>
                 <f:for each="{servers}" key="domainName" as="server">
                     <tr>
-                        <td>
+                        <td style="white-space: nowrap;">
+                            <f:if condition="{server.default}">
+                                🏠
+                            </f:if>
                             {server.server -> f:format.crop(maxCharacters:50)}
                         </td>
                         <td class="col-title">
@@ -52,14 +57,6 @@
 
                         <td>
                             {server.credits}
-                        </td>
-
-                        <td>
-                            <f:for each="{server.functionality}" as="functionality">
-                                <span class="badge badge-default label label-default">
-                                    <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_server.{functionality}" />
-                                </span>
-                            </f:for>
                         </td>
 
                         <td>
@@ -94,13 +91,104 @@
                                     data-button-close-text="{f:translate(key: 'LLL:EXT:backend/Resources/Private/Language/locallang_alt_doc.xlf:buttons.confirm.delete_record.no')}">
                                     <core:icon identifier="actions-delete" />
                                 </a>
+                                <f:if condition="{server.default} == 0">
+                                    <a class="btn btn-default btn-disabled"
+                                        href="{be:moduleLink(route:'tce_db', query:'data[tx_aitools_domain_model_server][{server.uid}][default]=1', arguments:'{redirect: returnUrl}')}">
+                                        set as Default
+                                    </a>
+                                </f:if>
                             </div>
                         </td>
                     </tr>
                 </f:for>
             </tbody>
         </table>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-sm-8">
+                    <be:link.newRecord table="tx_aitools_domain_model_server" returnUrl="{returnUrl}"
+                        defaultValues="{ 'tx_aitools_domain_model_server': { 'type': 'aigude' } }" class="btn btn-primary"
+                        style="background-color: #e966d4; border-color: #e960d3;">
+                        <core:icon identifier="actions-document-new" /> Create new Server
+                    </be:link.newRecord>
+                </div>
+            </div>
+        </div>
     </div>
+</f:section>
+
+
+<f:section name="initialization">
+
+    <h1>Getting Started</h1>
+
+    <p>
+        To setup AI tools, first get your API key and then use it to connect the extension to AiGude
+    </p>
+
+    <div class="card-container">
+        <div class="card card-size-fixed-small" style="border-color: #e960d3; border-width: 3px;">
+
+            <div class="card-header">
+                <div class="card-icon">
+                    <core:icon identifier="tx-aitools-module" size="large" />
+
+                </div>
+
+                <div class="card-header-body">
+                    <h2 class="card-title">Get your free API key</h2>
+                    <span class="card-subtitle">100 Credits free</span>
+                </div>
+            </div>
+
+
+            <div class="card-body">
+                <p class="card-text">
+                    Unlock advanced AI features by connecting your AiGude account. Get your free API key in seconds to start
+                    using all the extensions capabilities.
+                </p>
+            </div>
+            <div class="card-footer">
+                <a target="_blank" href="https://aigude.io/" class="btn btn-primary"
+                    style="background-color: #e966d4; border-color: #e960d3;">
+                    <core:icon identifier="actions-link" />
+                    Get API Key from Aigude
+                </a>
+            </div>
+        </div>
+
+        <div class="card card-size-fixed-small">
+
+            <div class="card-header">
+                <div class="card-icon">
+                    <core:icon identifier="install-test-environment" size="large" />
+                </div>
+
+                <div class="card-header-body">
+                    <h2 class="card-title">API connection</h2>
+                    <span class="card-subtitle">API key required</span>
+                </div>
+            </div>
+
+
+            <div class="card-body">
+                <p class="card-text">
+                    To use AI Tools, you need to configure a connection first. Use your API key to connect to AiGude.
+                </p>
+            </div>
+            <div class="card-footer">
+                <be:link.newRecord table="tx_aitools_domain_model_server" returnUrl="{returnUrl}"
+                    defaultValues="{ 'tx_aitools_domain_model_server': { 'type': 'aigude', 'title': 'AiGude' } }" class="btn btn-primary"
+                    style="background-color2: #e966d4; border-color2: #e960d3;">
+                    <core:icon identifier="actions-document-new" /> Connect to AiGude
+                </be:link.newRecord>
+            </div>
+        </div>
+
+
+    </div>
+
+
 </f:section>
 
 </html>

@@ -73,14 +73,15 @@ class AlternativeGenerator extends AbstractNode
             return $result;
         }
 
-        $prompt = $this->promptRepository->getDefaultPromptText();
+        $prompt = $this->promptRepository->getDefaultPrompt();
 
         $arguments = [
             'target' => $target,
             'target-language' => $this->data['databaseRow']['sys_language_uid'],
             'title' => $this->data['recordTitle'],
             'input-field-selector' => '[data-formengine-input-name="' . $this->data["parameterArray"]["itemFormElName"] . '"]',
-            'prompt' => $prompt,
+            'prompt' => $prompt->getPrompt(),
+            'prompt-language' => $prompt->getLanguage(),
         ];
 
         $this->templateView->assignMultiple($arguments);
