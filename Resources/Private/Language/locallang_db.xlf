@@ -36,7 +36,7 @@
 				<source>Default prompt</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_domain_model_prompt.language">
-				<source>Language</source>
+				<source>Prompt Language</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_domain_model_prompt.language.auto">
 				<source>Auto detect</source>
