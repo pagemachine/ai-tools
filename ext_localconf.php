@@ -32,6 +32,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ai_tools']['servers'] = [
         'functionality' => [
             'translation' => AigudeTranslationService::class,
             'image_recognition' => AigudeImageRecognitionService::class,
+            'translation_provider' => \Pagemachine\AItools\Service\TranslationProvider\AigudeTranslationProviderService::class,
         ],
     ],
 ];

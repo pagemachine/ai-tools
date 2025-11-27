@@ -20,6 +20,7 @@ class SettingsService
         switch ($key) {
             case 'translation_service':
             case 'image_recognition_service':
+            case 'translation_provider_service':
                 $serverRepository = GeneralUtility::makeInstance(ServerRepository::class);
                 $server = $serverRepository->getDefault();
                 if ($server === null) {
