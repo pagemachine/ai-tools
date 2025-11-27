@@ -26,6 +26,7 @@ class ServersController extends ActionController
         private readonly ModuleTemplateFactory $moduleTemplateFactory,
         private readonly IconFactory $iconFactory,
         private readonly ServerService $serverService,
+        private readonly \Pagemachine\AItools\Service\SettingsService $settingsService,
     ) {
     }
 
@@ -71,6 +72,8 @@ class ServersController extends ActionController
         $template_variables = [
             'servers' => $this->serverRepository->listAllServers(),
             'returnUrl' => $requestUri,
+            'gdprCompliant' => $this->settingsService->getGdprCompliant(),
+            'translationProviderPerLanguage' => $this->settingsService->getTranslationProviders(),
         ];
 
         $this->setDocHeader($moduleTemplate, $requestUri);
@@ -83,6 +86,16 @@ class ServersController extends ActionController
             $moduleTemplate->assignMultiple($template_variables); // @phpstan-ignore-line
             return $moduleTemplate->renderResponse('Backend/Servers/List'); // @phpstan-ignore-line
         }
+    }
+
+    public function saveSettingsAction(bool $gdprCompliant, array $providers): ResponseInterface
+    {
+        $this->settingsService->setGdprCompliant($gdprCompliant);
+        $this->settingsService->setTranslationProviders($providers);
+
+        $this->addFlashMessage('Settings have been saved.', 'Settings saved', \TYPO3\CMS\Core\Messaging\AbstractMessage::OK);
+
+        return $this->redirect('list');
     }
 
     protected function getLanguageService(): LanguageService

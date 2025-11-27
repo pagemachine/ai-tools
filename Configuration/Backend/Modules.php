@@ -36,6 +36,7 @@ return [
         'controllerActions' => [
             ServersController::class => [
                 'list',
+                'saveSettings',
             ],
         ],
     ],
