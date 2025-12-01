@@ -77,3 +77,6 @@ $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1758028928] = [
     'priority' => 70,
     'class' => PromptInfoElement::class,
 ];
+
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['ai_tools']
+    ??= [];

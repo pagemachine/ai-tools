@@ -4,32 +4,46 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Service\TranslationProvider;
 
+use Pagemachine\AItools\Domain\Model\Server;
 use Pagemachine\AItools\Service\Abstract\AigudeAbstract;
 use Pagemachine\AItools\Service\TranslationProvider\TranslationProviderServiceInterface;
+use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class AigudeTranslationProviderService extends AigudeAbstract implements TranslationProviderServiceInterface
 {
+    private FrontendInterface $cache;
 
-    private $resultCache = null;
+    public function __construct(Server $server)
+    {
+        parent::__construct($server);
+        $this->cache = GeneralUtility::makeInstance(CacheManager::class)
+            ->getCache('ai_tools');
+    }
 
     public function sendTranslationProviderRequestToApi(): array
     {
-        if (!is_null($this->resultCache)) {
-            return $this->resultCache;
+        $cacheIdentifier = 'providers_list';
+
+        if ($this->cache->has($cacheIdentifier)) {
+            return $this->cache->get($cacheIdentifier);
         }
 
         $url = $this->domain . '/translate/providers';
 
         $json = $this->request($url, 'GET', [
-            'timeout' => 1,
+            'timeout' => 5,
             'headers' => [
                 'Content-Type' => 'application/json',
             ],
         ]);
 
-        $this->resultCache = $json['providers'];
+        $providers = $json['providers'];
 
-        return $this->resultCache;
+        $this->cache->set($cacheIdentifier, $providers, [], 86400);
+
+        return $providers;
     }
 
     public function providerSupportedForLanguage(string $languageCode, ?string $countryCode = null, $regionFilter = null): array
