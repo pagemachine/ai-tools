@@ -16,7 +16,7 @@ class AigudeTranslationService extends AigudeAbstract implements TranslationServ
             $urlParts[] = 'translation_service=' . urlencode((string) $translationProvider);
         }
 
-        $url = $this->domain. '/translate' . '?' . implode('&', $urlParts);;
+        $url = $this->domain. '/translate' . '?' . implode('&', $urlParts);
 
         // Prepare the form data
         $formData = [

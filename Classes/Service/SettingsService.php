@@ -13,7 +13,8 @@ class SettingsService
     protected ExtensionConfiguration $extensionConfiguration;
     protected LanguageService $languageService;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class);
         $this->languageService = GeneralUtility::makeInstance(LanguageService::class);
     }
@@ -63,8 +64,8 @@ class SettingsService
     {
         try {
             $providersJson = $this->extensionConfiguration->get('ai_tools', 'translationProviders');
-            $providers = json_decode($providersJson, true, 512, JSON_THROW_ON_ERROR);
-        } catch (\Exception $e) {
+            $providers = json_decode((string) $providersJson, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\Exception) {
             $providers = [];
         }
         $translationProviderOptions = $this->languageService->getTranslationProviderPerLanguage($this->getGdprCompliant() ? 'eu' : null);
@@ -73,7 +74,7 @@ class SettingsService
             $active = $option['providers'][0]['provider'] ?? null;
 
 
-            if (isset($providers[$option['siteLanguage']->getLanguageId()]) ) {
+            if (isset($providers[$option['siteLanguage']->getLanguageId()])) {
                 $providerKeys = array_column($option['providers'], 'provider');
                 if (in_array($providers[$option['siteLanguage']->getLanguageId()], $providerKeys, true)) {
                     $active = $providers[$option['siteLanguage']->getLanguageId()];

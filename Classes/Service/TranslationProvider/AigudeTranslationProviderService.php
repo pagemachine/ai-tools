@@ -13,7 +13,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class AigudeTranslationProviderService extends AigudeAbstract implements TranslationProviderServiceInterface
 {
-    private FrontendInterface $cache;
+    private readonly FrontendInterface $cache;
 
     public function __construct(Server $server)
     {
