@@ -185,54 +185,68 @@
                         </div>
                     </div>
                 </fieldset>
-                <f:render section="section-prompt" arguments="{_all}" />
-                <f:render section="section-generation" arguments="{_all}" />
-                <f:render section="section-translation" arguments="{_all}" />
+                <f:if condition="{translationProvider}">
+                    <f:then>
+                        <f:render section="section-prompt" arguments="{_all}" />
+                        <f:render section="section-generation" arguments="{_all}" />
+                        <f:render section="section-translation" arguments="{_all}" />
 
-                <fieldset class="form-section t3js-ai-tools-show-after-prompt-generation-{fileObject.file.properties.identifier_hash}" style="display: none;">
-                    <div class="module-columns">
-                        <div class="module-column">
-                            <div class="form-group bottom">
-                                <f:if condition="{modal}">
-                                    <f:then>
-                                        <button href="#"
-                                            class="btn btn-default btn-primary t3js-alternative-use-trigger"
-                                            data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
-                                        >
-                                            <core:icon identifier="actions-save" size="small" />
-                                            Use
-                                        </button>
-                                    </f:then>
-                                    <f:else>
+                        <fieldset class="form-section t3js-ai-tools-show-after-prompt-generation-{fileObject.file.properties.identifier_hash}"
+                            style="display: none;">
+                            <div class="module-columns">
+                                <div class="module-column">
+                                    <div class="form-group bottom">
+                                        <f:if condition="{modal}">
+                                            <f:then>
+                                                <button href="#" class="btn btn-default btn-primary t3js-alternative-use-trigger"
+                                                    data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}">
+                                                    <core:icon identifier="actions-save" size="small" />
+                                                    Use
+                                                </button>
+                                            </f:then>
+                                            <f:else>
+                                                <button
+                                                    class="btn btn-default btn-primary t3js-alternative-save-trigger t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}"
+                                                    data-file-identifier="{fileObject.file.combinedIdentifier}"
+                                                    data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
+                                                    data-target-language="{targetLanguage}"
+                                                    data-button-target=".t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}"
+                                                    data-translate="0">
+                                                    <core:icon identifier="actions-save" size="small" />
+                                                    Save
+                                                </button>
+                                            </f:else>
+                                        </f:if>
+
                                         <button
-                                            class="btn btn-default btn-primary t3js-alternative-save-trigger t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}"
+                                            class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-save-trigger t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}"
                                             data-file-identifier="{fileObject.file.combinedIdentifier}"
                                             data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
                                             data-target-language="{targetLanguage}"
-                                            data-button-target=".t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}" data-translate="0">
-                                            <core:icon identifier="actions-save" size="small" />
-                                            Save
+                                            data-button-target=".t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}"
+                                            data-translation-hash="{fileObject.file.properties.identifier_hash}" data-translate="1">
+                                            <core:icon identifier="actions-cpu" size="small" />
+                                            Save and translate into all other languages
+                                            <aitools:backend.Credits />
                                         </button>
-                                    </f:else>
-                                </f:if>
-
-                                <button
-                                    class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-save-trigger t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}"
-                                    data-file-identifier="{fileObject.file.combinedIdentifier}"
-                                    data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
-                                    data-target-language="{targetLanguage}"
-                                    data-button-target=".t3js-alternative-save-trigger-{fileObject.file.properties.identifier_hash}"
-                                    data-translation-hash="{fileObject.file.properties.identifier_hash}"
-                                    data-translate="1"
-                                >
-                                    <core:icon identifier="actions-cpu" size="small" />
-                                    Save and translate into all other languages
-                                    <aitools:backend.Credits />
-                                </button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </fieldset>
+                        </fieldset>
+                    </f:then>
+                    <f:else>
+                        <fieldset class="form-section">
+                            <div class="form-group">
+                                <button href="#" class="btn btn-default" disabled>No translation provider available for this language</button>
+                                <f:be.link route="AItoolsAitools_AItoolsServers" class="btn btn-default btn-pagemachine-ai-tools">
+                                    <f:translate
+                                        key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.translationSettings" />
+                                </f:be.link>
+                            </div>
+                        </fieldset>
+                    </f:else>
+                </f:if>
+
             </div>
         </div>
     </div>
@@ -274,6 +288,7 @@
                                 data-text-prompt-field="#textPrompt-{fileObject.file.properties.identifier_hash}"
                                 data-output-target="#altTextSuggestion-{fileObject.file.properties.identifier_hash}"
                                 data-target-language="{targetLanguage}"
+                                data-translation-provider="{translationProvider}"
                                 data-show-target=".t3js-ai-tools-show-after-prompt-generation-{fileObject.file.properties.identifier_hash}"
                             >
 

@@ -37,6 +37,7 @@ class GeneratorButton {
       textPrompt = $(element.data('text-prompt-field')).val();
       textPromptLanguage = $(element.data('text-prompt-field')).attr('data-text-prompt-language') || textPromptLanguage;
     }
+    let translationProvider = element.data('translation-provider');
 
     element.prop('disabled', true);
     element.addClass(GeneratorButton.CSS_CLASSES.GENERATING);
@@ -49,7 +50,8 @@ class GeneratorButton {
         fileIdentifier,
         targetLanguage,
         textPrompt,
-        textPromptLanguage
+        textPromptLanguage,
+        translationProvider,
       );
 
       console.log('Prompt generated', results);

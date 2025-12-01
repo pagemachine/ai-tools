@@ -53,6 +53,12 @@ class SettingsService
         $this->setExtConfigValue('gdprCompliant', $gdprCompliant);
     }
 
+    public function getTranslationProviderForLanguage(int $languageId): ?string
+    {
+        $translationProviders = $this->getTranslationProviders();
+        return $translationProviders[$languageId]['active'] ?? null;
+    }
+
     public function getTranslationProviders(): array
     {
         try {

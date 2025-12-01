@@ -274,14 +274,15 @@ class ImageRecognizeController extends ActionController
             case 'generateMetaData':
                 $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt->getPrompt() != null ? $defaultPrompt->getPrompt() : '');
                 $promtLanguage = $parsedBody['textPromptLanguage'] ?? $queryParams['textPromptLanguage'] ?? 'auto';
-                $supportsTranslation = false; //d asd sad sadsa das dasd sad asd
+                $translationProvider = $parsedBody['translationProvider'] ?? $queryParams['translationProvider'] ?? null;
                 if ($this->imageMetaDataService->supportsTranslation()) {
                     $altTextFromImageTranslated = $this->imageMetaDataService->generateImageDescription(
                         $fileObjects[0]['file'],
                         $textPrompt,
                         $targetTwoLetterIsoCode,
                         (int) $target_language,
-                        $promtLanguage
+                        $promtLanguage,
+                        $translationProvider
                     );
                     $data = ['alternative' => $altTextFromImageTranslated, 'baseAlternative' => $altTextFromImageTranslated];
                 } else {
@@ -290,7 +291,8 @@ class ImageRecognizeController extends ActionController
                         $textPrompt,
                         'en',
                         (int) $target_language,
-                        $promtLanguage
+                        $promtLanguage,
+                        $translationProvider,
                     );
                     $altText = $this->translationService->translateText($altTextFromImage, 'en', $targetTwoLetterIsoCode);
                     $data = ['alternative' => $altText, 'baseAlternative' => $altTextFromImage];
@@ -322,6 +324,7 @@ class ImageRecognizeController extends ActionController
                     'modal' => $modal,
                     'textPrompt' => $defaultPrompt->getPrompt(),
                     'promptLanguage' => $defaultPrompt->getLanguage(),
+                    'translationProvider' => $this->settingsService->getTranslationProviderForLanguage((int) $target_language),
                     'allTextPrompts' => array_map(fn($prompt) => [
                         'description' => $prompt->getDescription(),
                         'prompt' => json_encode(['prompt' => $prompt->getPrompt(), 'language' => $prompt->getLanguage()]),
