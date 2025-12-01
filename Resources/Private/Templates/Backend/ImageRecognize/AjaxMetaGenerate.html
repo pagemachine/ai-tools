@@ -47,6 +47,10 @@
             align-items: center;
             gap: 15px;
         }
+        .otherLanguages li.no-provider {
+            border: 2px solid red;
+            opacity: 0.5;
+        }
         .otherLanguages li .text-section {
             flex-grow: 1;
         }
@@ -370,7 +374,8 @@
                                 each="{metaLanguages}"
                             >
                                 <f:if condition="{targetLanguage} != {metaLanguage.language.languageId}">
-                                    <li>
+                                    <f:variable name="provider">{translationProviders.{metaLanguage.language.languageId}}</f:variable>
+                                    <li class="{f:if(condition: '!{provider.active}', then: 'no-provider', else: '')}">
                                         <div class="flag-section">
                                             <aitools:backend.icon
                                                 title="{metaLanguage.language.title}"
@@ -379,7 +384,7 @@
                                         </div>
                                         <div class="text-section">
                                             <div class="t3js-formengine-label">
-                                                {metaLanguage.language.title}
+                                                {metaLanguage.language.title} ({f:if(condition: '{provider.active}', then: '{provider.active}', else: 'No translation provider available for this language')})
                                             </div>
                                             <div id="translate-{fileObject.file.properties.identifier_hash}-{metaLanguage.language.languageId}">
                                                 <f:if condition="{metaLanguage.meta}">

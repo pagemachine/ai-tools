@@ -58,14 +58,14 @@ class LanguageService
         $serverService = GeneralUtility::makeInstance(ServerService::class);
         $providerService = $serverService->getActiveServerClassByFunctionality('translation_provider');
 
-        $siteLanguages = $this->getAllSiteLanguages(); // TODO: Use locale code for combining instead of id
+        $siteLanguages = $this->getAllSiteLanguages();
 
         $languageProviders = [];
         foreach ($siteLanguages as $key => $siteLanguage) {
             $languageCode = $this->getLocaleLanguageCode($siteLanguage);
             $countryCode = $this->getLocaleCountryCode($siteLanguage);
             $providers = $providerService->providerSupportedForLanguage($languageCode, $countryCode, $regionFilter);
-            $languageProviders[$key] = [
+            $languageProviders[$siteLanguage->getLanguageId()] = [
                 'siteLanguage' => $siteLanguage,
                 'providers' => $providers,
             ];
