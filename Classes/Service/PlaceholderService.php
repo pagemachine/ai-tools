@@ -49,13 +49,20 @@ class PlaceholderService
 
                     $modifiers = $modifier ? explode('|', $modifier) : [];
 
+                    $placeholderLanguage = $placeholderInstance->getLanguage();
+                    if (in_array('translatable', $modifiers)) {
+                        $placeholderLanguage = $placeholderLanguage ?? 'auto';
+                    } elseif (in_array('untranslatable', $modifiers)) {
+                        $placeholderLanguage = null;
+                    }
+
                     $placeholderValues[$placeholderText] = new Placeholder(
                         $this->textSanitization($value),
                         $this->applyModifiers($value, $placeholderInstance, $modifiers),
                         $identifier,
                         $modifiers,
                         $placeholderText,
-                        $placeholderInstance->getLanguage()
+                        $placeholderLanguage
                     );
                 }
             }
