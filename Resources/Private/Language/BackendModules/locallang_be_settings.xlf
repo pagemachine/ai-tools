@@ -16,13 +16,13 @@
 				<source>Translation Settings</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_settings.gdprCompliant">
-				<source>Show EU-based services only</source>
+				<source>Show only EU-based translation providers</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_settings.provider.deepl">
 				<source>DeepL</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_settings.provider.google">
-				<source>Google Translate</source>
+				<source>Google</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_settings.noServiceAvailable">
 				<source>No service available for this language</source>
