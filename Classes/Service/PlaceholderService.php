@@ -51,7 +51,7 @@ class PlaceholderService
 
                     $placeholderLanguage = $placeholderInstance->getLanguage();
                     if (in_array('translatable', $modifiers)) {
-                        $placeholderLanguage = $placeholderLanguage ?? 'auto';
+                        $placeholderLanguage ??= 'auto';
                     } elseif (in_array('untranslatable', $modifiers)) {
                         $placeholderLanguage = null;
                     }
