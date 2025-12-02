@@ -12,7 +12,7 @@ class AigudeImageRecognitionService extends AigudeAbstract implements ImageRecog
 {
     private static string $cleanUpRegex = '/^(?:Certainly!\s*)?(?:The\s*|This\s*)?(?:main subject of the\s*)?(?:image\s)?(?:is\s*|prominently\s*|primarily\s*|predominantly\s*)?(?:shows|showing|displays|depicts|showcases|features|features)?\s*/';
 
-    public function sendFileToApi(FileInterface $fileObject, PlaceholderResult $placeholderResult, string $targetLanguage = 'en', string $promptLanguage = 'auto', ?string $translationProvider = null): string
+    public function sendFileToApi(FileInterface $fileObject, PlaceholderResult $placeholderResult, string $targetLanguage = 'en', ?string $translationProvider = null): string
     {
         $urlParts = ['api_version=2'];
 
@@ -47,7 +47,7 @@ class AigudeImageRecognitionService extends AigudeAbstract implements ImageRecog
 
         $prompt_spec = [
             "prompt_template" => $placeholderResult->getText(),
-            "prompt_lang" => $promptLanguage,
+            "prompt_lang" => 'auto',
             "tokens" => $tokens,
         ];
 

@@ -281,7 +281,6 @@
                             id: 'textPrompt-{fileObject.file.properties.identifier_hash}',
                             name: 'textPrompt',
                             value: textPrompt,
-                            promptLanguage: '{promptLanguage}',
                         }" />
 
                         <div class="form-group">
@@ -433,7 +432,7 @@
                 <div class="form-wizards-element">
                     <f:form.textarea
                         rows="3"
-                        additionalAttributes="{wrap:'virtual', 'data-text-prompt-language': '{promptLanguage}'}"
+                        additionalAttributes="{wrap:'virtual'}"
                         name="{name}"
                         value="{value}"
                         id="{id}"

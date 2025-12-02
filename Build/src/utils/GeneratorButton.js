@@ -32,10 +32,8 @@ class GeneratorButton {
     const showTarget = element.data('show-target');
 
     let textPrompt = element.data('text-prompt');
-    let textPromptLanguage = element.data('text-prompt-language') || 'auto';
     if (element.data('text-prompt-field')) {
       textPrompt = $(element.data('text-prompt-field')).val();
-      textPromptLanguage = $(element.data('text-prompt-field')).attr('data-text-prompt-language') || textPromptLanguage;
     }
     let translationProvider = element.data('translation-provider');
 
@@ -50,7 +48,6 @@ class GeneratorButton {
         fileIdentifier,
         targetLanguage,
         textPrompt,
-        textPromptLanguage,
         translationProvider,
       );
 

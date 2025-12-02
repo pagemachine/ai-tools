@@ -26,13 +26,12 @@ export async function ajaxCall(parameters, url) {
   });
 }
 
-export async function callAjaxMetaGenerateAction(fileIdentifier, targetLanguage, textPrompt, textPromptLanguage, translationProvider) {
+export async function callAjaxMetaGenerateAction(fileIdentifier, targetLanguage, textPrompt, translationProvider) {
   const params = {
     action: 'generateMetaData',
     target: fileIdentifier,
     "target-language": targetLanguage,
     textPrompt: textPrompt,
-    textPromptLanguage: textPromptLanguage,
     translationProvider: translationProvider,
   };
 
