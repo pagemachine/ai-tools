@@ -8,9 +8,15 @@ use Pagemachine\AItools\Service\Abstract\AigudeAbstract;
 
 class AigudeTranslationService extends AigudeAbstract implements TranslationServiceInterface
 {
-    public function sendTranslationRequestToApi(string $text, string $sourceLang = 'en', string $targetLang = 'en'): string
+    public function sendTranslationRequestToApi(string $text, string $sourceLang = 'en', string $targetLang = 'en', ?string $translationProvider = null): string
     {
-        $url = $this->domain.'/translate';
+        $urlParts = [];
+
+        if (!empty($translationProvider)) {
+            $urlParts[] = 'translation_service=' . urlencode((string) $translationProvider);
+        }
+
+        $url = $this->domain. '/translate' . '?' . implode('&', $urlParts);
 
         // Prepare the form data
         $formData = [

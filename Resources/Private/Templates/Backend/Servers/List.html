@@ -12,6 +12,52 @@
                 <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_server" />
             </h1>
             <f:render section="table" arguments="{_all}" />
+
+            <h1>
+                <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.translationSettings" />
+            </h1>
+            <f:form action="saveSettings" method="post">
+                <div class="card">
+                    <div class="card-body">
+
+                        <div class="mb-3 form-check">
+                            <f:form.checkbox class="form-check-input" id="gdprCompliant" name="gdprCompliant" value="1" checked="{gdprCompliant}" onChange="this.form.submit()" />
+                            <label class="form-check-label" for="gdprCompliant">
+                                <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.gdprCompliant" />
+                            </label>
+                        </div>
+
+                        <f:for each="{translationProviderPerLanguage}" as="providerLanguage">
+                            <div class="mb-3">
+                                <label for="provider_{providerLanguage.siteLanguage.languageId}" class="form-label">{providerLanguage.siteLanguage.title}</label>
+                                <f:if condition="{providerLanguage.providers}">
+                                    <f:then>
+                                        <f:form.select class="form-select" name="providers[{providerLanguage.siteLanguage.languageId}]"
+                                            id="provider_{providerLanguage.siteLanguage.languageId}" value="{providerLanguage.active}">
+                                            <f:for each="{providerLanguage.providers}" as="provider" iteration="i">
+                                                <f:form.select.option value="{provider.provider}">
+                                                    <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.provider.{provider.provider}" >
+                                                        {provider.provider}
+                                                    </f:translate>
+                                                    ({provider.languageCode})
+                                                </f:form.select.option>
+                                            </f:for>
+                                        </f:form.select>
+                                    </f:then>
+                                    <f:else>
+                                        <span class="text-danger form-control">
+                                            <core:icon identifier="actions-exclamation-triangle-alt" /> <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.noServiceAvailable" />
+                                        </span>
+                                    </f:else>
+                                </f:if>
+                            </div>
+                        </f:for>
+                    </div>
+                    <div class="card-footer">
+                        <f:form.submit value="{f:translate(key: 'LLL:EXT:core/Resources/Private/Language/locallang_common.xlf:save')}" class="btn btn-primary" style="background-color: #e966d4; border-color: #e960d3;" />
+                    </div>
+                </div>
+            </f:form>
         </f:then>
         <f:else>
             <f:render section="initialization" arguments="{_all}" />

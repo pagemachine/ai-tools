@@ -20,6 +20,7 @@ use Pagemachine\AItools\Placeholder\FileWidthPlaceholder;
 use Pagemachine\AItools\Service\Credits\AigudeCreditsService;
 use Pagemachine\AItools\Service\ImageRecognition\AigudeImageRecognitionService;
 use Pagemachine\AItools\Service\Translation\AigudeTranslationService;
+use Pagemachine\AItools\Service\TranslationProvider\AigudeTranslationProviderService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
@@ -32,6 +33,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ai_tools']['servers'] = [
         'functionality' => [
             'translation' => AigudeTranslationService::class,
             'image_recognition' => AigudeImageRecognitionService::class,
+            'translation_provider' => AigudeTranslationProviderService::class,
         ],
     ],
 ];
@@ -76,3 +78,6 @@ $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1758028928] = [
     'priority' => 70,
     'class' => PromptInfoElement::class,
 ];
+
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['ai_tools']
+    ??= [];

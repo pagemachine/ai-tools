@@ -12,12 +12,16 @@ class AigudeImageRecognitionService extends AigudeAbstract implements ImageRecog
 {
     private static string $cleanUpRegex = '/^(?:Certainly!\s*)?(?:The\s*|This\s*)?(?:main subject of the\s*)?(?:image\s)?(?:is\s*|prominently\s*|primarily\s*|predominantly\s*)?(?:shows|showing|displays|depicts|showcases|features|features)?\s*/';
 
-    public function sendFileToApi(FileInterface $fileObject, PlaceholderResult $placeholderResult, string $targetLanguage = 'en', string $promptLanguage = 'auto'): string
+    public function sendFileToApi(FileInterface $fileObject, PlaceholderResult $placeholderResult, string $targetLanguage = 'en', ?string $translationProvider = null): string
     {
         $urlParts = ['api_version=2'];
 
         if (!empty($targetLanguage)) {
-            $urlParts[] = '&target_lang=' . urlencode((string) $targetLanguage);
+            $urlParts[] = 'target_lang=' . urlencode((string) $targetLanguage);
+        }
+
+        if (!empty($translationProvider)) {
+            $urlParts[] = 'translation_provider=' . urlencode((string) $translationProvider);
         }
 
         $url = $this->domain . '/img2desc_file/' . '?' . implode('&', $urlParts);
@@ -30,20 +34,20 @@ class AigudeImageRecognitionService extends AigudeAbstract implements ImageRecog
         foreach ($placeholderResult->getPlaceholders() as $placeholder) {
             $lang = 'auto';
             $langScript = $placeholder->getLanguage();
-            if ($placeholder->getLanguage() && $langScript) {
+            if ($langScript) {
                 $lang = $langScript;
             }
 
             $tokens[$placeholder->getIdentifier()] = [
                 "value" => $placeholder->getValue(),
                 "lang" => $lang,
-                "translatable" => (boolean) $placeholder->getLanguage(),
+                "translatable" => (boolean) $langScript,
             ];
         }
 
         $prompt_spec = [
             "prompt_template" => $placeholderResult->getText(),
-            "prompt_lang" => $promptLanguage,
+            "prompt_lang" => 'auto',
             "tokens" => $tokens,
         ];
 

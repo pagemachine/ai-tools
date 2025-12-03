@@ -8,36 +8,48 @@
 <f:layout name="DefaultFieldWizard" />
 
 <f:section name="Content">
-    <button
-        href="#"
-        class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-generator-trigger"
-        data-file-identifier="{target}"
-        data-text-prompt="{prompt}"
-        data-text-prompt-language="{prompt-language}"
-        data-target-language="{target-language}"
-        data-output-target="{input-field-selector}"
-    >
-        <core:icon identifier="actions-cpu" size="small" />
-        Generate
-        <aitools:backend.Credits
-            type="imageRecognition"
-            file-identifier="{target}"
-            target-language="{target-language}"
-            text-prompt="{prompt}"
-        />
-    </button>
-
-    <button
-        href="#"
-        class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-generator-settings-trigger"
-        data-title="{title}"
-        data-target="{target}"
-        data-target-language="{target-language}"
-        data-output-target="{input-field-selector}"
-        data-base="{f:be.uri(route: 'ajax_aitools_ai_tools_images')}"
-    >
-        <core:icon identifier="actions-cog-alt" size="small" />
-    </button>
+    <f:if condition="{translation-provider}">
+        <f:then>
+            <button
+                href="#"
+                class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-generator-trigger"
+                data-file-identifier="{target}"
+                data-text-prompt="{prompt}"
+                data-text-prompt-language="{prompt-language}"
+                data-target-language="{target-language}"
+                data-translation-provider="{translation-provider}"
+                data-output-target="{input-field-selector}"
+            >
+                <core:icon identifier="actions-cpu" size="small" />
+                Generate
+                <aitools:backend.Credits
+                    type="imageRecognition"
+                    file-identifier="{target}"
+                    target-language="{target-language}"
+                    text-prompt="{prompt}"
+                />
+            </button>
+            <button
+                href="#"
+                class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-generator-settings-trigger"
+                data-title="{title}"
+                data-target="{target}"
+                data-target-language="{target-language}"
+                data-output-target="{input-field-selector}"
+                data-base="{f:be.uri(route: 'ajax_aitools_ai_tools_images')}"
+            >
+                <core:icon identifier="actions-cog-alt" size="small" />
+            </button>
+        </f:then>
+        <f:else>
+            <button href="#" class="btn btn-default" disabled>
+                No translation provider available for this language
+            </button>
+            <f:be.link route="AItoolsAitools_AItoolsServers"  class="btn btn-default btn-pagemachine-ai-tools">
+                <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.translationSettings" />
+            </f:be.link>
+        </f:else>
+    </f:if>
 
 </f:section>
 

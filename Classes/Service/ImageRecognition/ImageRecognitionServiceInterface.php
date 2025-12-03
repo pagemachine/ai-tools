@@ -17,7 +17,7 @@ interface ImageRecognitionServiceInterface
      *
      * @return string
      */
-    public function sendFileToApi(FileInterface $fileObject, PlaceholderResult $placeholderResult, string $targetLanguage = 'en', string $promptLanguage = 'auto'): string;
+    public function sendFileToApi(FileInterface $fileObject, PlaceholderResult $placeholderResult, string $targetLanguage = 'en', ?string $translationProvider = null): string;
 
     /**
      * Returns the price for the action

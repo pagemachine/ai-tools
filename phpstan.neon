@@ -15,5 +15,7 @@ parameters:
     - message: '#TYPO3\\CMS\\Fluid\\View\\StandaloneView::setRequest()#'
       count: 1
       path: Classes/Controller/Backend/ImageRecognizeController.php
+    - message: '*TYPO3\\CMS\\Core\\Type\\ContextualFeedbackSeverity*'
+      path: Classes/Controller/Backend/ServersController.php
 
   reportUnmatchedIgnoredErrors: false

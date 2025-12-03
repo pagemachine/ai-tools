@@ -47,7 +47,7 @@ if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0',
         'settings',
         '',
         [
-            ServersController::class => 'list',
+            ServersController::class => 'list, saveSettings',
         ],
         [
             'access' => 'admin',

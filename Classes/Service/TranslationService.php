@@ -16,7 +16,7 @@ class TranslationService
         $this->serverService = GeneralUtility::makeInstance(ServerService::class);
     }
 
-    public function translateText(string $text, string $sourceLanguage = 'en', string $targetLanguage = 'en'): string
+    public function translateText(string $text, string $sourceLanguage = 'en', string $targetLanguage = 'en', ?string $translationProvider = null): string
     {
         if ($text == '') {
             return '';
@@ -27,6 +27,6 @@ class TranslationService
         }
 
         $serverClass = $this->serverService->getActiveServerClassByFunctionality('translation');
-        return $serverClass->sendTranslationRequestToApi(text: $text, sourceLang: $sourceLanguage, targetLang: $targetLanguage);
+        return $serverClass->sendTranslationRequestToApi(text: $text, sourceLang: $sourceLanguage, targetLang: $targetLanguage, translationProvider: $translationProvider);
     }
 }

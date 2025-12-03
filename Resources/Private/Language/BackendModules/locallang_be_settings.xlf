@@ -11,6 +11,22 @@
 			<trans-unit id="mlang_labels_tabdescr" resname="mlang_labels_tabdescr">
 				<source>This module allows you to configure settings for AI-Tools.</source>
 			</trans-unit>
+
+			<trans-unit id="tx_aitools_settings.translationSettings">
+				<source>Translation Settings</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_settings.gdprCompliant">
+				<source>Show only EU-based translation providers</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_settings.provider.deepl">
+				<source>DeepL</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_settings.provider.google">
+				<source>Google</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_settings.noServiceAvailable">
+				<source>No service available for this language</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

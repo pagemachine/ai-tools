@@ -1,0 +1,5 @@
+# cat=basic/enable/050; type=boolean; label=Only show EU-based providers (GDPR compliant)
+gdprCompliant = true
+
+# cat=basic/enable/060; type=string; label=Select default translation provider
+translationProviders =

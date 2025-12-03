@@ -82,6 +82,7 @@ class AlternativeGenerator extends AbstractNode
             'input-field-selector' => '[data-formengine-input-name="' . $this->data["parameterArray"]["itemFormElName"] . '"]',
             'prompt' => $prompt->getPrompt(),
             'prompt-language' => $prompt->getLanguage(),
+            'translation-provider' => $this->settingsService->getTranslationProviderForLanguage((int) $this->data['databaseRow']['sys_language_uid']),
         ];
 
         $this->templateView->assignMultiple($arguments);

@@ -53,6 +53,27 @@ class LanguageService
         $config['items'] = array_merge($config['items'] ?? [], $items);
     }
 
+    public function getTranslationProviderPerLanguage($regionFilter = null): array
+    {
+        $serverService = GeneralUtility::makeInstance(ServerService::class);
+        $providerService = $serverService->getActiveServerClassByFunctionality('translation_provider');
+
+        $siteLanguages = $this->getAllSiteLanguages();
+
+        $languageProviders = [];
+        foreach ($siteLanguages as $key => $siteLanguage) {
+            $languageCode = $this->getLocaleLanguageCode($siteLanguage);
+            $countryCode = $this->getLocaleCountryCode($siteLanguage);
+            $providers = $providerService->providerSupportedForLanguage($languageCode, $countryCode, $regionFilter);
+            $languageProviders[$siteLanguage->getLanguageId()] = [
+                'siteLanguage' => $siteLanguage,
+                'providers' => $providers,
+            ];
+        }
+
+        return $languageProviders;
+    }
+
     /**
      * Get all site languages from all TYPO3 sites
      *
@@ -88,5 +109,15 @@ class LanguageService
             return $siteLanguage->getLocale()->getLanguageCode();
         }
         return $siteLanguage->getTwoLetterIsoCode(); // @phpstan-ignore-line
+    }
+
+    private function getLocaleCountryCode($siteLanguage): ?string
+    {
+        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
+        if (version_compare($version, '12.0', '>=')) {
+            // @phpstan-ignore-next-line Stop PHPStan about complaining this line for TYPO3 v11
+            return $siteLanguage->getLocale()->getCountryCode();
+        }
+        return null;
     }
 }

@@ -26,13 +26,13 @@ export async function ajaxCall(parameters, url) {
   });
 }
 
-export async function callAjaxMetaGenerateAction(fileIdentifier, targetLanguage, textPrompt, textPromptLanguage) {
+export async function callAjaxMetaGenerateAction(fileIdentifier, targetLanguage, textPrompt, translationProvider) {
   const params = {
     action: 'generateMetaData',
     target: fileIdentifier,
     "target-language": targetLanguage,
     textPrompt: textPrompt,
-    textPromptLanguage: textPromptLanguage,
+    translationProvider: translationProvider,
   };
 
   top.TYPO3.Notification.info('Generating Metadata', 'Generating Metadata...', 5);
