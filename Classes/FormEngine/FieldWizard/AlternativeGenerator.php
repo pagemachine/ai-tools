@@ -63,6 +63,17 @@ class AlternativeGenerator extends AbstractNode
     public function render(): array
     {
         $result = $this->initializeResultArray();
+
+        try {
+            return $this->buildWizardResult($result);
+        } catch (\Exception $e) {
+            $result['html'] = '<div class="alert alert-danger">AI Tools: ' . htmlspecialchars($e->getMessage()) . '</div>';
+            return $result;
+        }
+    }
+
+    protected function buildWizardResult(array $result): array
+    {
         $target = $this->data['databaseRow']['file'][0];
 
         if (!$this->isActive($target)) {
@@ -82,8 +93,13 @@ class AlternativeGenerator extends AbstractNode
             'input-field-selector' => '[data-formengine-input-name="' . $this->data["parameterArray"]["itemFormElName"] . '"]',
             'prompt' => $prompt->getPrompt(),
             'prompt-language' => $prompt->getLanguage(),
-            'translation-provider' => $this->settingsService->getTranslationProviderForLanguage((int) $this->data['databaseRow']['sys_language_uid']),
         ];
+
+        try {
+            $arguments['translation-provider'] = $this->settingsService->getTranslationProviderForLanguage((int) $this->data['databaseRow']['sys_language_uid']);
+        } catch (\Exception $e) {
+            $arguments['translation-provider-error'] = $e->getMessage();
+        }
 
         $this->templateView->assignMultiple($arguments);
 

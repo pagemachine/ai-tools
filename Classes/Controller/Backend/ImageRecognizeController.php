@@ -325,13 +325,18 @@ class ImageRecognizeController extends ActionController
                     'targetLanguage' => (int) $target_language,
                     'modal' => $modal,
                     'textPrompt' => $defaultPrompt->getPrompt(),
-                    'translationProvider' => $this->settingsService->getTranslationProviderForLanguage((int) $target_language),
-                    'translationProviders' => $this->settingsService->getTranslationProviders(),
                     'allTextPrompts' => array_map(fn($prompt) => [
                         'description' => $prompt->getDescription(),
                         'prompt' => json_encode(['prompt' => $prompt->getPrompt(), 'language' => $prompt->getLanguage()]),
                     ], $allPrompts->toArray()),
                 ];
+
+                try {
+                    $template_variables['translationProvider'] = $this->settingsService->getTranslationProviderForLanguage((int) $target_language);
+                    $template_variables['translationProviders'] = $this->settingsService->getTranslationProviders();
+                } catch (\Exception $e) {
+                    $template_variables['translationProviderError'] = $e->getMessage();
+                }
 
                 $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
                 $typo3Version = new Typo3Version();
