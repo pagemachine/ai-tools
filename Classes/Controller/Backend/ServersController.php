@@ -76,8 +76,13 @@ class ServersController extends ActionController
             'servers' => $this->serverRepository->listAllServers(),
             'returnUrl' => $requestUri,
             'gdprCompliant' => $this->settingsService->getGdprCompliant(),
-            'translationProviderPerLanguage' => $this->settingsService->getTranslationProviders(),
         ];
+
+        try {
+            $template_variables['translationProviderPerLanguage'] = $this->settingsService->getTranslationProviders();
+        } catch (\Exception $e) {
+            $template_variables['translationProviderError'] = $e->getMessage();
+        }
 
         $this->setDocHeader($moduleTemplate, $requestUri);
 
