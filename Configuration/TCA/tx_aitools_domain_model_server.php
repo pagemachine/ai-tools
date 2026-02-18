@@ -13,7 +13,7 @@ return [
         'label' => 'title',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
-        'delete' => 'title',
+        'delete' => 'deleted',
         'default_sortby' => 'title',
         'searchFields' => 'title',
         'enablecolumns' => [

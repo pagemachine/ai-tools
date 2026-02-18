@@ -16,7 +16,7 @@ class ServerService
 
     public function __construct()
     {
-        $this->serverConfig = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ai_tools']['servers'];
+        $this->serverConfig = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ai_tools']['servers'] ?? [];
 
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
     }
