@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pagemachine\AItools\Controller\Backend;
 
 use Exception;
+use Pagemachine\AItools\Domain\Model\Prompt;
 use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Pagemachine\AItools\Service\ImageMetaDataService;
 use Pagemachine\AItools\Service\SettingsService;
@@ -32,6 +33,7 @@ use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
 use TYPO3\CMS\Extbase\Mvc\Request;
+use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 use TYPO3\CMS\Fluid\View\TemplatePaths;
 
@@ -220,6 +222,7 @@ class ImageRecognizeController extends ActionController
 
         $fileObjects = $this->getFileObjectFromRequestTarget($request);
 
+        /** @var QueryResultInterface<Prompt> $allPrompts */
         $allPrompts = $this->promptRepository->findAll();
 
         $defaultPrompt = $this->promptRepository->getDefaultPrompt();
@@ -325,7 +328,7 @@ class ImageRecognizeController extends ActionController
                     'targetLanguage' => (int) $target_language,
                     'modal' => $modal,
                     'textPrompt' => $defaultPrompt->getPrompt(),
-                    'allTextPrompts' => array_map(fn($prompt) => [
+                    'allTextPrompts' => array_map(fn(Prompt $prompt) => [
                         'description' => $prompt->getDescription(),
                         'prompt' => json_encode(['prompt' => $prompt->getPrompt(), 'language' => $prompt->getLanguage()]),
                     ], $allPrompts->toArray()),
