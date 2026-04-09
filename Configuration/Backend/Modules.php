@@ -5,7 +5,7 @@ use Pagemachine\AItools\Controller\Backend\ServersController;
 
 return [
     'AItoolsAitools' => [
-        'position' => ['after' => 'web'],
+        'position' => ['after' => 'content'],
         'iconIdentifier' => 'tx-aitools-module',
         'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_mainmodule.xlf',
     ],
@@ -16,11 +16,12 @@ return [
         'workspaces' => 'live',
         'iconIdentifier' => 'tx-aitools-module-templates',
         'path' => '/module/aitools/AItoolsPrompts',
-        'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.templates',
+        'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_prompts.xlf',
         'extensionName' => 'AItools',
         'controllerActions' => [
             PromptsController::class => [
                 'list',
+                'restoreDefaults',
             ],
         ],
     ],

@@ -18,6 +18,35 @@
         .w5 {
             width: 49%;
         }
+        .progressBar {
+            width: 100%;
+            border-radius: 0.5rem;
+            height: 0.5rem;
+            margin-top: 0.75rem;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        .progressBar::-webkit-progress-bar {
+            background-color: #f3d4f0;
+            border-radius: 0.5rem;
+        }
+        .progressBar::-webkit-progress-value {
+            background-color: #e966d4;
+            border-radius: 0.5rem;
+        }
+        .progressBar::-moz-progress-bar {
+            background-color: #e966d4;
+            border-radius: 0.5rem;
+        }
+        .typo3-TCEforms.imageEntry {
+            border: 1px solid #ddd;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .typo3-TCEforms.imageEntry img {
+            border-radius: 0.5rem;
+        }
         .info-block {
             padding: 10px;
             margin: 10px;
@@ -40,7 +69,7 @@
             color: black;
             background-color: #fff;
             border: 1px solid #ddd;
-            border-radius: 8px;
+            border-radius: 0.5rem;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: flex-start;
@@ -91,7 +120,7 @@
                                 id: 'globalTextPrompt',
                                 name: 'globalTextPrompt',
                                 options: allTextPrompts,
-                                value: textPrompt,
+                                value: textPromptValue,
                                 optionLabelField: 'description',
                                 optionValueField: 'prompt'
                             }"
@@ -136,7 +165,7 @@
                             <aitools:backend.Credits />
                         </button>
                         <br />
-                        <progress value="0" max="{fileObjects -> f:count()}" id="progressBar" class="progressBar"></progress>
+                        <progress value="0" max="{fileObjects -> f:count()}" id="progressBar" class="progressBar" style="display: none;"></progress>
                     </div>
                 </div>
             </div>
@@ -270,7 +299,7 @@
                             target: '#textPrompt-{fileObject.file.properties.identifier_hash}',
                             name: 'textPromptSelect',
                             options: allTextPrompts,
-                            value: textPrompt,
+                            value: textPromptValue,
                             optionLabelField: 'description',
                             optionValueField: 'prompt'
                         }" />

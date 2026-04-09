@@ -31,6 +31,10 @@ abstract class AigudeAbstract
     protected function request($url, $method, $options = [])
     {
         $options['http_errors'] = false;
+        $options['headers'] = array_merge(
+            $options['headers'] ?? [],
+            ['X-AIGUDE-Client' => 'typo3']
+        );
         $response = $this->requestFactory->request($url, $method, $options);
 
         if ($response->getStatusCode() === 200) {

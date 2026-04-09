@@ -34,16 +34,16 @@
                     <tr>
                         <td style="white-space: nowrap;">
                             <f:if condition="{prompt.default}">
-                                🏠
+                                <core:icon identifier="actions-star" size="small" />
                             </f:if>
                             <be:link.editRecord returnUrl="{returnUrl}" table="tx_aitools_domain_model_prompt" uid="{prompt.uid}"
                                 title="{f:translate(key: 'LLL:EXT:core/Resources/Private/Language/locallang_mod_web_list.xlf:edit')}">
                                 {prompt.description -> f:format.crop(maxCharacters:50)}
                             </be:link.editRecord>
                         </td>
-                        <td >
+                        <td>
                             <be:link.editRecord title="{prompt.prompt}" returnUrl="{returnUrl}" table="tx_aitools_domain_model_prompt" uid="{prompt.uid}">
-                                <span >{prompt.prompt -> f:format.crop(maxCharacters:500)}</span>
+                                <span>{prompt.prompt -> f:format.crop(maxCharacters:500)}</span>
                             </be:link.editRecord>
                         </td>
                         <td>
@@ -53,31 +53,44 @@
                                     title="{f:translate(key: 'LLL:EXT:core/Resources/Private/Language/locallang_mod_web_list.xlf:edit')}">
                                     <core:icon identifier="actions-open" />
                                 </be:link.editRecord>
-                                <f:if condition="{prompt.hidden} == 1">
+                                <f:if condition="!{prompt.system}">
+                                    <f:if condition="{prompt.hidden} == 1">
+                                        <f:then>
+                                            <a class="btn btn-default"
+                                                href="{be:moduleLink(route:'tce_db', query:'data[tx_aitools_domain_model_prompt][{prompt.uid}][hidden]=0', arguments:'{redirect: returnUrl}')}"
+                                                title="{f:translate(key:'LLL:EXT:core/Resources/Private/Language/locallang_mod_web_list.xlf:unHide')}">
+                                                <core:icon identifier="actions-edit-unhide" />
+                                            </a>
+                                        </f:then>
+                                        <f:else>
+                                            <a class="btn btn-default"
+                                                href="{be:moduleLink(route:'tce_db', query:'data[tx_aitools_domain_model_prompt][{prompt.uid}][hidden]=1', arguments:'{redirect: returnUrl}')}"
+                                                title="{f:translate(key:'LLL:EXT:core/Resources/Private/Language/locallang_mod_web_list.xlf:hide')}">
+                                                <core:icon identifier="actions-edit-hide" />
+                                            </a>
+                                        </f:else>
+                                    </f:if>
+                                </f:if>
+                                <f:if condition="{prompt.system}">
                                     <f:then>
                                         <a class="btn btn-default"
-                                            href="{be:moduleLink(route:'tce_db', query:'data[tx_aitools_domain_model_prompt][{prompt.uid}][hidden]=0', arguments:'{redirect: returnUrl}')}"
-                                            title="{f:translate(key:'LLL:EXT:core/Resources/Private/Language/locallang_mod_web_list.xlf:unHide')}">
-                                            <core:icon identifier="actions-edit-unhide" />
+                                            href="{f:uri.action(action: 'restoreDefaults')}"
+                                            title="Restore defaults">
+                                            <core:icon identifier="actions-undo" />
                                         </a>
                                     </f:then>
                                     <f:else>
-                                        <a class="btn btn-default"
-                                            href="{be:moduleLink(route:'tce_db', query:'data[tx_aitools_domain_model_prompt][{prompt.uid}][hidden]=1', arguments:'{redirect: returnUrl}')}"
-                                            title="{f:translate(key:'LLL:EXT:core/Resources/Private/Language/locallang_mod_web_list.xlf:hide')}">
-                                            <core:icon identifier="actions-edit-hide" />
+                                        <a class="btn btn-default t3js-modal-trigger"
+                                            href="{be:moduleLink(route:'tce_db', query:'cmd[tx_aitools_domain_model_prompt][{prompt.uid}][delete]=1', arguments:'{redirect: returnUrl}')}"
+                                            title="{f:translate(key: 'LLL:EXT:core/Resources/Private/Language/locallang_mod_web_list.xlf:delete')}"
+                                            data-severity="warning"
+                                            data-title="{f:translate(key: 'LLL:EXT:backend/Resources/Private/Language/locallang_alt_doc.xlf:label.confirm.delete_record.title')}"
+                                            data-bs-content="{f:translate(key: 'LLL:EXT:backend/Resources/Private/Language/locallang_alt_doc.xlf:deleteWarning')}"
+                                            data-button-close-text="{f:translate(key: 'LLL:EXT:backend/Resources/Private/Language/locallang_alt_doc.xlf:buttons.confirm.delete_record.no')}">
+                                            <core:icon identifier="actions-delete" />
                                         </a>
                                     </f:else>
                                 </f:if>
-                                <a class="btn btn-default t3js-modal-trigger"
-                                    href="{be:moduleLink(route:'tce_db', query:'cmd[tx_aitools_domain_model_prompt][{prompt.uid}][delete]=1', arguments:'{redirect: returnUrl}')}"
-                                    title="{f:translate(key: 'LLL:EXT:core/Resources/Private/Language/locallang_mod_web_list.xlf:delete')}"
-                                    data-severity="warning"
-                                    data-title="{f:translate(key: 'LLL:EXT:backend/Resources/Private/Language/locallang_alt_doc.xlf:label.confirm.delete_record.title')}"
-                                    data-bs-content="{f:translate(key: 'LLL:EXT:backend/Resources/Private/Language/locallang_alt_doc.xlf:deleteWarning')}"
-                                    data-button-close-text="{f:translate(key: 'LLL:EXT:backend/Resources/Private/Language/locallang_alt_doc.xlf:buttons.confirm.delete_record.no')}">
-                                    <core:icon identifier="actions-delete" />
-                                </a>
                                 <f:if condition="{prompt.default} == 0">
                                     <a class="btn btn-default btn-disabled"
                                         href="{be:moduleLink(route:'tce_db', query:'data[tx_aitools_domain_model_prompt][{prompt.uid}][default]=1', arguments:'{redirect: returnUrl}')}">

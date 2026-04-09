@@ -15,6 +15,7 @@ class CustomImageRecognitionServiceTest extends UnitTestCase
     {
         $reflection = new \ReflectionClass(CustomImageRecognitionService::class);
         $property = $reflection->getProperty('cleanUpRegex');
+        $property->setAccessible(true);
         $regex = $property->getValue();
 
         $result = preg_replace($regex, '', $input);

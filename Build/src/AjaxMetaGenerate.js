@@ -100,14 +100,28 @@ $(() => {
 
     progressBar.attr('max', filteredImageBlocks.length);
     progressBar.val(0);
+    progressBar.show();
+
+    let aborted = false;
+    const $cancelBtn = $('<button class="btn btn-danger btn-pagemachine-ai-tools t3js-alternative-cancel-all" style="margin-left: 10px;">Cancel</button>');
+    $cancelBtn.insertAfter($('.t3js-alternative-generate-all').last());
+    $cancelBtn.on('click', function(e) {
+      e.preventDefault();
+      aborted = true;
+      $(this).prop('disabled', true).text('Cancelling...');
+    });
 
     for (let imageEntry of filteredImageBlocks) {
+      if (aborted) break;
+
       try {
         const button = $(imageEntry).find('.t3js-alternative-generator-trigger').first();
         const save = $(imageEntry).find('.t3js-alternative-save-trigger[data-translate="0"]').first();
         const saveTranslate = $(imageEntry).find('.t3js-alternative-save-trigger[data-translate="1"]').first();
 
-        await generator.triggerGeneratorButton(button);
+        const results = await generator.triggerGeneratorButton(button);
+
+        $(imageEntry).data('alternative', results.alternative);
 
         if (translate) {
           if (!saveTranslate.length) {
@@ -132,6 +146,10 @@ $(() => {
 
       progressBar.val(progressBar.val() + 1);
     }
+
+    $cancelBtn.remove();
+    progressBar.hide();
+    generateAllListCalculate();
 
     $('.t3js-alternative-generate-all').prop('disabled', false);
     $('.t3js-alternative-generate-all').removeClass('generating');
@@ -206,7 +224,7 @@ function generateAllListCalculate() {
   $('.t3-alternative-generate-all-total-images').text(filteredImageBlocks.length);
 
   const creditsElements = $(filteredImageBlocks).find('.t3js-ai-tools-credits-view-helper[data-credits]');
-  total = 0;
+  let total = 0;
   for (let creditsElement of creditsElements) {
     const credits = Number($(creditsElement).data('credits'));
     if (!isNaN(credits)) {
@@ -214,7 +232,7 @@ function generateAllListCalculate() {
     }
   }
 
-  element = document.getElementById('t3-alternative-generate-all-total-credits');
+  let element = document.getElementById('t3-alternative-generate-all-total-credits');
   if (total) {
     element.innerHTML = total + ' Credits';
     element.setAttribute('data-credits', total);
