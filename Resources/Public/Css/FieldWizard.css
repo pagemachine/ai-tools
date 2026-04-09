@@ -49,6 +49,11 @@
     background-color: #ffcafd;
     padding: 10px 15px;
     color: black;
+    border-radius: 0.5rem;
+}
+
+.box-pagemachine-ai-tools img {
+    border-radius: 0.5rem;
 }
 
 .t3js-ai-tools-generating {

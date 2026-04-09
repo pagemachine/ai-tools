@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\ViewHelpers\Backend;
 
-use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper;
@@ -60,17 +59,9 @@ class CreditsViewHelper extends AbstractTagBasedViewHelper
         );
 
         $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
-
-        $typo3Version = new Typo3Version();
-        if ($typo3Version->getMajorVersion() > 11) {
-            $pageRenderer->loadJavaScriptModule( // @phpstan-ignore-line
-                '@pagemachine/ai-tools/CreditsViewHelper.js',
-            );
-        } else {
-            $pageRenderer->loadRequireJsModule( // @phpstan-ignore-line
-                'TYPO3/CMS/AiTools/Amd/CreditsViewHelper'
-            );
-        }
+        $pageRenderer->loadJavaScriptModule(
+            '@pagemachine/ai-tools/CreditsViewHelper.js',
+        );
 
         return $this->tag->render();
     }

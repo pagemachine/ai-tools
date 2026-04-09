@@ -47,7 +47,7 @@ return [
                 'cols' => '40',
                 'required' => true,
                 'rows' => '15',
-                'fieldInformation' => [
+                'fieldWizard' => [
                     'PromptInfo' => [
                         'renderType' => 'PromptInfoElement',
                     ]
@@ -81,6 +81,15 @@ return [
             'config' => [
                 'type' => 'check',
                 'default' => 0,
+            ],
+        ],
+        'system' => [
+            'exclude' => true,
+            'label' => 'System prompt',
+            'config' => [
+                'type' => 'check',
+                'default' => 0,
+                'readOnly' => true,
             ],
         ],
     ],

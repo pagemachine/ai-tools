@@ -7,38 +7,27 @@ namespace Pagemachine\AItools\FormEngine\FieldWizard;
 use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Pagemachine\AItools\Service\SettingsService;
 use TYPO3\CMS\Backend\Form\AbstractNode;
-use TYPO3\CMS\Backend\Form\NodeFactory;
-use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
-use TYPO3\CMS\Core\Resource\AbstractFile;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Resource\FileType;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Fluid\View\StandaloneView;
+use TYPO3\CMS\Core\View\ViewFactoryData;
+use TYPO3\CMS\Core\View\ViewFactoryInterface;
 
 class AlternativeGenerator extends AbstractNode
 {
 
-    protected StandaloneView $templateView;
-
     protected PromptRepository $promptRepository;
     protected SettingsService $settingsService;
+    protected ViewFactoryInterface $viewFactory;
 
-    public function __construct(NodeFactory $nodeFactory = null, array $data = null)
+    public function __construct()
     {
-        $typo3Version = new Typo3Version();
-        if ($typo3Version->getMajorVersion() < 13) {
-            parent::__construct($nodeFactory, $data); // @phpstan-ignore-line
-        }
-
         $this->promptRepository = GeneralUtility::makeInstance(PromptRepository::class);
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
-
-        $this->templateView = GeneralUtility::makeInstance(StandaloneView::class);
-        $this->templateView->setLayoutRootPaths([GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Layouts/')]);
-        $this->templateView->setPartialRootPaths([GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Partials/FieldWizard/')]);
-        $this->templateView->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Templates/FieldWizard/AlternativeGenerator.html'));
+        $this->viewFactory = GeneralUtility::makeInstance(ViewFactoryInterface::class);
     }
 
     protected function isActive($identifier): bool
@@ -53,7 +42,7 @@ class AlternativeGenerator extends AbstractNode
             return false;
         }
 
-        if ($file->getType() !== AbstractFile::FILETYPE_IMAGE) {
+        if ($file->getType() !== FileType::IMAGE->value) {
             return false;
         }
 
@@ -101,22 +90,21 @@ class AlternativeGenerator extends AbstractNode
             $arguments['translation-provider-error'] = $e->getMessage();
         }
 
-        $this->templateView->assignMultiple($arguments);
+        $viewFactoryData = new ViewFactoryData(
+            templateRootPaths: [GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Templates/')],
+            layoutRootPaths: [GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Layouts/')],
+            partialRootPaths: [GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Partials/FieldWizard/')],
+        );
+        $view = $this->viewFactory->create($viewFactoryData);
+        $view->assignMultiple($arguments);
 
-        $result['html'] = $this->templateView->render();
+        $result['html'] = $view->render('FieldWizard/AlternativeGenerator');
 
         $result['stylesheetFiles'] = [
             'EXT:ai_tools/Resources/Public/Css/FieldWizard.css',
         ];
 
-        $typo3Version = new Typo3Version();
-        if ($typo3Version->getMajorVersion() > 11) {
-            $result['javaScriptModules'][] = JavaScriptModuleInstruction::create('@pagemachine/ai-tools/AlternativeGenerator.js'); // @phpstan-ignore-line
-        } else {
-            $result['requireJsModules'][] = JavaScriptModuleInstruction::forRequireJS( // @phpstan-ignore-line
-                'TYPO3/CMS/AiTools/Amd/AlternativeGenerator'
-            );
-        }
+        $result['javaScriptModules'][] = JavaScriptModuleInstruction::create('@pagemachine/ai-tools/AlternativeGenerator.js');
 
         return $result;
     }

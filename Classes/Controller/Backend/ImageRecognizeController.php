@@ -16,26 +16,20 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
-use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
-use TYPO3\CMS\Core\Information\Typo3Version;
+use TYPO3\CMS\Core\Imaging\IconSize;
 use TYPO3\CMS\Core\Page\PageRenderer;
-use TYPO3\CMS\Core\Resource\AbstractFile;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\FileInterface;
+use TYPO3\CMS\Core\Resource\FileType;
 use TYPO3\CMS\Core\Resource\FolderInterface;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
-use TYPO3\CMS\Core\Type\Icon\IconState;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
 use TYPO3\CMS\Extbase\Mvc\Request;
-use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
-use TYPO3\CMS\Fluid\View\StandaloneView;
-use TYPO3\CMS\Fluid\View\TemplatePaths;
 
 class ImageRecognizeController extends ActionController
 {
@@ -44,16 +38,6 @@ class ImageRecognizeController extends ActionController
     protected SiteFinder $siteFinder;
     protected SettingsService $settingsService;
     protected PromptRepository $promptRepository;
-
-    /**
-     * @var string
-     */
-    protected $templateRootPath = 'EXT:ai_tools/Resources/Private/Templates/Backend/ImageRecognize/';
-
-    /**
-     * @var string
-     */
-    protected $layoutRootPath = 'EXT:ai_tools/Resources/Private/Layouts/';
 
     public function __construct(
         private readonly ResourceFactory $resourceFactory,
@@ -68,7 +52,7 @@ class ImageRecognizeController extends ActionController
         $this->promptRepository = GeneralUtility::makeInstance(PromptRepository::class);
     }
 
-    protected function getFileMetaDataEditLink(int $uid, string $returnUrl = null): UriInterface
+    protected function getFileMetaDataEditLink(int $uid, ?string $returnUrl = null): UriInterface
     {
         $uriParameters = [
             'edit' =>
@@ -83,47 +67,15 @@ class ImageRecognizeController extends ActionController
             ->buildUriFromRoute('record_edit', $uriParameters);
     }
 
-    protected function getLanguageFlagHtml($identifier, $title = '', $size = Icon::SIZE_LARGE, $overlay = '', $state = IconState::STATE_DEFAULT)
+    protected function getLanguageFlagHtml($identifier, $title = '', $size = IconSize::LARGE, $overlay = '')
     {
-        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
         $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
-        $icon = $iconFactory->getIcon($identifier, $size, $overlay, IconState::cast($state));
+        $icon = $iconFactory->getIcon($identifier, $size, $overlay);
 
-        if (version_compare($version, '12.0', '>=')) {
-            if ($title ?? false) {
-                // @phpstan-ignore-next-line
-                $icon->setTitle($title);
-            }
+        if ($title ?? false) {
+            $icon->setTitle($title);
         }
         return $icon->render();
-    }
-
-    /**
-     * Return custom Standalone View
-     * @internal
-     * @return StandaloneView
-     */
-    protected function getView(string $templateName = 'Default', $request = null): StandaloneView
-    {
-        $templatePaths = new TemplatePaths($this->templateRootPath);
-        $view = GeneralUtility::makeInstance(StandaloneView::class);
-
-        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
-        if ($request !== null && version_compare($version, '12.0', '>=')) {
-            // needed in TYPO3 v12 see https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Breaking-98377-FluidStandaloneViewDoesNotCreateAnExtbaseRequestAnymore.html
-            $attribute = new ExtbaseRequestParameters(ImageRecognizeController::class);
-            $request = $request->withAttribute('extbase', $attribute);
-            $extbaseRequest = GeneralUtility::makeInstance(Request::class, $request);
-            $view->setRequest($extbaseRequest);
-        }
-
-        $view->getRenderingContext()->setTemplatePaths($templatePaths);
-        $view->setTemplate($templateName);
-        $view->setFormat('html');
-        $view->setTemplatePathAndFilename($this->templateRootPath . $templateName . '.html');
-        $view->setLayoutRootPaths([$this->layoutRootPath]);
-        $view->assign('settings', $this->settings);
-        return $view;
     }
 
     /**
@@ -134,15 +86,13 @@ class ImageRecognizeController extends ActionController
     {
         $parsedBody = $request->getParsedBody();
         $queryParams = $request->getQueryParams();
-        // Setting target, which must be a file reference to a file within the mounts.
         $target = $parsedBody['target'] ?? $queryParams['target'] ?? '';
         $target_language = $parsedBody['target-language'] ?? $queryParams['target-language'] ?? '';
 
-        // create the file object
         if ($target) {
             $fileObject = $this->resourceFactory->retrieveFileOrFolderObject($target);
             if ($fileObject instanceof FileInterface) {
-                if ($fileObject->getType() !== AbstractFile::FILETYPE_IMAGE) {
+                if ($fileObject->getType() !== FileType::IMAGE->value) {
                     return null;
                 }
 
@@ -150,7 +100,7 @@ class ImageRecognizeController extends ActionController
             }
             if ($fileObject instanceof FolderInterface) {
                 $files = $fileObject->getFiles();
-                $files = array_filter($files, fn($file) => $file->getType() === AbstractFile::FILETYPE_IMAGE);
+                $files = array_filter($files, fn($file) => $file->getType() === FileType::IMAGE->value);
                 $files = array_map(fn($file) => $this->addMetaToFile($file, [$target_language]), $files);
 
                 return $files;
@@ -222,7 +172,6 @@ class ImageRecognizeController extends ActionController
 
         $fileObjects = $this->getFileObjectFromRequestTarget($request);
 
-        /** @var QueryResultInterface<Prompt> $allPrompts */
         $allPrompts = $this->promptRepository->findAll();
 
         $defaultPrompt = $this->promptRepository->getDefaultPrompt();
@@ -238,7 +187,6 @@ class ImageRecognizeController extends ActionController
         $targetLanguage = $this->getLanguageById((int) $target_language);
         $targetTwoLetterIsoCode = $this->getLocaleLanguageCode($targetLanguage);
 
-        // Setting target, which must be a file reference to a file within the mounts.
         $action = $parsedBody['action'] ?? $queryParams['action'] ?? '';
         $target = $parsedBody['target'] ?? $queryParams['target'] ?? '';
         switch ($action) {
@@ -249,9 +197,7 @@ class ImageRecognizeController extends ActionController
 
                 $translations = [];
                 if ($doTranslate) {
-                    // fetch all site languages and translate the altText
                     foreach ($siteLanguages as $siteLanguage) {
-                        // only translate additional languages (skip current language)
                         if ($siteLanguage->getLanguageId() !== (int) $target_language) {
                             $translationProvider = $this->settingsService->getTranslationProviderForLanguage($siteLanguage->getLanguageId());
                             if (is_null($translationProvider)) {
@@ -308,15 +254,10 @@ class ImageRecognizeController extends ActionController
                     ->withBody($this->streamFactory->createStream(json_encode($data)));
 
             default:
-                if (version_compare(GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version(), '13.0', '<')) {
-                    $moduleTemplate = $this->moduleTemplateFactory->create($request);
-                    $view = $this->getView('AjaxMetaGenerate', $request);
-                } else {
-                    $attribute = new ExtbaseRequestParameters(ImageRecognizeController::class);
-                    $request = $request->withAttribute('extbase', $attribute);
-                    $extbaseRequest = GeneralUtility::makeInstance(Request::class, $request);
-                    $moduleTemplate = $this->moduleTemplateFactory->create($extbaseRequest);
-                }
+                $attribute = new ExtbaseRequestParameters(ImageRecognizeController::class);
+                $request = $request->withAttribute('extbase', $attribute);
+                $extbaseRequest = GeneralUtility::makeInstance(Request::class, $request);
+                $moduleTemplate = $this->moduleTemplateFactory->create($extbaseRequest);
 
                 $moduleTemplate->getDocHeaderComponent()->disable();
 
@@ -328,10 +269,15 @@ class ImageRecognizeController extends ActionController
                     'targetLanguage' => (int) $target_language,
                     'modal' => $modal,
                     'textPrompt' => $defaultPrompt->getPrompt(),
-                    'allTextPrompts' => array_map(fn(Prompt $prompt) => [
-                        'description' => $prompt->getDescription(),
-                        'prompt' => json_encode(['prompt' => $prompt->getPrompt(), 'language' => $prompt->getLanguage()]),
-                    ], $allPrompts->toArray()),
+                    'textPromptValue' => json_encode(['prompt' => $defaultPrompt->getPrompt(), 'language' => $defaultPrompt->getLanguage()]),
+                    'allTextPrompts' => array_map(
+                        /** @phpstan-ignore argument.type */
+                        fn(Prompt $prompt) => [
+                            'description' => ($prompt->isDefault() ? "\u{2605} " : '') . $prompt->getDescription(),
+                            'prompt' => json_encode(['prompt' => $prompt->getPrompt(), 'language' => $prompt->getLanguage()]),
+                        ],
+                        $allPrompts->toArray()
+                    ),
                 ];
 
                 try {
@@ -342,27 +288,12 @@ class ImageRecognizeController extends ActionController
                 }
 
                 $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
-                $typo3Version = new Typo3Version();
-                if ($typo3Version->getMajorVersion() > 11) {
-                    $pageRenderer->loadJavaScriptModule( // @phpstan-ignore-line
-                        '@pagemachine/ai-tools/AjaxMetaGenerate.js',
-                    );
-                } else {
-                    $pageRenderer->loadRequireJsModule( // @phpstan-ignore-line
-                        'TYPO3/CMS/AiTools/Amd/AjaxMetaGenerate'
-                    );
-                }
+                $pageRenderer->loadJavaScriptModule(
+                    '@pagemachine/ai-tools/AjaxMetaGenerate.js',
+                );
 
-
-                if (version_compare(GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version(), '13.0', '<')) {
-                    $view = $this->getView('AjaxMetaGenerate', $request);
-                    $view->assignMultiple($template_variables);
-                    $moduleTemplate->setContent($view->render()); // @phpstan-ignore-line
-                    return $this->htmlResponse($moduleTemplate->renderContent()); // @phpstan-ignore-line
-                } else {
-                    $moduleTemplate->assignMultiple($template_variables); // @phpstan-ignore-line
-                    return $moduleTemplate->renderResponse('Backend/ImageRecognize/AjaxMetaGenerate'); // @phpstan-ignore-line
-                }
+                $moduleTemplate->assignMultiple($template_variables);
+                return $moduleTemplate->renderResponse('Backend/ImageRecognize/AjaxMetaGenerate');
         }
     }
 
@@ -378,11 +309,6 @@ class ImageRecognizeController extends ActionController
 
     public function getLocaleLanguageCode(SiteLanguage $siteLanguage): string
     {
-        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
-        if (version_compare($version, '12.0', '>=')) {
-            // @phpstan-ignore-next-line Stop PHPStan about complaining this line for TYPO3 v11
-            return $siteLanguage->getLocale()->getLanguageCode();
-        }
-        return $siteLanguage->getTwoLetterIsoCode(); // @phpstan-ignore-line
+        return $siteLanguage->getLocale()->getLanguageCode();
     }
 }

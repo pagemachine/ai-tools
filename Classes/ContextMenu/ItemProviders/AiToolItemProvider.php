@@ -6,13 +6,12 @@ namespace Pagemachine\AItools\ContextMenu\ItemProviders;
 
 use Pagemachine\AItools\Service\SettingsService;
 use TYPO3\CMS\Backend\ContextMenu\ItemProviders\AbstractProvider;
-use TYPO3\CMS\Core\Resource\AbstractFile;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Resource\FileType;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 class AiToolItemProvider extends AbstractProvider
 {
@@ -33,39 +32,23 @@ class AiToolItemProvider extends AbstractProvider
     protected $itemsConfiguration = [
         'generateAIMetadata' => [
             'type' => 'item',
-            'label' => 'Generate A.I. Metadata', // you can use "LLL:" syntax here
+            'label' => 'Generate A.I. Metadata',
             'iconIdentifier' => 'actions-document-info',
-            'callbackAction' => 'generateAIMetadata', //name of the function in the JS file
+            'callbackAction' => 'generateAIMetadata',
         ],
     ];
 
-    public function __construct(string $table = '', string $identifier = '', string $context = '')
+    public function __construct()
     {
-        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
-        if (version_compare($version, '12.0', '>=')) {
-            // TYPO3 v12 or later
-            // @phpstan-ignore-next-line
-            parent::__construct();
-        } else {
-            // TYPO3 v11 or earlier
-            // @phpstan-ignore-next-line
-            parent::__construct($table, $identifier, $context);
-        }
-
+        parent::__construct();
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
     }
 
-    /**
-     * @return bool
-     */
     public function canHandle(): bool
     {
         return $this->table === 'sys_file';
     }
 
-    /**
-     * Initialize file object
-     */
     protected function initialize()
     {
         parent::initialize();
@@ -76,44 +59,16 @@ class AiToolItemProvider extends AbstractProvider
         }
     }
 
-    /**
-     * Returns the provider priority which is used for determining the order in which providers are processing items
-     * to the result array. Highest priority means provider is evaluated first.
-     *
-     * This item provider should be called after PageProvider which has priority 100.
-     *
-     * BEWARE: Returned priority should logically not clash with another provider.
-     *         Please check @see \TYPO3\CMS\Backend\ContextMenu\ContextMenu::getAvailableProviders() if needed.
-     *
-     * @return int
-     */
     public function getPriority(): int
     {
         return 55;
     }
 
-    /**
-     * Registers the additional JavaScript RequireJS callback-module which will allow to display a notification
-     * whenever the user tries to click on the "Hello World" item.
-     * The method is called from AbstractProvider::prepareItems() for each context menu item.
-     *
-     * @param string $itemName
-     * @return array
-     */
     protected function getAdditionalAttributes(string $itemName): array
     {
-        // TYPO3 version check
-        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
-
         $attributes = [
             'data-callback-module' => '@pagemachine/ai-tools/ContextMenuActions',
         ];
-        if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0', '<')) {
-            // for TYPO3 v11
-            $attributes = [
-                'data-callback-module' => 'TYPO3/CMS/AiTools/ContextMenuActions',
-            ];
-        }
 
         if ($itemName === 'generateAIMetadata') {
             $attributes += [
@@ -127,16 +82,8 @@ class AiToolItemProvider extends AbstractProvider
         return $attributes;
     }
 
-    /**
-     * This method is called for each item this provider adds and checks if given item can be added
-     *
-     * @param string $itemName
-     * @param string $type
-     * @return bool
-     */
     protected function canRender(string $itemName, string $type): bool
     {
-        // checking if item is disabled through TSConfig
         if (in_array($itemName, $this->disabledItems, true)) {
             return false;
         }
@@ -149,9 +96,6 @@ class AiToolItemProvider extends AbstractProvider
         return $canRender;
     }
 
-    /**
-     * @return bool
-     */
     protected function isFile(): bool
     {
         return $this->record instanceof File;
@@ -164,7 +108,7 @@ class AiToolItemProvider extends AbstractProvider
 
     protected function isImage(): bool
     {
-        return $this->isFile() && $this->record->getType() == AbstractFile::FILETYPE_IMAGE;
+        return $this->isFile() && $this->record->getType() == FileType::IMAGE->value;
     }
 
     protected function isUserAllowed(): bool

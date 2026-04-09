@@ -6,7 +6,6 @@ use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * Abstract class for prompt placeholders
@@ -129,11 +128,6 @@ abstract class PlaceholderAbstract implements PlaceholderInterface
 
     public function getLocaleLanguageCode(SiteLanguage $siteLanguage): string
     {
-        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
-        if (version_compare($version, '12.0', '>=')) {
-            // @phpstan-ignore-next-line Stop PHPStan about complaining this line for TYPO3 v11
-            return $siteLanguage->getLocale()->getLanguageCode();
-        }
-        return $siteLanguage->getTwoLetterIsoCode(); // @phpstan-ignore-line
+        return $siteLanguage->getLocale()->getLanguageCode();
     }
 }
