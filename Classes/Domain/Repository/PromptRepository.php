@@ -28,10 +28,11 @@ class PromptRepository extends Repository
     {
         $this->ensureSystemPromptExists();
 
-        /** @var Prompt $defaultPrompt */
+        /** @var Prompt|null $defaultPrompt */
         $defaultPrompt = $this->findOneBy(['default' => true]);
 
         if (!$defaultPrompt) {
+            /** @var Prompt|null $defaultPrompt */
             $defaultPrompt = $this->findOneBy(['system' => true]);
         }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Updates;
 
+use Doctrine\DBAL\ParameterType;
 use TYPO3\CMS\Core\Attribute\UpgradeWizard;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Upgrades\DatabaseUpdatedPrerequisite;
@@ -71,7 +72,7 @@ class DefaultPromptUpdateWizard implements UpgradeWizardInterface
             ->count('uid')
             ->from(self::TABLE)
             ->where(
-                $queryBuilder->expr()->eq('system', $queryBuilder->createNamedParameter(1, \Doctrine\DBAL\ParameterType::INTEGER))
+                $queryBuilder->expr()->eq('system', $queryBuilder->createNamedParameter(1, ParameterType::INTEGER))
             )
             ->executeQuery()
             ->fetchOne();

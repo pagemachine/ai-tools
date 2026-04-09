@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pagemachine\AItools\Controller\Backend;
 
 use Exception;
+use Pagemachine\AItools\Domain\Model\Prompt;
 use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Pagemachine\AItools\Service\ImageMetaDataService;
 use Pagemachine\AItools\Service\SettingsService;
@@ -269,10 +270,14 @@ class ImageRecognizeController extends ActionController
                     'modal' => $modal,
                     'textPrompt' => $defaultPrompt->getPrompt(),
                     'textPromptValue' => json_encode(['prompt' => $defaultPrompt->getPrompt(), 'language' => $defaultPrompt->getLanguage()]),
-                    'allTextPrompts' => array_map(fn($prompt) => [
-                        'description' => ($prompt->isDefault() ? "\u{2605} " : '') . $prompt->getDescription(),
-                        'prompt' => json_encode(['prompt' => $prompt->getPrompt(), 'language' => $prompt->getLanguage()]),
-                    ], $allPrompts->toArray()),
+                    'allTextPrompts' => array_map(
+                        /** @phpstan-ignore argument.type */
+                        fn(Prompt $prompt) => [
+                            'description' => ($prompt->isDefault() ? "\u{2605} " : '') . $prompt->getDescription(),
+                            'prompt' => json_encode(['prompt' => $prompt->getPrompt(), 'language' => $prompt->getLanguage()]),
+                        ],
+                        $allPrompts->toArray()
+                    ),
                 ];
 
                 try {

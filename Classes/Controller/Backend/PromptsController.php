@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Controller\Backend;
 
+use Pagemachine\AItools\Domain\Model\Prompt;
 use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
@@ -70,6 +71,7 @@ class PromptsController extends ActionController
 
     public function restoreDefaultsAction(): ResponseInterface
     {
+        /** @var Prompt|null $systemPrompt */
         $systemPrompt = $this->promptRepository->findOneBy(['system' => true]);
 
         if ($systemPrompt) {

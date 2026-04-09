@@ -20,6 +20,7 @@ use Pagemachine\AItools\Service\Credits\AigudeCreditsService;
 use Pagemachine\AItools\Service\ImageRecognition\AigudeImageRecognitionService;
 use Pagemachine\AItools\Service\Translation\AigudeTranslationService;
 use Pagemachine\AItools\Service\TranslationProvider\AigudeTranslationProviderService;
+
 defined('TYPO3') or die();
 
 $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ai_tools']['servers'] = [

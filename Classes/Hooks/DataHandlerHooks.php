@@ -25,7 +25,7 @@ class DataHandlerHooks
         }
         $record = BackendUtility::getRecord($table, (int)$id, 'system');
         if ($record && $record['system']) {
-            $dataHandler->log($table, (int)$id, 0, 0, 1, 'Cannot delete a system prompt');
+            $dataHandler->log($table, (int)$id, 0, null, 1, 'Cannot delete a system prompt');
             $commandIsProcessed = true;
         }
     }

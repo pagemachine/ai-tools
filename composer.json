@@ -34,21 +34,22 @@
         "php": "^8.2",
         "typo3/cms-backend": "^14.0",
         "typo3/cms-core": "^14.0",
-        "typo3/cms-fluid": "^14.0"
+        "typo3/cms-fluid": "^14.0",
+        "typo3/cms-frontend": "^14.0"
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.43",
-        "jangregor/phpstan-prophecy": "^1.0",
+        "jangregor/phpstan-prophecy": "^2.3",
         "php-parallel-lint/php-console-highlighter": "^1.0",
         "php-parallel-lint/php-parallel-lint": "^1.4",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.1",
-        "rector/rector": "^1.1",
+        "rector/rector": "^2.3",
         "saschaegerer/phpstan-typo3": "^3.0",
         "sclable/xml-lint": "^0.9.0",
         "slevomat/coding-standard": "^8.15",
         "squizlabs/php_codesniffer": "^4.0",
-        "ssch/typo3-rector": "^2.6"
+        "ssch/typo3-rector": "^3.13"
     },
     "autoload": {
         "psr-4": {
