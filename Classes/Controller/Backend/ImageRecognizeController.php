@@ -52,7 +52,7 @@ class ImageRecognizeController extends ActionController
         $this->promptRepository = GeneralUtility::makeInstance(PromptRepository::class);
     }
 
-    protected function getFileMetaDataEditLink(int $uid, string $returnUrl = null): UriInterface
+    protected function getFileMetaDataEditLink(int $uid, ?string $returnUrl = null): UriInterface
     {
         $uriParameters = [
             'edit' =>

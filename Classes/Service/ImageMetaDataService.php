@@ -82,7 +82,7 @@ class ImageMetaDataService
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
      */
-    public function saveMetaData(string $target, string $altText = null, int $language = 0, int $parentUid = 0): int
+    public function saveMetaData(string $target, ?string $altText = null, int $language = 0, int $parentUid = 0): int
     {
         if (!empty($target)) {
             $fileObject = $this->resourceFactory->retrieveFileOrFolderObject($target);
