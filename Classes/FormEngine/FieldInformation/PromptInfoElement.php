@@ -15,21 +15,24 @@ class PromptInfoElement extends AbstractFormElement
         $placeholderService = GeneralUtility::makeInstance(PlaceholderService::class);
         $placeholders = $placeholderService->getAllPlaceholders();
 
-        $html = '<div class="form-control-wrap" style="font-weight: bold;">';
+        $html = '<div class="form-control-wrap">';
 
-        $html .= $this->getTranslation('placeholder.header') . '<br>';
+        $html .= '<details style="margin-bottom: 0.5em;">';
+        $html .= '<summary style="font-weight: bold; cursor: pointer;">' . $this->getTranslation('placeholder.header') . '</summary>';
+        $html .= '<div style="padding: 0.5em 0 0 1em;">';
         foreach ($placeholders as $identifier => $placeholderClass) {
             $placeholder = GeneralUtility::makeInstance($placeholderClass);
             $html .= '<code>%' . htmlspecialchars($identifier) . '%</code>';
-            $html .= ' → ';
+            $html .= ' &rarr; ';
             $html .= '<span style="color: #888; font-size: 90%;">' . $placeholderService->applyModifiers(htmlspecialchars((string) $placeholder->getExampleValue()), $placeholder) . '</span>';
             $html .= '<br>';
         }
-        $html .= '<br>';
+        $html .= '</div></details>';
 
-        $html .= $this->getTranslation('modifier.header') . '<br>';
+        $html .= '<details style="margin-bottom: 0.5em;">';
+        $html .= '<summary style="font-weight: bold; cursor: pointer;">' . $this->getTranslation('modifier.header') . '</summary>';
+        $html .= '<div style="padding: 0.5em 0 0 1em;">';
         $html .= '<span style="font-size: 90%; color: #666;">' . $this->getTranslation('modifier.info') . '<br>';
-
 
         $modifier = [
             'q' => 'Force quoting',
@@ -43,17 +46,20 @@ class PromptInfoElement extends AbstractFormElement
         ];
 
         foreach ($modifier as $key => $value) {
-            $html .= '<code>' . htmlspecialchars($key) . '</code> → <span style="color: #888; font-size: 90%;">' . htmlspecialchars($value) . '</span><br>';
+            $html .= '<code>' . htmlspecialchars($key) . '</code> &rarr; <span style="color: #888; font-size: 90%;">' . htmlspecialchars($value) . '</span><br>';
         }
 
-        $html .= 'Example: <code>%filename|raw|upper%</code></span><br><br>';
+        $html .= 'Example: <code>%filename|raw|upper%</code></span>';
+        $html .= '</div></details>';
 
         $promptText = $this->data['databaseRow']['prompt'];
         $prompt = $placeholderService->applyPlaceholders($promptText);
 
         if ($prompt !== $promptText) {
-            $html .= $this->getTranslation('applied.header') . '<br>';
-            $html .= '<code style="white-space: pre-wrap;">' . htmlspecialchars($prompt) . '</code><br><br>';
+            $html .= '<div style="margin-top: 0.5em;">';
+            $html .= '<strong>' . $this->getTranslation('applied.header') . '</strong><br>';
+            $html .= '<code style="white-space: pre-wrap;">' . htmlspecialchars($prompt) . '</code>';
+            $html .= '</div>';
         }
 
         $html .= '</div>';

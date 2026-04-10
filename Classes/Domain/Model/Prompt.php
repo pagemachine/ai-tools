@@ -8,34 +8,18 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 class Prompt extends AbstractEntity
 {
-    /**
-     * @var bool
-     */
-    protected bool $hidden;
+    protected bool $hidden = false;
 
-    /**
-     * @var string
-     */
     protected string $prompt;
 
-    /**
-     * @var string
-     */
     protected string $description;
 
-    /**
-     * @var string
-     */
     protected string $type;
 
-    /**
-     * @var bool
-     */
     protected bool $default = false;
 
-    /**
-     * @var string
-     */
+    protected bool $system = false;
+
     protected string $language = 'en_US';
 
     public function getHidden(): bool
@@ -91,6 +75,16 @@ class Prompt extends AbstractEntity
     public function setDefault(bool $default): void
     {
         $this->default = $default;
+    }
+
+    public function isSystem(): bool
+    {
+        return $this->system;
+    }
+
+    public function setSystem(bool $system): void
+    {
+        $this->system = $system;
     }
 
     public function getLanguage(): string

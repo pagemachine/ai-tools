@@ -12,10 +12,10 @@
 				<source>Prompt</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_domain_model_prompt.prompt.placeholder.header">
-				<source>Available placeholders:</source>
+				<source>Available placeholders</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_domain_model_prompt.prompt.modifier.header">
-				<source>Available modifiers:</source>
+				<source>Available modifiers</source>
 			</trans-unit>
 			<trans-unit id="tx_aitools_domain_model_prompt.prompt.modifier.info">
 				<source>You can apply one or more modifiers to a placeholder by using the | character. Modifiers can be chained in any order.</source>
