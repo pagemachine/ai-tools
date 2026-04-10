@@ -58,6 +58,8 @@ class GeneratorButton {
       if (this.updateHook) {
         this.updateHook(target, results);
       }
+
+      return results;
     } finally {
       element.prop('disabled', false);
       element.removeClass(GeneratorButton.CSS_CLASSES.GENERATING);

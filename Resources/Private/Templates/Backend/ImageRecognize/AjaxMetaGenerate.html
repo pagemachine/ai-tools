@@ -91,7 +91,7 @@
                                 id: 'globalTextPrompt',
                                 name: 'globalTextPrompt',
                                 options: allTextPrompts,
-                                value: textPrompt,
+                                value: textPromptValue,
                                 optionLabelField: 'description',
                                 optionValueField: 'prompt'
                             }"
@@ -136,7 +136,7 @@
                             <aitools:backend.Credits />
                         </button>
                         <br />
-                        <progress value="0" max="{fileObjects -> f:count()}" id="progressBar" class="progressBar"></progress>
+                        <progress value="0" max="{fileObjects -> f:count()}" id="progressBar" class="progressBar" style="display: none;"></progress>
                     </div>
                 </div>
             </div>
@@ -270,7 +270,7 @@
                             target: '#textPrompt-{fileObject.file.properties.identifier_hash}',
                             name: 'textPromptSelect',
                             options: allTextPrompts,
-                            value: textPrompt,
+                            value: textPromptValue,
                             optionLabelField: 'description',
                             optionValueField: 'prompt'
                         }" />

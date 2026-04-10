@@ -16,6 +16,7 @@ use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
 class PromptsController extends ActionController
 {
@@ -51,6 +52,8 @@ class PromptsController extends ActionController
 
     public function listAction(): ResponseInterface
     {
+        $this->promptRepository->ensureSystemPromptExists();
+
         $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
 
         $requestUri = $this->request->getAttribute('normalizedParams')->getRequestUri();
@@ -70,6 +73,29 @@ class PromptsController extends ActionController
             $moduleTemplate->assignMultiple($template_variables); // @phpstan-ignore-line
             return $moduleTemplate->renderResponse('Backend/Prompts/List'); // @phpstan-ignore-line
         }
+    }
+
+    public function restoreDefaultsAction(): ResponseInterface
+    {
+        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
+        if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0', '<')) {
+            // @phpstan-ignore-next-line
+            $systemPrompt = $this->promptRepository->findOneBySystem(true);
+        } else {
+            /** @phpstan-ignore-next-line */
+            $systemPrompt = $this->promptRepository->findOneBy(['system' => true]);
+        }
+
+        if ($systemPrompt) {
+            $systemPrompt->setPrompt(PromptRepository::SYSTEM_PROMPT_TEXT);
+            $systemPrompt->setDescription('Default Prompt');
+            $systemPrompt->setType('img2txt');
+            $systemPrompt->setLanguage('en_US');
+            $this->promptRepository->update($systemPrompt);
+            GeneralUtility::makeInstance(PersistenceManager::class)->persistAll();
+        }
+
+        return $this->redirect('list');
     }
 
     protected function getLanguageService(): LanguageService
