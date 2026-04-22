@@ -6,7 +6,6 @@ namespace Pagemachine\AItools\Service;
 
 use Doctrine\DBAL\Driver\Exception;
 use Pagemachine\AItools\Domain\Repository\MetaDataRepository;
-use T3G\AgencyPack\FileVariants\Service\ResourcesService;
 use TYPO3\CMS\Core\Resource\Exception\InvalidUidException;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\File;
@@ -107,8 +106,6 @@ class ImageMetaDataService
              * Special file_variants handling
              */
             if (ExtensionManagementUtility::isLoaded('file_variants')) {
-                /** @var ResourcesService $resourcesService */
-                $resourcesService = GeneralUtility::makeInstance(ResourcesService::class);
                 $fileMetadata = $fileObject->getMetaData()->get();
                 $fileMetadataUid = $fileMetadata['uid'] ?? null;
                 if (empty($fileMetadataUid)) {

@@ -109,14 +109,7 @@ class AlternativeGenerator extends AbstractNode
             'EXT:ai_tools/Resources/Public/Css/FieldWizard.css',
         ];
 
-        $typo3Version = new Typo3Version();
-        if ($typo3Version->getMajorVersion() > 11) {
-            $result['javaScriptModules'][] = JavaScriptModuleInstruction::create('@pagemachine/ai-tools/AlternativeGenerator.js'); // @phpstan-ignore-line
-        } else {
-            $result['requireJsModules'][] = JavaScriptModuleInstruction::forRequireJS( // @phpstan-ignore-line
-                'TYPO3/CMS/AiTools/Amd/AlternativeGenerator'
-            );
-        }
+        $result['javaScriptModules'][] = JavaScriptModuleInstruction::create('@pagemachine/ai-tools/AlternativeGenerator.js');
 
         return $result;
     }
