@@ -57,6 +57,11 @@ class AlternativeGenerator extends AbstractNode
             return false;
         }
 
+        $storageRecord = $file->getStorage()->getStorageRecord();
+        if ((int) ($storageRecord['tx_aitools_enabled'] ?? 1) !== 1) {
+            return false;
+        }
+
         return true;
     }
 
