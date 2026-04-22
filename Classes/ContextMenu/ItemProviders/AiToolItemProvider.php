@@ -12,7 +12,6 @@ use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 class AiToolItemProvider extends AbstractProvider
 {
@@ -39,18 +38,9 @@ class AiToolItemProvider extends AbstractProvider
         ],
     ];
 
-    public function __construct(string $table = '', string $identifier = '', string $context = '')
+    public function __construct()
     {
-        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
-        if (version_compare($version, '12.0', '>=')) {
-            // TYPO3 v12 or later
-            // @phpstan-ignore-next-line
-            parent::__construct();
-        } else {
-            // TYPO3 v11 or earlier
-            // @phpstan-ignore-next-line
-            parent::__construct($table, $identifier, $context);
-        }
+        parent::__construct();
 
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
     }
@@ -102,18 +92,9 @@ class AiToolItemProvider extends AbstractProvider
      */
     protected function getAdditionalAttributes(string $itemName): array
     {
-        // TYPO3 version check
-        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
-
         $attributes = [
             'data-callback-module' => '@pagemachine/ai-tools/ContextMenuActions',
         ];
-        if (version_compare($version, '11.0', '>=') && version_compare($version, '12.0', '<')) {
-            // for TYPO3 v11
-            $attributes = [
-                'data-callback-module' => 'TYPO3/CMS/AiTools/ContextMenuActions',
-            ];
-        }
 
         if ($itemName === 'generateAIMetadata') {
             $attributes += [

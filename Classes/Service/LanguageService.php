@@ -7,7 +7,6 @@ namespace Pagemachine\AItools\Service;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 class LanguageService
 {
@@ -103,21 +102,11 @@ class LanguageService
      */
     private function getLocaleLanguageCode($siteLanguage): string
     {
-        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
-        if (version_compare($version, '12.0', '>=')) {
-            // @phpstan-ignore-next-line Stop PHPStan about complaining this line for TYPO3 v11
-            return $siteLanguage->getLocale()->getLanguageCode();
-        }
-        return $siteLanguage->getTwoLetterIsoCode(); // @phpstan-ignore-line
+        return $siteLanguage->getLocale()->getLanguageCode();
     }
 
     private function getLocaleCountryCode($siteLanguage): ?string
     {
-        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
-        if (version_compare($version, '12.0', '>=')) {
-            // @phpstan-ignore-next-line Stop PHPStan about complaining this line for TYPO3 v11
-            return $siteLanguage->getLocale()->getCountryCode();
-        }
-        return null;
+        return $siteLanguage->getLocale()->getCountryCode();
     }
 }

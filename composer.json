@@ -12,6 +12,12 @@
     ],
     "authors": [
         {
+            "name": "Francisco Seipel",
+            "email": "fseipel@pagemachine.de",
+            "homepage": "https://pagemachine.de",
+            "role": "Developer"
+        },
+        {
             "name": "Mauricio Altamirano Silva",
             "email": "maltamirano@pagemachine.de",
             "homepage": "https://pagemachine.de",
@@ -25,10 +31,10 @@
         }
     ],
     "require": {
-        "php": "^8.1",
-        "typo3/cms-backend": "^11.5 || ^12.4 || ^13.4",
-        "typo3/cms-core": "^11.5 || ^12.4 || ^13.4",
-        "typo3/cms-fluid": "^11.5 || ^12.4 || ^13.4"
+        "php": "^8.2",
+        "typo3/cms-backend": "^12.4 || ^13.4",
+        "typo3/cms-core": "^12.4 || ^13.4",
+        "typo3/cms-fluid": "^12.4 || ^13.4"
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.43",
@@ -71,7 +77,7 @@
     },
     "scripts": {
         "build": [
-            "@composer require --no-progress --ansi --update-with-dependencies typo3/cms-core $TYPO3_VERSION",
+            "@composer require --no-progress --ansi --with-all-dependencies typo3/cms-core:$TYPO3_VERSION typo3/cms-backend:$TYPO3_VERSION typo3/cms-fluid:$TYPO3_VERSION",
             "@build:assets",
             "@lint"
         ],

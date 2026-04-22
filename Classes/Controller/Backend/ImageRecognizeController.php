@@ -18,7 +18,6 @@ use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
-use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Resource\AbstractFile;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
@@ -85,15 +84,11 @@ class ImageRecognizeController extends ActionController
 
     protected function getLanguageFlagHtml($identifier, $title = '', $size = Icon::SIZE_LARGE, $overlay = '', $state = IconState::STATE_DEFAULT)
     {
-        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
         $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
         $icon = $iconFactory->getIcon($identifier, $size, $overlay, IconState::cast($state));
 
-        if (version_compare($version, '12.0', '>=')) {
-            if ($title ?? false) {
-                // @phpstan-ignore-next-line
-                $icon->setTitle($title);
-            }
+        if ($title ?? false) {
+            $icon->setTitle($title);
         }
         return $icon->render();
     }
@@ -108,9 +103,7 @@ class ImageRecognizeController extends ActionController
         $templatePaths = new TemplatePaths($this->templateRootPath);
         $view = GeneralUtility::makeInstance(StandaloneView::class);
 
-        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
-        if ($request !== null && version_compare($version, '12.0', '>=')) {
-            // needed in TYPO3 v12 see https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Breaking-98377-FluidStandaloneViewDoesNotCreateAnExtbaseRequestAnymore.html
+        if ($request !== null) {
             $attribute = new ExtbaseRequestParameters(ImageRecognizeController::class);
             $request = $request->withAttribute('extbase', $attribute);
             $extbaseRequest = GeneralUtility::makeInstance(Request::class, $request);
@@ -342,16 +335,9 @@ class ImageRecognizeController extends ActionController
                 }
 
                 $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
-                $typo3Version = new Typo3Version();
-                if ($typo3Version->getMajorVersion() > 11) {
-                    $pageRenderer->loadJavaScriptModule( // @phpstan-ignore-line
-                        '@pagemachine/ai-tools/AjaxMetaGenerate.js',
-                    );
-                } else {
-                    $pageRenderer->loadRequireJsModule( // @phpstan-ignore-line
-                        'TYPO3/CMS/AiTools/Amd/AjaxMetaGenerate'
-                    );
-                }
+                $pageRenderer->loadJavaScriptModule(
+                    '@pagemachine/ai-tools/AjaxMetaGenerate.js',
+                );
 
 
                 if (version_compare(GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version(), '13.0', '<')) {
@@ -378,11 +364,6 @@ class ImageRecognizeController extends ActionController
 
     public function getLocaleLanguageCode(SiteLanguage $siteLanguage): string
     {
-        $version = GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version();
-        if (version_compare($version, '12.0', '>=')) {
-            // @phpstan-ignore-next-line Stop PHPStan about complaining this line for TYPO3 v11
-            return $siteLanguage->getLocale()->getLanguageCode();
-        }
-        return $siteLanguage->getTwoLetterIsoCode(); // @phpstan-ignore-line
+        return $siteLanguage->getLocale()->getLanguageCode();
     }
 }
