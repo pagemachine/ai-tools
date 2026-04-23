@@ -74,11 +74,16 @@ class ServerService
         $serverRepository = GeneralUtility::makeInstance(ServerRepository::class);
         $serverEntry = null;
 
-        if ($fileContext !== null && $functionality === 'image_recognition') {
+        if ($fileContext !== null) {
             $storageRecord = $fileContext->getStorage()->getStorageRecord();
             $overrideUid = (int) ($storageRecord['tx_aitools_server'] ?? 0);
             if ($overrideUid > 0) {
-                $serverEntry = $serverRepository->findServerByUid($overrideUid);
+                $overrideServer = $serverRepository->findServerByUid($overrideUid);
+                if ($overrideServer instanceof Server
+                    && array_key_exists($functionality, $this->serverConfig[$overrideServer->getType()]['functionality'] ?? [])
+                ) {
+                    $serverEntry = $overrideServer;
+                }
             }
         }
 

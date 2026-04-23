@@ -242,6 +242,10 @@ class ImageRecognizeController extends ActionController
 
                 $translations = [];
                 if ($doTranslate) {
+                    $fileContext = $target !== '' ? ($this->resourceFactory->retrieveFileOrFolderObject($target) ?: null) : null;
+                    if (!$fileContext instanceof FileInterface) {
+                        $fileContext = null;
+                    }
                     // fetch all site languages and translate the altText
                     foreach ($siteLanguages as $siteLanguage) {
                         // only translate additional languages (skip current language)
@@ -251,7 +255,7 @@ class ImageRecognizeController extends ActionController
                                 continue;
                             }
 
-                            $altTextTranslated = $this->translationService->translateText($altText, $targetTwoLetterIsoCode, $this->getLocaleLanguageCode($siteLanguage), $translationProvider);
+                            $altTextTranslated = $this->translationService->translateText($altText, $targetTwoLetterIsoCode, $this->getLocaleLanguageCode($siteLanguage), $translationProvider, $fileContext);
                             $metaDataUid = $this->imageMetaDataService->saveMetaData($target, $altTextTranslated, $siteLanguage->getLanguageId(), $parentUid);
                             $translations[] = [
                                 'languageId' => $siteLanguage->getLanguageId(),
@@ -296,7 +300,7 @@ class ImageRecognizeController extends ActionController
                         (int) $target_language,
                         $translationProvider,
                     );
-                    $altText = $this->translationService->translateText($altTextFromImage, 'en', $targetTwoLetterIsoCode, $this->settingsService->getTranslationProviderForLanguage((int) $target_language));
+                    $altText = $this->translationService->translateText($altTextFromImage, 'en', $targetTwoLetterIsoCode, $this->settingsService->getTranslationProviderForLanguage((int) $target_language), $fileForGeneration);
                     $data = ['alternative' => $altText, 'baseAlternative' => $altTextFromImage];
                 }
 
