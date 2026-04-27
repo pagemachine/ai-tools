@@ -7,6 +7,12 @@ parameters:
     - ext_tables.php
     - Classes
 
+  excludePaths:
+    # Wizard uses TYPO3\CMS\Core\Upgrades\* (v14-only). On v12/v13 the file
+    # is never autoloaded since nothing references it; phpstan against v12/v13
+    # stubs cannot resolve the parent interface, so skip static analysis.
+    - Classes/Updates/DefaultPromptUpdateWizard.php
+
   ignoreErrors:
     - message: '#Variable \$_EXTKEY might not be defined.#'
       path: ext_emconf.php
