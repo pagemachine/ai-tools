@@ -6,9 +6,9 @@ namespace Pagemachine\AItools\ContextMenu\ItemProviders;
 
 use Pagemachine\AItools\Service\SettingsService;
 use TYPO3\CMS\Backend\ContextMenu\ItemProviders\AbstractProvider;
+use TYPO3\CMS\Core\Resource\AbstractFile;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\File;
-use TYPO3\CMS\Core\Resource\FileType;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -32,23 +32,30 @@ class AiToolItemProvider extends AbstractProvider
     protected $itemsConfiguration = [
         'generateAIMetadata' => [
             'type' => 'item',
-            'label' => 'Generate A.I. Metadata',
+            'label' => 'Generate A.I. Metadata', // you can use "LLL:" syntax here
             'iconIdentifier' => 'actions-document-info',
-            'callbackAction' => 'generateAIMetadata',
+            'callbackAction' => 'generateAIMetadata', //name of the function in the JS file
         ],
     ];
 
     public function __construct()
     {
         parent::__construct();
+
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
     }
 
+    /**
+     * @return bool
+     */
     public function canHandle(): bool
     {
         return $this->table === 'sys_file';
     }
 
+    /**
+     * Initialize file object
+     */
     protected function initialize()
     {
         parent::initialize();
@@ -59,11 +66,30 @@ class AiToolItemProvider extends AbstractProvider
         }
     }
 
+    /**
+     * Returns the provider priority which is used for determining the order in which providers are processing items
+     * to the result array. Highest priority means provider is evaluated first.
+     *
+     * This item provider should be called after PageProvider which has priority 100.
+     *
+     * BEWARE: Returned priority should logically not clash with another provider.
+     *         Please check @see \TYPO3\CMS\Backend\ContextMenu\ContextMenu::getAvailableProviders() if needed.
+     *
+     * @return int
+     */
     public function getPriority(): int
     {
         return 55;
     }
 
+    /**
+     * Registers the additional JavaScript RequireJS callback-module which will allow to display a notification
+     * whenever the user tries to click on the "Hello World" item.
+     * The method is called from AbstractProvider::prepareItems() for each context menu item.
+     *
+     * @param string $itemName
+     * @return array
+     */
     protected function getAdditionalAttributes(string $itemName): array
     {
         $attributes = [
@@ -82,8 +108,16 @@ class AiToolItemProvider extends AbstractProvider
         return $attributes;
     }
 
+    /**
+     * This method is called for each item this provider adds and checks if given item can be added
+     *
+     * @param string $itemName
+     * @param string $type
+     * @return bool
+     */
     protected function canRender(string $itemName, string $type): bool
     {
+        // checking if item is disabled through TSConfig
         if (in_array($itemName, $this->disabledItems, true)) {
             return false;
         }
@@ -96,6 +130,9 @@ class AiToolItemProvider extends AbstractProvider
         return $canRender;
     }
 
+    /**
+     * @return bool
+     */
     protected function isFile(): bool
     {
         return $this->record instanceof File;
@@ -108,7 +145,7 @@ class AiToolItemProvider extends AbstractProvider
 
     protected function isImage(): bool
     {
-        return $this->isFile() && $this->record->getType() == FileType::IMAGE->value;
+        return $this->isFile() && $this->record->getType() == AbstractFile::FILETYPE_IMAGE;
     }
 
     protected function isUserAllowed(): bool
@@ -120,6 +157,7 @@ class AiToolItemProvider extends AbstractProvider
     {
         return $this->isImage()
             && $this->isUserAllowed()
+            && $this->isStorageEnabled()
             && $this->record->isIndexed()
             && $this->record->checkActionPermission('editMeta')
             && $this->record->getMetaData()->offsetExists('uid')
@@ -131,8 +169,18 @@ class AiToolItemProvider extends AbstractProvider
     {
         return $this->isFolder()
             && $this->isUserAllowed()
+            && $this->isStorageEnabled()
             && $this->backendUser->check('tables_modify', 'sys_file_metadata')
             && $this->backendUser->checkLanguageAccess(0);
+    }
+
+    protected function isStorageEnabled(): bool
+    {
+        if ($this->record === null) {
+            return false;
+        }
+        $record = $this->record->getStorage()->getStorageRecord();
+        return (int) ($record['tx_aitools_enabled'] ?? 1) === 1;
     }
 
     protected function getIdentifier(): string

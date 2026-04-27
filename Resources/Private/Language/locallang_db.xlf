@@ -84,6 +84,18 @@
 			<trans-unit id="tx_aitools_domain_model_server.image_recognition">
 				<source>Image Recognition</source>
 			</trans-unit>
+			<trans-unit id="sys_file_storage.tab">
+				<source>AI Tools</source>
+			</trans-unit>
+			<trans-unit id="sys_file_storage.tx_aitools_enabled">
+				<source>Enable AI Tools for this storage</source>
+			</trans-unit>
+			<trans-unit id="sys_file_storage.tx_aitools_server">
+				<source>AI Server (override)</source>
+			</trans-unit>
+			<trans-unit id="sys_file_storage.tx_aitools_server.default">
+				<source>Use default server</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

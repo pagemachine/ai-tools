@@ -41,9 +41,22 @@ class ServerRepository extends Repository
         return $query->execute();
     }
 
+    public function findServerByUid(int $uid): ?Server
+    {
+        $query = $this->createQuery();
+        $query->getQuerySettings()->setIgnoreEnableFields(false);
+        $query->matching($query->equals('uid', $uid))->setLimit(1);
+        /** @var Server|null $result */
+        $result = $query->execute()->getFirst();
+        return $result;
+    }
+
     public function getDefault()
     {
-        /** @var Server $default */
+        /**
+         * @var Server $default
+         * @phpstan-ignore-next-line
+         */
         $default = $this->findOneBy(['default' => true]);
 
         return $default;

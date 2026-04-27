@@ -6,7 +6,6 @@ namespace Pagemachine\AItools\Service;
 
 use Doctrine\DBAL\Driver\Exception;
 use Pagemachine\AItools\Domain\Repository\MetaDataRepository;
-use T3G\AgencyPack\FileVariants\Service\ResourcesService;
 use TYPO3\CMS\Core\Resource\Exception\InvalidUidException;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\File;
@@ -51,7 +50,7 @@ class ImageMetaDataService
      */
     public function generateImageDescription(FileInterface $fileObject, string $textPrompt = '', string $targetLanguage = 'en', int $language = 0, ?string $translationProvider = null): string
     {
-        $serverClass = $this->serverService->getActiveServerClassByFunctionality('image_recognition');
+        $serverClass = $this->serverService->getActiveServerClassByFunctionality('image_recognition', $fileObject);
         $processedImage = $this->getScaledImage($fileObject);
 
         /** @var File $fileObject */
@@ -68,7 +67,7 @@ class ImageMetaDataService
      */
     public function priceForImageDescription(FileInterface $fileObject, string $textPrompt = '', string $targetLanguage = 'en'): string
     {
-        $serverClass = $this->serverService->getActiveServerClassByFunctionality('image_recognition');
+        $serverClass = $this->serverService->getActiveServerClassByFunctionality('image_recognition', $fileObject);
         $processedImage = $this->getScaledImage($fileObject);
         return $serverClass->sendCreditsRequestToApi($processedImage, $textPrompt, $targetLanguage);
     }
@@ -107,8 +106,6 @@ class ImageMetaDataService
              * Special file_variants handling
              */
             if (ExtensionManagementUtility::isLoaded('file_variants')) {
-                /** @var ResourcesService $resourcesService */
-                $resourcesService = GeneralUtility::makeInstance(ResourcesService::class);
                 $fileMetadata = $fileObject->getMetaData()->get();
                 $fileMetadataUid = $fileMetadata['uid'] ?? null;
                 if (empty($fileMetadataUid)) {

@@ -46,6 +46,11 @@ class AlternativeGenerator extends AbstractNode
             return false;
         }
 
+        $storageRecord = $file->getStorage()->getStorageRecord();
+        if ((int) ($storageRecord['tx_aitools_enabled'] ?? 1) !== 1) {
+            return false;
+        }
+
         return true;
     }
 
@@ -63,9 +68,10 @@ class AlternativeGenerator extends AbstractNode
 
     protected function buildWizardResult(array $result): array
     {
-        $target = $this->data['databaseRow']['file'][0];
+        $rawFile = $this->data['databaseRow']['file'][0] ?? null;
+        $target = is_array($rawFile) ? ($rawFile['uid'] ?? null) : $rawFile;
 
-        if (!$this->isActive($target)) {
+        if (empty($target) || !$this->isActive($target)) {
             return $result;
         }
 

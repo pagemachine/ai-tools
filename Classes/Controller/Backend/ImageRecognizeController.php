@@ -16,20 +16,25 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
+use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
-use TYPO3\CMS\Core\Imaging\IconSize;
 use TYPO3\CMS\Core\Page\PageRenderer;
+use TYPO3\CMS\Core\Resource\AbstractFile;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\FileInterface;
-use TYPO3\CMS\Core\Resource\FileType;
 use TYPO3\CMS\Core\Resource\FolderInterface;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
+use TYPO3\CMS\Core\Type\Icon\IconState;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
 use TYPO3\CMS\Extbase\Mvc\Request;
+use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
+use TYPO3\CMS\Fluid\View\StandaloneView;
+use TYPO3\CMS\Fluid\View\TemplatePaths;
 
 class ImageRecognizeController extends ActionController
 {
@@ -38,6 +43,16 @@ class ImageRecognizeController extends ActionController
     protected SiteFinder $siteFinder;
     protected SettingsService $settingsService;
     protected PromptRepository $promptRepository;
+
+    /**
+     * @var string
+     */
+    protected $templateRootPath = 'EXT:ai_tools/Resources/Private/Templates/Backend/ImageRecognize/';
+
+    /**
+     * @var string
+     */
+    protected $layoutRootPath = 'EXT:ai_tools/Resources/Private/Layouts/';
 
     public function __construct(
         private readonly ResourceFactory $resourceFactory,
@@ -52,7 +67,7 @@ class ImageRecognizeController extends ActionController
         $this->promptRepository = GeneralUtility::makeInstance(PromptRepository::class);
     }
 
-    protected function getFileMetaDataEditLink(int $uid, ?string $returnUrl = null): UriInterface
+    protected function getFileMetaDataEditLink(int $uid, string $returnUrl = null): UriInterface
     {
         $uriParameters = [
             'edit' =>
@@ -67,15 +82,41 @@ class ImageRecognizeController extends ActionController
             ->buildUriFromRoute('record_edit', $uriParameters);
     }
 
-    protected function getLanguageFlagHtml($identifier, $title = '', $size = IconSize::LARGE, $overlay = '')
+    protected function getLanguageFlagHtml($identifier, $title = '', $size = Icon::SIZE_LARGE, $overlay = '', $state = IconState::STATE_DEFAULT)
     {
         $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
-        $icon = $iconFactory->getIcon($identifier, $size, $overlay);
+        $icon = $iconFactory->getIcon($identifier, $size, $overlay, IconState::cast($state));
 
         if ($title ?? false) {
             $icon->setTitle($title);
         }
         return $icon->render();
+    }
+
+    /**
+     * Return custom Standalone View
+     * @internal
+     * @return StandaloneView
+     */
+    protected function getView(string $templateName = 'Default', $request = null): StandaloneView
+    {
+        $templatePaths = new TemplatePaths($this->templateRootPath);
+        $view = GeneralUtility::makeInstance(StandaloneView::class);
+
+        if ($request !== null) {
+            $attribute = new ExtbaseRequestParameters(ImageRecognizeController::class);
+            $request = $request->withAttribute('extbase', $attribute);
+            $extbaseRequest = GeneralUtility::makeInstance(Request::class, $request);
+            $view->setRequest($extbaseRequest);
+        }
+
+        $view->getRenderingContext()->setTemplatePaths($templatePaths);
+        $view->setTemplate($templateName);
+        $view->setFormat('html');
+        $view->setTemplatePathAndFilename($this->templateRootPath . $templateName . '.html');
+        $view->setLayoutRootPaths([$this->layoutRootPath]);
+        $view->assign('settings', $this->settings);
+        return $view;
     }
 
     /**
@@ -86,13 +127,15 @@ class ImageRecognizeController extends ActionController
     {
         $parsedBody = $request->getParsedBody();
         $queryParams = $request->getQueryParams();
+        // Setting target, which must be a file reference to a file within the mounts.
         $target = $parsedBody['target'] ?? $queryParams['target'] ?? '';
         $target_language = $parsedBody['target-language'] ?? $queryParams['target-language'] ?? '';
 
+        // create the file object
         if ($target) {
             $fileObject = $this->resourceFactory->retrieveFileOrFolderObject($target);
             if ($fileObject instanceof FileInterface) {
-                if ($fileObject->getType() !== FileType::IMAGE->value) {
+                if ($fileObject->getType() !== AbstractFile::FILETYPE_IMAGE) {
                     return null;
                 }
 
@@ -100,7 +143,7 @@ class ImageRecognizeController extends ActionController
             }
             if ($fileObject instanceof FolderInterface) {
                 $files = $fileObject->getFiles();
-                $files = array_filter($files, fn($file) => $file->getType() === FileType::IMAGE->value);
+                $files = array_filter($files, fn($file) => $file->getType() === AbstractFile::FILETYPE_IMAGE);
                 $files = array_map(fn($file) => $this->addMetaToFile($file, [$target_language]), $files);
 
                 return $files;
@@ -172,6 +215,7 @@ class ImageRecognizeController extends ActionController
 
         $fileObjects = $this->getFileObjectFromRequestTarget($request);
 
+        /** @var QueryResultInterface<Prompt> $allPrompts */
         $allPrompts = $this->promptRepository->findAll();
 
         $defaultPrompt = $this->promptRepository->getDefaultPrompt();
@@ -187,6 +231,7 @@ class ImageRecognizeController extends ActionController
         $targetLanguage = $this->getLanguageById((int) $target_language);
         $targetTwoLetterIsoCode = $this->getLocaleLanguageCode($targetLanguage);
 
+        // Setting target, which must be a file reference to a file within the mounts.
         $action = $parsedBody['action'] ?? $queryParams['action'] ?? '';
         $target = $parsedBody['target'] ?? $queryParams['target'] ?? '';
         switch ($action) {
@@ -197,14 +242,20 @@ class ImageRecognizeController extends ActionController
 
                 $translations = [];
                 if ($doTranslate) {
+                    $fileContext = $target !== '' ? ($this->resourceFactory->retrieveFileOrFolderObject($target) ?: null) : null;
+                    if (!$fileContext instanceof FileInterface) {
+                        $fileContext = null;
+                    }
+                    // fetch all site languages and translate the altText
                     foreach ($siteLanguages as $siteLanguage) {
+                        // only translate additional languages (skip current language)
                         if ($siteLanguage->getLanguageId() !== (int) $target_language) {
                             $translationProvider = $this->settingsService->getTranslationProviderForLanguage($siteLanguage->getLanguageId());
                             if (is_null($translationProvider)) {
                                 continue;
                             }
 
-                            $altTextTranslated = $this->translationService->translateText($altText, $targetTwoLetterIsoCode, $this->getLocaleLanguageCode($siteLanguage), $translationProvider);
+                            $altTextTranslated = $this->translationService->translateText($altText, $targetTwoLetterIsoCode, $this->getLocaleLanguageCode($siteLanguage), $translationProvider, $fileContext);
                             $metaDataUid = $this->imageMetaDataService->saveMetaData($target, $altTextTranslated, $siteLanguage->getLanguageId(), $parentUid);
                             $translations[] = [
                                 'languageId' => $siteLanguage->getLanguageId(),
@@ -226,11 +277,15 @@ class ImageRecognizeController extends ActionController
                     ->withHeader('Content-Type', 'application/json')
                     ->withBody($this->streamFactory->createStream(json_encode($returnArray)));
             case 'generateMetaData':
+                $fileForGeneration = $fileObjects[0]['file'] ?? null;
+                if (!$fileForGeneration instanceof FileInterface) {
+                    throw new Exception('Cannot generate metadata: target did not resolve to an image file', 1745356800);
+                }
                 $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt->getPrompt() != null ? $defaultPrompt->getPrompt() : '');
                 $translationProvider = $parsedBody['translationProvider'] ?? $queryParams['translationProvider'] ?? null;
                 if ($this->imageMetaDataService->supportsTranslation()) {
                     $altTextFromImageTranslated = $this->imageMetaDataService->generateImageDescription(
-                        $fileObjects[0]['file'],
+                        $fileForGeneration,
                         $textPrompt,
                         $targetTwoLetterIsoCode,
                         (int) $target_language,
@@ -239,13 +294,13 @@ class ImageRecognizeController extends ActionController
                     $data = ['alternative' => $altTextFromImageTranslated, 'baseAlternative' => $altTextFromImageTranslated];
                 } else {
                     $altTextFromImage = $this->imageMetaDataService->generateImageDescription(
-                        $fileObjects[0]['file'],
+                        $fileForGeneration,
                         $textPrompt,
                         'en',
                         (int) $target_language,
                         $translationProvider,
                     );
-                    $altText = $this->translationService->translateText($altTextFromImage, 'en', $targetTwoLetterIsoCode, $this->settingsService->getTranslationProviderForLanguage((int) $target_language));
+                    $altText = $this->translationService->translateText($altTextFromImage, 'en', $targetTwoLetterIsoCode, $this->settingsService->getTranslationProviderForLanguage((int) $target_language), $fileForGeneration);
                     $data = ['alternative' => $altText, 'baseAlternative' => $altTextFromImage];
                 }
 
@@ -254,10 +309,15 @@ class ImageRecognizeController extends ActionController
                     ->withBody($this->streamFactory->createStream(json_encode($data)));
 
             default:
-                $attribute = new ExtbaseRequestParameters(ImageRecognizeController::class);
-                $request = $request->withAttribute('extbase', $attribute);
-                $extbaseRequest = GeneralUtility::makeInstance(Request::class, $request);
-                $moduleTemplate = $this->moduleTemplateFactory->create($extbaseRequest);
+                if (version_compare(GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version(), '13.0', '<')) {
+                    $moduleTemplate = $this->moduleTemplateFactory->create($request);
+                    $view = $this->getView('AjaxMetaGenerate', $request);
+                } else {
+                    $attribute = new ExtbaseRequestParameters(ImageRecognizeController::class);
+                    $request = $request->withAttribute('extbase', $attribute);
+                    $extbaseRequest = GeneralUtility::makeInstance(Request::class, $request);
+                    $moduleTemplate = $this->moduleTemplateFactory->create($extbaseRequest);
+                }
 
                 $moduleTemplate->getDocHeaderComponent()->disable();
 
@@ -269,15 +329,10 @@ class ImageRecognizeController extends ActionController
                     'targetLanguage' => (int) $target_language,
                     'modal' => $modal,
                     'textPrompt' => $defaultPrompt->getPrompt(),
-                    'textPromptValue' => json_encode(['prompt' => $defaultPrompt->getPrompt(), 'language' => $defaultPrompt->getLanguage()]),
-                    'allTextPrompts' => array_map(
-                        /** @phpstan-ignore argument.type */
-                        fn(Prompt $prompt) => [
-                            'description' => ($prompt->isDefault() ? "\u{2605} " : '') . $prompt->getDescription(),
-                            'prompt' => json_encode(['prompt' => $prompt->getPrompt(), 'language' => $prompt->getLanguage()]),
-                        ],
-                        $allPrompts->toArray()
-                    ),
+                    'allTextPrompts' => array_map(fn(Prompt $prompt) => [
+                        'description' => $prompt->getDescription(),
+                        'prompt' => json_encode(['prompt' => $prompt->getPrompt(), 'language' => $prompt->getLanguage()]),
+                    ], $allPrompts->toArray()),
                 ];
 
                 try {
@@ -292,8 +347,16 @@ class ImageRecognizeController extends ActionController
                     '@pagemachine/ai-tools/AjaxMetaGenerate.js',
                 );
 
-                $moduleTemplate->assignMultiple($template_variables);
-                return $moduleTemplate->renderResponse('Backend/ImageRecognize/AjaxMetaGenerate');
+
+                if (version_compare(GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version(), '13.0', '<')) {
+                    $view = $this->getView('AjaxMetaGenerate', $request);
+                    $view->assignMultiple($template_variables);
+                    $moduleTemplate->setContent($view->render()); // @phpstan-ignore-line
+                    return $this->htmlResponse($moduleTemplate->renderContent()); // @phpstan-ignore-line
+                } else {
+                    $moduleTemplate->assignMultiple($template_variables); // @phpstan-ignore-line
+                    return $moduleTemplate->renderResponse('Backend/ImageRecognize/AjaxMetaGenerate'); // @phpstan-ignore-line
+                }
         }
     }
 
