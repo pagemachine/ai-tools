@@ -21,7 +21,6 @@ return [
         'controllerActions' => [
             PromptsController::class => [
                 'list',
-                'restoreDefaults',
             ],
         ],
     ],

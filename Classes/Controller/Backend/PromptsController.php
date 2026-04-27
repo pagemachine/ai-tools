@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Pagemachine\AItools\Controller\Backend;
 
 use Pagemachine\AItools\Compatibility\Typo3VersionGate;
-use Pagemachine\AItools\Domain\Model\Prompt;
 use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
@@ -16,7 +15,6 @@ use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
-use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
 class PromptsController extends ActionController
 {
@@ -52,8 +50,6 @@ class PromptsController extends ActionController
 
     public function listAction(): ResponseInterface
     {
-        $this->promptRepository->ensureSystemPromptExists();
-
         $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
 
         $requestUri = $this->request->getAttribute('normalizedParams')->getRequestUri();
@@ -67,23 +63,6 @@ class PromptsController extends ActionController
 
         $moduleTemplate->assignMultiple($template_variables);
         return $moduleTemplate->renderResponse('Backend/Prompts/List');
-    }
-
-    public function restoreDefaultsAction(): ResponseInterface
-    {
-        /** @var Prompt|null $systemPrompt */
-        $systemPrompt = $this->promptRepository->findOneBy(['system' => true]);
-
-        if ($systemPrompt) {
-            $systemPrompt->setPrompt(PromptRepository::SYSTEM_PROMPT_TEXT);
-            $systemPrompt->setDescription('Default Prompt');
-            $systemPrompt->setType('img2txt');
-            $systemPrompt->setLanguage('en_US');
-            $this->promptRepository->update($systemPrompt);
-            GeneralUtility::makeInstance(PersistenceManager::class)->persistAll();
-        }
-
-        return $this->redirect('list');
     }
 
     protected function getLanguageService(): LanguageService
