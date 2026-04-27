@@ -80,9 +80,12 @@ class ImageRecognizeController extends ActionController
             ->buildUriFromRoute('record_edit', $uriParameters);
     }
 
-    protected function getLanguageFlagHtml($identifier, $title = '', $size = 'large', $overlay = '')
+    protected function getLanguageFlagHtml($identifier, $title = '', $overlay = '')
     {
         $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
+        $size = Typo3VersionGate::isV14OrHigher()
+            ? \TYPO3\CMS\Core\Imaging\IconSize::LARGE
+            : \TYPO3\CMS\Core\Imaging\Icon::SIZE_LARGE;
         $icon = $iconFactory->getIcon($identifier, $size, $overlay);
 
         if ($title ?? false) {
@@ -201,7 +204,7 @@ class ImageRecognizeController extends ActionController
         if (!is_null($action)) {
             try {
                 return $this->ajaxData($request);
-            } catch (Exception $e) {
+            } catch (\Throwable $e) {
                 return $this->responseFactory->createResponse()
                     ->withHeader('Content-Type', 'application/json')
                     ->withBody($this->streamFactory->createStream(json_encode(['error' => $e->getMessage()], JSON_THROW_ON_ERROR)));
@@ -284,7 +287,7 @@ class ImageRecognizeController extends ActionController
                 if (!$fileForGeneration instanceof FileInterface) {
                     throw new Exception('Cannot generate metadata: target did not resolve to an image file', 1745356800);
                 }
-                $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt->getPrompt() != null ? $defaultPrompt->getPrompt() : '');
+                $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt?->getPrompt() ?? '');
                 $translationProvider = $parsedBody['translationProvider'] ?? $queryParams['translationProvider'] ?? null;
                 if ($this->imageMetaDataService->supportsTranslation()) {
                     $altTextFromImageTranslated = $this->imageMetaDataService->generateImageDescription(
@@ -331,7 +334,7 @@ class ImageRecognizeController extends ActionController
                     'fileObjects' => $fileObjects ?? null,
                     'targetLanguage' => (int) $target_language,
                     'modal' => $modal,
-                    'textPrompt' => $defaultPrompt->getPrompt(),
+                    'textPrompt' => $defaultPrompt?->getPrompt() ?? '',
                     'allTextPrompts' => array_map(fn(Prompt $prompt) => [
                         'description' => $prompt->getDescription(),
                         'prompt' => json_encode(['prompt' => $prompt->getPrompt(), 'language' => $prompt->getLanguage()]),
