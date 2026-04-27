@@ -25,7 +25,7 @@ defined('TYPO3') or die();
 
 $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ai_tools']['servers'] = [
     'aigude' => [
-        'name' => 'AI Gude',
+        'name' => 'AiGude',
         'credits' => AigudeCreditsService::class,
         'functionality' => [
             'translation' => AigudeTranslationService::class,

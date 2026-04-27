@@ -14,7 +14,7 @@ class AigudeImageRecognitionService extends AigudeAbstract implements ImageRecog
 
     public function sendFileToApi(FileInterface $fileObject, PlaceholderResult $placeholderResult, string $targetLanguage = 'en', ?string $translationProvider = null): string
     {
-        $urlParts = ['api_version=2'];
+        $urlParts = ['api_version=2', 'model=aigude-vision-v1'];
 
         if (!empty($targetLanguage)) {
             $urlParts[] = 'target_lang=' . urlencode((string) $targetLanguage);
