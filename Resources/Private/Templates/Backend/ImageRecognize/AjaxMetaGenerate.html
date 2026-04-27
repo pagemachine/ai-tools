@@ -405,7 +405,7 @@
                                     <f:variable name="provider">{translationProviders.{metaLanguage.language.languageId}}</f:variable>
                                     <li class="{f:if(condition: '!{provider.active}', then: 'no-provider', else: '')}">
                                         <div class="flag-section">
-                                            <aitools:backend.icon
+                                            <core:icon
                                                 title="{metaLanguage.language.title}"
                                                 identifier="{metaLanguage.language.flagIdentifier}" size="large"
                                             />
