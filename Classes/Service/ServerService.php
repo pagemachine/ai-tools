@@ -7,6 +7,7 @@ namespace Pagemachine\AItools\Service;
 use Pagemachine\AItools\Domain\Model\Server;
 use Pagemachine\AItools\Domain\Repository\ServerRepository;
 use Pagemachine\AItools\Service\SettingsService;
+use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ServerService
@@ -68,16 +69,33 @@ class ServerService
         return array_keys($this->serverConfig[$type]['functionality']);
     }
 
-    public function getActiveServerClassByFunctionality($functionality)
+    public function getActiveServerClassByFunctionality($functionality, ?FileInterface $fileContext = null)
     {
-        $serviceUid = (integer) $this->settingsService->getSetting($functionality.'_service');
+        $serverRepository = GeneralUtility::makeInstance(ServerRepository::class);
+        $serverEntry = null;
 
-        if (empty($serviceUid)) {
-            throw new \Exception('No default API Connection defined in the settings (' . $functionality . ')');
+        if ($fileContext !== null) {
+            $storageRecord = $fileContext->getStorage()->getStorageRecord();
+            $overrideUid = (int) ($storageRecord['tx_aitools_server'] ?? 0);
+            if ($overrideUid > 0) {
+                $overrideServer = $serverRepository->findServerByUid($overrideUid);
+                if ($overrideServer instanceof Server
+                    && array_key_exists($functionality, $this->serverConfig[$overrideServer->getType()]['functionality'] ?? [])
+                ) {
+                    $serverEntry = $overrideServer;
+                }
+            }
         }
 
-        $serverRepository = GeneralUtility::makeInstance(ServerRepository::class);
-        $serverEntry = $serverRepository->findByUid($serviceUid);
+        if (!$serverEntry instanceof Server) {
+            $serviceUid = (integer) $this->settingsService->getSetting($functionality.'_service');
+
+            if (empty($serviceUid)) {
+                throw new \Exception('No default API Connection defined in the settings (' . $functionality . ')');
+            }
+
+            $serverEntry = $serverRepository->findByUid($serviceUid);
+        }
 
         if (!$serverEntry instanceof Server) {
             throw new \Exception('No valid '.$functionality.' service configured');

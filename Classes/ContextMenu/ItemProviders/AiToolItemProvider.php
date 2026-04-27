@@ -157,6 +157,7 @@ class AiToolItemProvider extends AbstractProvider
     {
         return $this->isImage()
             && $this->isUserAllowed()
+            && $this->isStorageEnabled()
             && $this->record->isIndexed()
             && $this->record->checkActionPermission('editMeta')
             && $this->record->getMetaData()->offsetExists('uid')
@@ -168,8 +169,18 @@ class AiToolItemProvider extends AbstractProvider
     {
         return $this->isFolder()
             && $this->isUserAllowed()
+            && $this->isStorageEnabled()
             && $this->backendUser->check('tables_modify', 'sys_file_metadata')
             && $this->backendUser->checkLanguageAccess(0);
+    }
+
+    protected function isStorageEnabled(): bool
+    {
+        if ($this->record === null) {
+            return false;
+        }
+        $record = $this->record->getStorage()->getStorageRecord();
+        return (int) ($record['tx_aitools_enabled'] ?? 1) === 1;
     }
 
     protected function getIdentifier(): string

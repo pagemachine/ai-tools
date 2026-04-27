@@ -20,3 +20,8 @@ CREATE TABLE tx_aitools_domain_model_server (
 	imageUrl varchar(255),
 	translationUrl varchar(255),
 );
+
+CREATE TABLE sys_file_storage (
+	tx_aitools_enabled tinyint(1) unsigned DEFAULT '1' NOT NULL,
+	tx_aitools_server int(11) unsigned DEFAULT '0' NOT NULL
+);

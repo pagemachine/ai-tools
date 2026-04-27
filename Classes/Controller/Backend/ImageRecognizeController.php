@@ -242,6 +242,10 @@ class ImageRecognizeController extends ActionController
 
                 $translations = [];
                 if ($doTranslate) {
+                    $fileContext = $target !== '' ? ($this->resourceFactory->retrieveFileOrFolderObject($target) ?: null) : null;
+                    if (!$fileContext instanceof FileInterface) {
+                        $fileContext = null;
+                    }
                     // fetch all site languages and translate the altText
                     foreach ($siteLanguages as $siteLanguage) {
                         // only translate additional languages (skip current language)
@@ -251,7 +255,7 @@ class ImageRecognizeController extends ActionController
                                 continue;
                             }
 
-                            $altTextTranslated = $this->translationService->translateText($altText, $targetTwoLetterIsoCode, $this->getLocaleLanguageCode($siteLanguage), $translationProvider);
+                            $altTextTranslated = $this->translationService->translateText($altText, $targetTwoLetterIsoCode, $this->getLocaleLanguageCode($siteLanguage), $translationProvider, $fileContext);
                             $metaDataUid = $this->imageMetaDataService->saveMetaData($target, $altTextTranslated, $siteLanguage->getLanguageId(), $parentUid);
                             $translations[] = [
                                 'languageId' => $siteLanguage->getLanguageId(),
@@ -273,11 +277,15 @@ class ImageRecognizeController extends ActionController
                     ->withHeader('Content-Type', 'application/json')
                     ->withBody($this->streamFactory->createStream(json_encode($returnArray)));
             case 'generateMetaData':
+                $fileForGeneration = $fileObjects[0]['file'] ?? null;
+                if (!$fileForGeneration instanceof FileInterface) {
+                    throw new Exception('Cannot generate metadata: target did not resolve to an image file', 1745356800);
+                }
                 $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt->getPrompt() != null ? $defaultPrompt->getPrompt() : '');
                 $translationProvider = $parsedBody['translationProvider'] ?? $queryParams['translationProvider'] ?? null;
                 if ($this->imageMetaDataService->supportsTranslation()) {
                     $altTextFromImageTranslated = $this->imageMetaDataService->generateImageDescription(
-                        $fileObjects[0]['file'],
+                        $fileForGeneration,
                         $textPrompt,
                         $targetTwoLetterIsoCode,
                         (int) $target_language,
@@ -286,13 +294,13 @@ class ImageRecognizeController extends ActionController
                     $data = ['alternative' => $altTextFromImageTranslated, 'baseAlternative' => $altTextFromImageTranslated];
                 } else {
                     $altTextFromImage = $this->imageMetaDataService->generateImageDescription(
-                        $fileObjects[0]['file'],
+                        $fileForGeneration,
                         $textPrompt,
                         'en',
                         (int) $target_language,
                         $translationProvider,
                     );
-                    $altText = $this->translationService->translateText($altTextFromImage, 'en', $targetTwoLetterIsoCode, $this->settingsService->getTranslationProviderForLanguage((int) $target_language));
+                    $altText = $this->translationService->translateText($altTextFromImage, 'en', $targetTwoLetterIsoCode, $this->settingsService->getTranslationProviderForLanguage((int) $target_language), $fileForGeneration);
                     $data = ['alternative' => $altText, 'baseAlternative' => $altTextFromImage];
                 }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pagemachine\AItools\Service;
 
 use Pagemachine\AItools\Service\ServerService;
+use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class TranslationService
@@ -16,7 +17,7 @@ class TranslationService
         $this->serverService = GeneralUtility::makeInstance(ServerService::class);
     }
 
-    public function translateText(string $text, string $sourceLanguage = 'en', string $targetLanguage = 'en', ?string $translationProvider = null): string
+    public function translateText(string $text, string $sourceLanguage = 'en', string $targetLanguage = 'en', ?string $translationProvider = null, ?FileInterface $fileContext = null): string
     {
         if ($text == '') {
             return '';
@@ -26,7 +27,7 @@ class TranslationService
             return $text;
         }
 
-        $serverClass = $this->serverService->getActiveServerClassByFunctionality('translation');
+        $serverClass = $this->serverService->getActiveServerClassByFunctionality('translation', $fileContext);
         return $serverClass->sendTranslationRequestToApi(text: $text, sourceLang: $sourceLanguage, targetLang: $targetLanguage, translationProvider: $translationProvider);
     }
 }
