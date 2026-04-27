@@ -13,7 +13,6 @@ use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Imaging\IconFactory;
-use TYPO3\CMS\Core\Imaging\IconSize;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -57,7 +56,7 @@ class ServersController extends ActionController
                 ))
                 ->setTitle($value['name'])
                 ->setShowLabelText(true)
-                ->setIcon($this->iconFactory->getIcon('actions-add', IconSize::SMALL));
+                ->setIcon($this->iconFactory->getIcon('actions-add', 'small'));
 
             $group++;
             $buttonBar->addButton($newRecordButton, ButtonBar::BUTTON_POSITION_LEFT, $group);

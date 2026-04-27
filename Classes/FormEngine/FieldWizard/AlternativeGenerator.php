@@ -4,30 +4,26 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\FormEngine\FieldWizard;
 
+use Pagemachine\AItools\Compatibility\Typo3VersionGate;
 use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Pagemachine\AItools\Service\SettingsService;
 use TYPO3\CMS\Backend\Form\AbstractNode;
 use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\File;
-use TYPO3\CMS\Core\Resource\FileType;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\View\ViewFactoryData;
-use TYPO3\CMS\Core\View\ViewFactoryInterface;
 
 class AlternativeGenerator extends AbstractNode
 {
 
     protected PromptRepository $promptRepository;
     protected SettingsService $settingsService;
-    protected ViewFactoryInterface $viewFactory;
 
     public function __construct()
     {
         $this->promptRepository = GeneralUtility::makeInstance(PromptRepository::class);
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
-        $this->viewFactory = GeneralUtility::makeInstance(ViewFactoryInterface::class);
     }
 
     protected function isActive($identifier): bool
@@ -42,7 +38,7 @@ class AlternativeGenerator extends AbstractNode
             return false;
         }
 
-        if ($file->getType() !== FileType::IMAGE->value) {
+        if ($file->getType() !== Typo3VersionGate::imageFileType()) {
             return false;
         }
 
@@ -96,15 +92,26 @@ class AlternativeGenerator extends AbstractNode
             $arguments['translation-provider-error'] = $e->getMessage();
         }
 
-        $viewFactoryData = new ViewFactoryData(
-            templateRootPaths: [GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Templates/')],
-            layoutRootPaths: [GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Layouts/')],
-            partialRootPaths: [GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Partials/FieldWizard/')],
-        );
-        $view = $this->viewFactory->create($viewFactoryData);
-        $view->assignMultiple($arguments);
-
-        $result['html'] = $view->render('FieldWizard/AlternativeGenerator');
+        if (Typo3VersionGate::isV14OrHigher()) {
+            // @phpstan-ignore-next-line ViewFactoryInterface only exists in v14+
+            $viewFactoryData = new \TYPO3\CMS\Core\View\ViewFactoryData(
+                templateRootPaths: [GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Templates/')],
+                layoutRootPaths: [GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Layouts/')],
+                partialRootPaths: [GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Partials/FieldWizard/')],
+            );
+            // @phpstan-ignore-next-line
+            $view = GeneralUtility::makeInstance(\TYPO3\CMS\Core\View\ViewFactoryInterface::class)->create($viewFactoryData);
+            $view->assignMultiple($arguments);
+            $result['html'] = $view->render('FieldWizard/AlternativeGenerator');
+        } else {
+            // @phpstan-ignore-next-line StandaloneView deprecated in v14, only used on v12/v13
+            $templateView = GeneralUtility::makeInstance(\TYPO3\CMS\Fluid\View\StandaloneView::class);
+            $templateView->setLayoutRootPaths([GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Layouts/')]);
+            $templateView->setPartialRootPaths([GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Partials/FieldWizard/')]);
+            $templateView->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Templates/FieldWizard/AlternativeGenerator.html'));
+            $templateView->assignMultiple($arguments);
+            $result['html'] = $templateView->render();
+        }
 
         $result['stylesheetFiles'] = [
             'EXT:ai_tools/Resources/Public/Css/FieldWizard.css',
