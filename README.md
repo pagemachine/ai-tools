@@ -1,35 +1,52 @@
 # AI Tools ![CI](https://github.com/pagemachine/ai-tools/workflows/CI/badge.svg)
 
-A TYPO3 extension that leverages artificial intelligence to enhance content and accessibility.
+TYPO3 extension that uses AI to generate and translate image alt text automatically.
 
-## Documentation
-
-The full documentation can be found [here](https://pagemachine.github.io/ai-tools/)
+**Requires:** TYPO3 12.4–14.4 · PHP 8.2+
 
 ## Installation
 
-This extension is installable from various sources:
+```bash
+composer require pagemachine/ai-tools
+```
 
-1. Via [Composer](https://packagist.org/packages/pagemachine/ai-tools):
-
-        composer require pagemachine/ai-tools
-
-2. From the [TYPO3 Extension Repository](https://extensions.typo3.org/extension/ai_tools)
-3. From [Github](https://github.com/pagemachine/ai-tools/releases)
+Also available from the [TYPO3 Extension Repository](https://extensions.typo3.org/extension/ai_tools) and [GitHub releases](https://github.com/pagemachine/ai-tools/releases).
 
 ## Features
 
-### Image Alt Tag Generation
-* Automatically generates meaningful alt tags for images using AI
-* Supports generation in multiple languages:
-    * Create alt tags in any supported language
-    * Translate existing alt tags to different languages
-* Improves website accessibility and SEO
-* Prompt management through the TYPO3 backend
+### Alt text generation
 
+Right-click any image in the File List and choose **Generate A.I. Metadata** to open the generation modal. The extension sends the image to the configured AI server and writes the result back to the file's metadata.
+
+- Generate alt text in any site language
+- Auto-translate to all other site languages in one step
+- Customize the prompt used for generation (AI Tools > Prompts)
+- Use **Generate All** on a folder to process multiple images at once
+
+### Translation
+
+Supported providers: DeepL and Google Translate. The active provider is configurable per server.
+
+### Prompt management
+
+Go to **AI Tools > Prompts** to manage the prompts used for image description. Set one as the default; it will be pre-selected in the generation modal.
+
+### Server configuration
+
+Go to **AI Tools > Settings** (admin only) to configure AI servers:
+
+- API key (get a free key at [aigude.io](https://aigude.io/en/Products/))
+- Multiple servers supported; one set as default
+
+### Storage-scoped configuration
+
+Useful for multi-site setups where each site has its own storage and API budget. Each file storage can be configured independently under **System > File Storages > AI Tools tab**:
+
+- **Enable/disable** AI Tools for that storage
+- **Override AI server:** route API calls for that storage to a specific server instead of the default
 
 ## Testing
 
-All tests can be executed and all assets generated with the shipped Docker Compose definition:
-
-    docker compose run --rm app composer build
+```bash
+docker compose run --rm app composer build
+```
