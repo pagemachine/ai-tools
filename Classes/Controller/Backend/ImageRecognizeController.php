@@ -83,6 +83,7 @@ class ImageRecognizeController extends ActionController
     protected function getLanguageFlagHtml($identifier, $title = '', $overlay = '')
     {
         $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
+        // @phpstan-ignore-next-line
         $size = Typo3VersionGate::isV14OrHigher()
             ? \TYPO3\CMS\Core\Imaging\IconSize::LARGE
             : \TYPO3\CMS\Core\Imaging\Icon::SIZE_LARGE;

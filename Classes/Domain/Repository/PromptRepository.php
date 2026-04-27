@@ -22,6 +22,8 @@ class PromptRepository extends Repository
 
     public function getDefaultPrompt(): ?Prompt
     {
-        return $this->findOneBy(['default' => true]);
+        /** @var Prompt|null $prompt */
+        $prompt = $this->findOneBy(['default' => true]);
+        return $prompt;
     }
 }
