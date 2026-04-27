@@ -9,6 +9,6 @@
   "dependencies": {
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^1.0.0",
-    "rollup": "^2.79.2"
+    "rollup": "^3.0.0"
   }
 }
