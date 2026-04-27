@@ -5,7 +5,7 @@ use Pagemachine\AItools\Controller\Backend\ServersController;
 
 return [
     'AItoolsAitools' => [
-        'position' => ['after' => 'content'],
+        'position' => ['after' => 'web'],
         'iconIdentifier' => 'tx-aitools-module',
         'labels' => 'LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_mainmodule.xlf',
     ],
