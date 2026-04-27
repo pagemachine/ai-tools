@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Controller\Backend;
 
+use Pagemachine\AItools\Compatibility\Typo3VersionGate;
 use Pagemachine\AItools\Domain\Repository\ServerRepository;
 use Pagemachine\AItools\Service\ServerService;
 use Pagemachine\AItools\Service\SettingsService;
@@ -56,7 +57,7 @@ class ServersController extends ActionController
                 ))
                 ->setTitle($value['name'])
                 ->setShowLabelText(true)
-                ->setIcon($this->iconFactory->getIcon('actions-add', 'small'));
+                ->setIcon($this->iconFactory->getIcon('actions-add', Typo3VersionGate::iconSizeSmall()));
 
             $group++;
             $buttonBar->addButton($newRecordButton, ButtonBar::BUTTON_POSITION_LEFT, $group);

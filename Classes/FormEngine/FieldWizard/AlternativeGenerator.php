@@ -13,6 +13,9 @@ use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\View\ViewFactoryData;
+use TYPO3\CMS\Core\View\ViewFactoryInterface;
+use TYPO3\CMS\Fluid\View\StandaloneView;
 
 class AlternativeGenerator extends AbstractNode
 {
@@ -94,18 +97,18 @@ class AlternativeGenerator extends AbstractNode
 
         if (Typo3VersionGate::isV14OrHigher()) {
             // @phpstan-ignore-next-line ViewFactoryInterface only exists in v14+
-            $viewFactoryData = new \TYPO3\CMS\Core\View\ViewFactoryData(
+            $viewFactoryData = new ViewFactoryData(
                 templateRootPaths: [GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Templates/')],
                 layoutRootPaths: [GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Layouts/')],
                 partialRootPaths: [GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Partials/FieldWizard/')],
             );
             // @phpstan-ignore-next-line
-            $view = GeneralUtility::makeInstance(\TYPO3\CMS\Core\View\ViewFactoryInterface::class)->create($viewFactoryData);
+            $view = GeneralUtility::makeInstance(ViewFactoryInterface::class)->create($viewFactoryData);
             $view->assignMultiple($arguments);
             $result['html'] = $view->render('FieldWizard/AlternativeGenerator');
         } else {
             // @phpstan-ignore-next-line StandaloneView deprecated in v14, only used on v12/v13
-            $templateView = GeneralUtility::makeInstance(\TYPO3\CMS\Fluid\View\StandaloneView::class);
+            $templateView = GeneralUtility::makeInstance(StandaloneView::class);
             $templateView->setLayoutRootPaths([GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Layouts/')]);
             $templateView->setPartialRootPaths([GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Partials/FieldWizard/')]);
             $templateView->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:ai_tools/Resources/Private/Templates/FieldWizard/AlternativeGenerator.html'));

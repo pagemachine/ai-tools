@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Compatibility;
 
+use TYPO3\CMS\Core\Imaging\IconSize;
+use TYPO3\CMS\Core\Resource\AbstractFile;
+use TYPO3\CMS\Core\Resource\FileType;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
@@ -30,9 +33,21 @@ final class Typo3VersionGate
     {
         if (self::isV14OrHigher()) {
             // @phpstan-ignore-next-line FileType enum only exists in v13+; reachable only on v14
-            return \TYPO3\CMS\Core\Resource\FileType::IMAGE->value;
+            return FileType::IMAGE->value;
         }
         // @phpstan-ignore-next-line FILETYPE_IMAGE removed in v14; reachable only on v12/v13
-        return \TYPO3\CMS\Core\Resource\AbstractFile::FILETYPE_IMAGE;
+        return AbstractFile::FILETYPE_IMAGE;
+    }
+
+    /**
+     * Icon size for IconFactory::getIcon: IconSize enum on v14, string literal on v12/v13.
+     */
+    public static function iconSizeSmall(): mixed
+    {
+        if (self::isV14OrHigher()) {
+            // @phpstan-ignore-next-line IconSize enum only exists in v13+
+            return IconSize::SMALL;
+        }
+        return 'small';
     }
 }

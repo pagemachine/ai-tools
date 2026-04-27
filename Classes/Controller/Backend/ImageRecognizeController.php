@@ -31,6 +31,8 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
 use TYPO3\CMS\Extbase\Mvc\Request;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
+use TYPO3\CMS\Fluid\View\StandaloneView;
+use TYPO3\CMS\Fluid\View\TemplatePaths;
 
 class ImageRecognizeController extends ActionController
 {
@@ -98,9 +100,9 @@ class ImageRecognizeController extends ActionController
     protected function getView(string $templateName = 'Default', $request = null)
     {
         // @phpstan-ignore-next-line StandaloneView removed in v14, only reachable on v12
-        $templatePaths = new \TYPO3\CMS\Fluid\View\TemplatePaths($this->templateRootPath);
+        $templatePaths = new TemplatePaths($this->templateRootPath);
         // @phpstan-ignore-next-line
-        $view = GeneralUtility::makeInstance(\TYPO3\CMS\Fluid\View\StandaloneView::class);
+        $view = GeneralUtility::makeInstance(StandaloneView::class);
 
         if ($request !== null) {
             $attribute = new ExtbaseRequestParameters(ImageRecognizeController::class);

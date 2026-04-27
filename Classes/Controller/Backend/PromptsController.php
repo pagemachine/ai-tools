@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Controller\Backend;
 
+use Pagemachine\AItools\Compatibility\Typo3VersionGate;
 use Pagemachine\AItools\Domain\Model\Prompt;
 use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Psr\Http\Message\ResponseInterface;
@@ -44,7 +45,7 @@ class PromptsController extends ActionController
                 ]
             ))
             ->setTitle('Add')
-            ->setIcon($this->iconFactory->getIcon('actions-add', 'small'));
+            ->setIcon($this->iconFactory->getIcon('actions-add', Typo3VersionGate::iconSizeSmall()));
 
         $buttonBar->addButton($newRecordButton, ButtonBar::BUTTON_POSITION_LEFT, 10);
     }

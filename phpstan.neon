@@ -12,9 +12,12 @@ parameters:
       path: ext_emconf.php
     - message: '#T3G\\AgencyPack\\FileVariants\\Service\\ResourcesService#'
       path: Classes/Service/ImageMetaDataService.php
-    - message: '#TYPO3\\CMS\\Fluid\\View\\StandaloneView::setRequest()#'
-      count: 1
+    - message: '#TYPO3\\CMS\\Fluid\\View\\StandaloneView#'
       path: Classes/Controller/Backend/ImageRecognizeController.php
+    - message: '#TYPO3\\CMS\\Fluid\\View\\(StandaloneView|TemplatePaths)#'
+      path: Classes/FormEngine/FieldWizard/AlternativeGenerator.php
+    - message: '#TYPO3\\CMS\\Core\\View\\(ViewFactoryInterface|ViewFactoryData)#'
+      path: Classes/FormEngine/FieldWizard/AlternativeGenerator.php
     - message: '*TYPO3\\CMS\\Core\\Type\\ContextualFeedbackSeverity*'
       path: Classes/Controller/Backend/ServersController.php
 
