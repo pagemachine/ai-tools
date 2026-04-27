@@ -22,12 +22,6 @@
             "email": "maltamirano@pagemachine.de",
             "homepage": "https://pagemachine.de",
             "role": "Developer"
-        },
-        {
-            "name": "Sascha Löffler",
-            "email": "sloeffler@pagemachine.de",
-            "homepage": "https://pagemachine.de",
-            "role": "Developer"
         }
     ],
     "require": {
