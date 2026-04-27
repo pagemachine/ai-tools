@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Controller\Backend;
 
+use Pagemachine\AItools\Compatibility\Typo3VersionGate;
 use Pagemachine\AItools\Service\ImageMetaDataService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use TYPO3\CMS\Core\Resource\AbstractFile;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
@@ -26,7 +26,7 @@ class CreditsController extends ActionController
         if ($fileIdentifier) {
             $fileObject = $this->resourceFactory->retrieveFileOrFolderObject($fileIdentifier);
             if ($fileObject instanceof FileInterface) {
-                if ($fileObject->getType() !== AbstractFile::FILETYPE_IMAGE) {
+                if ($fileObject->getType() !== Typo3VersionGate::imageFileType()) {
                     return '';
                 }
 

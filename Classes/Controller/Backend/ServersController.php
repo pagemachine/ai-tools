@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Controller\Backend;
 
+use Pagemachine\AItools\Compatibility\Typo3VersionGate;
 use Pagemachine\AItools\Domain\Repository\ServerRepository;
 use Pagemachine\AItools\Service\ServerService;
 use Pagemachine\AItools\Service\SettingsService;
@@ -12,13 +13,10 @@ use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
-use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Localization\LanguageService;
-use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
 class ServersController extends ActionController
@@ -59,7 +57,7 @@ class ServersController extends ActionController
                 ))
                 ->setTitle($value['name'])
                 ->setShowLabelText(true)
-                ->setIcon($this->iconFactory->getIcon('actions-add', Icon::SIZE_SMALL));
+                ->setIcon($this->iconFactory->getIcon('actions-add', Typo3VersionGate::iconSizeSmall()));
 
             $group++;
             $buttonBar->addButton($newRecordButton, ButtonBar::BUTTON_POSITION_LEFT, $group);
@@ -86,14 +84,8 @@ class ServersController extends ActionController
 
         $this->setDocHeader($moduleTemplate, $requestUri);
 
-        if (version_compare(GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version(), '13.0', '<')) {
-            $this->view->assignMultiple($template_variables);
-            $moduleTemplate->setContent($this->view->render()); // @phpstan-ignore-line
-            return $this->htmlResponse($moduleTemplate->renderContent()); // @phpstan-ignore-line
-        } else {
-            $moduleTemplate->assignMultiple($template_variables); // @phpstan-ignore-line
-            return $moduleTemplate->renderResponse('Backend/Servers/List'); // @phpstan-ignore-line
-        }
+        $moduleTemplate->assignMultiple($template_variables);
+        return $moduleTemplate->renderResponse('Backend/Servers/List');
     }
 
     public function saveSettingsAction(bool $gdprCompliant, array $providers): ResponseInterface
@@ -101,11 +93,7 @@ class ServersController extends ActionController
         $this->settingsService->setGdprCompliant($gdprCompliant);
         $this->settingsService->setTranslationProviders($providers);
 
-        if (version_compare(GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version(), '13.0', '<')) {
-            $this->addFlashMessage('Settings have been saved.', 'Settings saved', AbstractMessage::OK); // @phpstan-ignore-line
-        } else {
-            $this->addFlashMessage('Settings have been saved.', 'Settings saved', ContextualFeedbackSeverity::OK);
-        }
+        $this->addFlashMessage('Settings have been saved.', 'Settings saved', ContextualFeedbackSeverity::OK);
 
         return $this->redirect('list');
     }

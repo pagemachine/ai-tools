@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pagemachine\AItools\Controller\Backend;
 
 use Exception;
+use Pagemachine\AItools\Compatibility\Typo3VersionGate;
 use Pagemachine\AItools\Domain\Model\Prompt;
 use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Pagemachine\AItools\Service\ImageMetaDataService;
@@ -18,15 +19,14 @@ use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Imaging\IconSize;
 use TYPO3\CMS\Core\Page\PageRenderer;
-use TYPO3\CMS\Core\Resource\AbstractFile;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\FolderInterface;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
-use TYPO3\CMS\Core\Type\Icon\IconState;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
@@ -67,7 +67,7 @@ class ImageRecognizeController extends ActionController
         $this->promptRepository = GeneralUtility::makeInstance(PromptRepository::class);
     }
 
-    protected function getFileMetaDataEditLink(int $uid, string $returnUrl = null): UriInterface
+    protected function getFileMetaDataEditLink(int $uid, ?string $returnUrl = null): UriInterface
     {
         $uriParameters = [
             'edit' =>
@@ -82,10 +82,17 @@ class ImageRecognizeController extends ActionController
             ->buildUriFromRoute('record_edit', $uriParameters);
     }
 
-    protected function getLanguageFlagHtml($identifier, $title = '', $size = Icon::SIZE_LARGE, $overlay = '', $state = IconState::STATE_DEFAULT)
+    protected function getLanguageFlagHtml($identifier, $title = '', $overlay = '')
     {
         $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
-        $icon = $iconFactory->getIcon($identifier, $size, $overlay, IconState::cast($state));
+        if (Typo3VersionGate::isV14OrHigher()) {
+            // @phpstan-ignore-next-line
+            $size = IconSize::LARGE;
+        } else {
+            // @phpstan-ignore-next-line
+            $size = Icon::SIZE_LARGE;
+        }
+        $icon = $iconFactory->getIcon($identifier, $size, $overlay);
 
         if ($title ?? false) {
             $icon->setTitle($title);
@@ -94,13 +101,16 @@ class ImageRecognizeController extends ActionController
     }
 
     /**
-     * Return custom Standalone View
+     * Return custom Standalone View (TYPO3 v12 only; v13+ uses moduleTemplate->renderResponse).
+     * StandaloneView was removed in v14, but this method is never called on v14
+     * because the call site is gated by version_compare(<13.0).
      * @internal
-     * @return StandaloneView
      */
-    protected function getView(string $templateName = 'Default', $request = null): StandaloneView
+    protected function getView(string $templateName = 'Default', $request = null)
     {
+        // @phpstan-ignore-next-line StandaloneView removed in v14, only reachable on v12
         $templatePaths = new TemplatePaths($this->templateRootPath);
+        // @phpstan-ignore-next-line
         $view = GeneralUtility::makeInstance(StandaloneView::class);
 
         if ($request !== null) {
@@ -135,15 +145,17 @@ class ImageRecognizeController extends ActionController
         if ($target) {
             $fileObject = $this->resourceFactory->retrieveFileOrFolderObject($target);
             if ($fileObject instanceof FileInterface) {
-                if ($fileObject->getType() !== AbstractFile::FILETYPE_IMAGE) {
+                $imageType = Typo3VersionGate::imageFileType();
+                if ($fileObject->getType() !== $imageType) {
                     return null;
                 }
 
                 return [$this->addMetaToFile($fileObject, [$target_language])];
             }
             if ($fileObject instanceof FolderInterface) {
+                $imageType = Typo3VersionGate::imageFileType();
                 $files = $fileObject->getFiles();
-                $files = array_filter($files, fn($file) => $file->getType() === AbstractFile::FILETYPE_IMAGE);
+                $files = array_filter($files, fn($file) => $file->getType() === $imageType);
                 $files = array_map(fn($file) => $this->addMetaToFile($file, [$target_language]), $files);
 
                 return $files;
@@ -198,7 +210,7 @@ class ImageRecognizeController extends ActionController
         if (!is_null($action)) {
             try {
                 return $this->ajaxData($request);
-            } catch (Exception $e) {
+            } catch (\Throwable $e) {
                 return $this->responseFactory->createResponse()
                     ->withHeader('Content-Type', 'application/json')
                     ->withBody($this->streamFactory->createStream(json_encode(['error' => $e->getMessage()], JSON_THROW_ON_ERROR)));
@@ -281,7 +293,7 @@ class ImageRecognizeController extends ActionController
                 if (!$fileForGeneration instanceof FileInterface) {
                     throw new Exception('Cannot generate metadata: target did not resolve to an image file', 1745356800);
                 }
-                $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt->getPrompt() != null ? $defaultPrompt->getPrompt() : '');
+                $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt?->getPrompt() ?? '');
                 $translationProvider = $parsedBody['translationProvider'] ?? $queryParams['translationProvider'] ?? null;
                 if ($this->imageMetaDataService->supportsTranslation()) {
                     $altTextFromImageTranslated = $this->imageMetaDataService->generateImageDescription(
@@ -328,7 +340,7 @@ class ImageRecognizeController extends ActionController
                     'fileObjects' => $fileObjects ?? null,
                     'targetLanguage' => (int) $target_language,
                     'modal' => $modal,
-                    'textPrompt' => $defaultPrompt->getPrompt(),
+                    'textPrompt' => $defaultPrompt?->getPrompt() ?? '',
                     'allTextPrompts' => array_map(fn(Prompt $prompt) => [
                         'description' => $prompt->getDescription(),
                         'prompt' => json_encode(['prompt' => $prompt->getPrompt(), 'language' => $prompt->getLanguage()]),

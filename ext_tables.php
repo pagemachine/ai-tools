@@ -7,9 +7,8 @@ defined('TYPO3') or die();
 $GLOBALS['TYPO3_CONF_VARS']['BE']['customPermOptions']['tx_aitools_permissions'] = [
     'header' => 'AI Tools permissions',
     'items' => [
-        'generate_metadata' => [ // key
+        'generate_metadata' => [
             'Generate metadata',
-            // Icon has been registered above
             'tcarecords-tx_styleguide_forms-default',
             'Allows User to use the generate metadata context menu',
         ],

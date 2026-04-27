@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\ContextMenu\ItemProviders;
 
+use Pagemachine\AItools\Compatibility\Typo3VersionGate;
 use Pagemachine\AItools\Service\SettingsService;
 use TYPO3\CMS\Backend\ContextMenu\ItemProviders\AbstractProvider;
-use TYPO3\CMS\Core\Resource\AbstractFile;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
@@ -145,7 +145,7 @@ class AiToolItemProvider extends AbstractProvider
 
     protected function isImage(): bool
     {
-        return $this->isFile() && $this->record->getType() == AbstractFile::FILETYPE_IMAGE;
+        return $this->isFile() && $this->record->getType() == Typo3VersionGate::imageFileType();
     }
 
     protected function isUserAllowed(): bool

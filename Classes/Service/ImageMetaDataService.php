@@ -81,7 +81,7 @@ class ImageMetaDataService
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
      */
-    public function saveMetaData(string $target, string $altText = null, int $language = 0, int $parentUid = 0): int
+    public function saveMetaData(string $target, ?string $altText = null, int $language = 0, int $parentUid = 0): int
     {
         if (!empty($target)) {
             $fileObject = $this->resourceFactory->retrieveFileOrFolderObject($target);
@@ -130,7 +130,7 @@ class ImageMetaDataService
                     $translatedMetaDataRecord = $this->metaDataRepository->createMetaDataRecord($fileObjectUid, [
                         'sys_language_uid' => $language,
                         'l10n_parent' => $parentUid,
-                        't3_origuid' => $parentUid,
+
                         'width' => $fileObject->getProperty('width'),
                         'height' => $fileObject->getProperty('height'),
                         'alternative' => $altText,
@@ -161,7 +161,6 @@ class ImageMetaDataService
                 $translatedMetaDataRecord = $this->metaDataRepository->createMetaDataRecord($fileObjectUid, [
                     'sys_language_uid' => $language,
                     'l10n_parent' => $parentUid,
-                    't3_origuid' => $parentUid,
                     'width' => $fileObject->getProperty('width'),
                     'height' => $fileObject->getProperty('height'),
                     'alternative' => $altText,

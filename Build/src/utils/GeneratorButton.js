@@ -53,11 +53,12 @@ class GeneratorButton {
 
       console.log('Prompt generated', results);
       target.val(results.alternative);
-      target.trigger('change');
 
       if (this.updateHook) {
         this.updateHook(target, results);
       }
+
+      return results;
     } finally {
       element.prop('disabled', false);
       element.removeClass(GeneratorButton.CSS_CLASSES.GENERATING);

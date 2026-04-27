@@ -11,7 +11,7 @@ class Prompt extends AbstractEntity
     /**
      * @var bool
      */
-    protected bool $hidden;
+    protected bool $hidden = false;
 
     /**
      * @var string
@@ -37,6 +37,8 @@ class Prompt extends AbstractEntity
      * @var string
      */
     protected string $language = 'en_US';
+
+    protected bool $system = false;
 
     public function getHidden(): bool
     {
@@ -101,5 +103,15 @@ class Prompt extends AbstractEntity
     public function setLanguage(string $language): void
     {
         $this->language = $language;
+    }
+
+    public function isSystem(): bool
+    {
+        return $this->system;
+    }
+
+    public function setSystem(bool $system): void
+    {
+        $this->system = $system;
     }
 }
