@@ -20,6 +20,10 @@ parameters:
       path: Classes/Service/ImageMetaDataService.php
     - message: '#TYPO3\\CMS\\Fluid\\View\\StandaloneView#'
       path: Classes/Controller/Backend/ImageRecognizeController.php
+    - message: '#TYPO3\\CMS\\Core\\Imaging\\IconSize#'
+      path: Classes/Controller/Backend/ImageRecognizeController.php
+    - message: '#TYPO3\\CMS\\Core\\Imaging\\Icon::SIZE_LARGE#'
+      path: Classes/Controller/Backend/ImageRecognizeController.php
     - message: '#TYPO3\\CMS\\Fluid\\View\\(StandaloneView|TemplatePaths)#'
       path: Classes/FormEngine/FieldWizard/AlternativeGenerator.php
     - message: '#TYPO3\\CMS\\Core\\View\\(ViewFactoryInterface|ViewFactoryData)#'

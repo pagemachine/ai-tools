@@ -17,7 +17,9 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
+use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Imaging\IconSize;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\FileInterface;
@@ -83,10 +85,13 @@ class ImageRecognizeController extends ActionController
     protected function getLanguageFlagHtml($identifier, $title = '', $overlay = '')
     {
         $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
-        // @phpstan-ignore-next-line
-        $size = Typo3VersionGate::isV14OrHigher()
-            ? \TYPO3\CMS\Core\Imaging\IconSize::LARGE
-            : \TYPO3\CMS\Core\Imaging\Icon::SIZE_LARGE;
+        if (Typo3VersionGate::isV14OrHigher()) {
+            // @phpstan-ignore-next-line
+            $size = IconSize::LARGE;
+        } else {
+            // @phpstan-ignore-next-line
+            $size = Icon::SIZE_LARGE;
+        }
         $icon = $iconFactory->getIcon($identifier, $size, $overlay);
 
         if ($title ?? false) {
