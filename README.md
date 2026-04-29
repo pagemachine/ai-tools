@@ -38,6 +38,14 @@ Go to **AI Tools > Settings** (admin only) to configure AI servers:
 - API key (get a free key at [aigude.io](https://aigude.io/en/Products/))
 - Multiple servers supported; one set as default
 
+### Supported languages
+
+AiGude generates descriptions natively in these languages without a translation step:
+
+English, German, Spanish, French, Italian, Portuguese, Dutch, Japanese, Korean, Arabic, Chinese, Russian, Hindi, Turkish, Hebrew
+
+For other site languages, write the prompt in any of the supported languages (e.g. English or German). The description is generated in the prompt's language and then translated to the target site language using the configured translation provider.
+
 ### Storage-scoped configuration
 
 Useful for multi-site setups where each site has its own storage and API budget. Each file storage can be configured independently under **System > File Storages > AI Tools tab**:

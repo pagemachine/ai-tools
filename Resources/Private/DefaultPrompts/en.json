@@ -1,0 +1,5 @@
+{
+    "locale": "en_US",
+    "description": "Default Prompt",
+    "prompt": "Describe the essential content of the picture briefly and concisely. Limit the text to a very short sentence. Avoid elements such as \"The picture shows\" and descriptive adjectives. Return plain text only, no markdown or formatting."
+}

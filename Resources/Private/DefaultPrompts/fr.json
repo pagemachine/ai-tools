@@ -1,0 +1,5 @@
+{
+    "locale": "fr_FR",
+    "description": "Invite par défaut",
+    "prompt": "Décrivez le contenu essentiel de l'image de manière brève et concise. Limitez le texte à une phrase très courte. Évitez des éléments tels que \"L'image montre\" et les adjectifs descriptifs. Réponds uniquement en texte brut, sans markdown ni formatage."
+}
