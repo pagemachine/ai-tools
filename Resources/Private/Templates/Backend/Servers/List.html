@@ -211,42 +211,65 @@
         <div class="card">
             <div class="card-body">
 
-                <div class="mb-3 form-check">
+                <div class="mb-3 form-check form-switch">
                     <f:form.checkbox class="form-check-input" id="gdprCompliant" name="gdprCompliant" value="1"
-                        checked="{gdprCompliant}" onChange="this.form.submit()" />
+                        checked="{gdprCompliant}" additionalAttributes="{onChange: 'this.form.submit()'}" />
                     <label class="form-check-label" for="gdprCompliant">
                         <f:translate
                             key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.gdprCompliant" />
                     </label>
                 </div>
 
+                <p class="text-muted small mb-3">
+                    <a href="https://github.com/pagemachine/ai-tools#supported-languages" target="_blank" rel="noopener">AiGude generates descriptions natively in supported languages.</a>
+                </p>
+
                 <f:for each="{translationProviderPerLanguage}" as="providerLanguage">
                     <div class="mb-3">
-                        <label for="provider_{providerLanguage.siteLanguage.languageId}"
-                            class="form-label">{providerLanguage.siteLanguage.title}</label>
-                        <f:if condition="{providerLanguage.providers}">
+                        <label class="form-label" for="provider_{providerLanguage.siteLanguage.languageId}">
+                            {providerLanguage.siteLanguage.title}
+                            <f:if condition="{providerLanguage.isBase}">
+                                <span class="badge badge-info" style="margin-left: 4px;">base</span>
+                            </f:if>
+                        </label>
+                        <f:if condition="{providerLanguage.isBase} && {providerLanguage.isAigudeVisionSupported}">
                             <f:then>
-                                <f:form.select class="form-select"
-                                    name="providers[{providerLanguage.siteLanguage.languageId}]"
-                                    id="provider_{providerLanguage.siteLanguage.languageId}"
-                                    value="{providerLanguage.active}">
-                                    <f:for each="{providerLanguage.providers}" as="provider" iteration="i">
-                                        <f:form.select.option value="{provider.provider}">
-                                            <f:translate
-                                                key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.provider.{provider.provider}">
-                                                {provider.provider}
-                                            </f:translate>
-                                            ({provider.languageCode})
-                                        </f:form.select.option>
-                                    </f:for>
-                                </f:form.select>
+                                <div class="form-control" style="background:#eafbe7;border-color:#7ec67a;color:#2e6b2e;">
+                                    🤖 Generated natively by AiGude
+                                </div>
                             </f:then>
                             <f:else>
-                                <span class="text-danger form-control">
-                                    <core:icon identifier="actions-exclamation-triangle-alt" />
-                                    <f:translate
-                                        key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.noServiceAvailable" />
-                                </span>
+                                <f:if condition="{providerLanguage.providers}">
+                                    <f:then>
+                                        <div class="input-group">
+                                            <f:if condition="{providerLanguage.isBase}">
+                                                <span class="input-group-text">↳ Translate from English via</span>
+                                            </f:if>
+                                            <f:form.select class="form-select"
+                                                name="providers[{providerLanguage.siteLanguage.languageId}]"
+                                                id="provider_{providerLanguage.siteLanguage.languageId}"
+                                                value="{providerLanguage.active}"
+                                                additionalAttributes="{onChange: 'this.form.submit()'}">
+                                                <f:for each="{providerLanguage.providers}" as="provider" iteration="i">
+                                                    <f:form.select.option value="{provider.provider}">
+                                                        <f:translate
+                                                            key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.provider.{provider.provider}">
+                                                            {provider.provider}
+                                                        </f:translate>
+                                                        ({provider.languageCode})
+                                                    </f:form.select.option>
+                                                </f:for>
+                                            </f:form.select>
+                                        </div>
+                                    </f:then>
+                                    <f:else>
+                                        <span class="text-danger form-control">
+                                            <core:icon identifier="actions-exclamation-triangle-alt" />
+                                            <f:translate
+                                                key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.noServiceAvailable" />
+                                        </span>
+                                    </f:else>
+                                </f:if>
                             </f:else>
                         </f:if>
                     </div>
