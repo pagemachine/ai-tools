@@ -299,7 +299,7 @@ class ImageRecognizeController extends ActionController
                     $textPromptLanguage = $defaultPrompt?->getLanguage() ?? 'en_US';
                 }
                 $translationProvider = $parsedBody['translationProvider'] ?? $queryParams['translationProvider'] ?? null;
-                $promptLang = strtolower(substr($textPromptLanguage, 0, 2)) ?: 'auto';
+                $promptLang = strtolower(substr((string) $textPromptLanguage, 0, 2)) ?: 'auto';
                 if ($this->imageMetaDataService->supportsTranslation()) {
                     $generated = $this->imageMetaDataService->generateImageDescription(
                         $fileForGeneration,
