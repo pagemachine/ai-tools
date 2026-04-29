@@ -34,7 +34,7 @@ $(() => {
     e.preventDefault();
     e.stopPropagation();
 
-    const fileIdentifier = $(this).data('file-identifier');
+    const fileIdentifier = $(this).attr('data-file-identifier');
     const targetLanguage = $(this).data('target-language');
     const translationHash = $(this).data('translation-hash');
     const target = $($(this).data('output-target'));
@@ -241,6 +241,20 @@ function generateAllListCalculate() {
     element.innerHTML = 'No Credits';
     element.setAttribute('data-credits', 0);
     element.style = 'display: none;';
+  }
+
+  const translateBtn = document.querySelector('.t3js-alternative-generate-all[data-translate="1"]');
+  const translateCreditElement = document.getElementById('t3-alternative-generate-all-translate-credits');
+  if (translateBtn && translateCreditElement) {
+    const translationLangCount = parseInt(translateBtn.getAttribute('data-translation-language-count') ?? '0');
+    const translateTotal = total + filteredImageBlocks.length * translationLangCount;
+    if (translateTotal) {
+      translateCreditElement.innerHTML = translateTotal + ' Credits';
+      translateCreditElement.style = '';
+    } else {
+      translateCreditElement.innerHTML = 'No Credits';
+      translateCreditElement.style = 'display: none;';
+    }
   }
 }
 

@@ -339,8 +339,18 @@ class ImageRecognizeController extends ActionController
 
                 $moduleTemplate->getDocHeaderComponent()->disable();
 
+                $translationLanguageCount = 0;
+                foreach ($siteLanguages as $siteLanguage) {
+                    if ($siteLanguage->getLanguageId() !== (int) $target_language) {
+                        if (!is_null($this->settingsService->getTranslationProviderForLanguage($siteLanguage->getLanguageId()))) {
+                            $translationLanguageCount++;
+                        }
+                    }
+                }
+
                 $template_variables = [
                     'siteLanguages' => $siteLanguages,
+                    'translationLanguageCount' => $translationLanguageCount,
                     'action' => $action,
                     'target' => $target,
                     'fileObjects' => $fileObjects ?? null,
