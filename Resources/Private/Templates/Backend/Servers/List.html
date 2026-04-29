@@ -242,9 +242,6 @@
                                 <f:if condition="{providerLanguage.providers}">
                                     <f:then>
                                         <div class="input-group">
-                                            <f:if condition="{providerLanguage.isBase}">
-                                                <span class="input-group-text">↳ Translate from English via</span>
-                                            </f:if>
                                             <f:form.select class="form-select"
                                                 name="providers[{providerLanguage.siteLanguage.languageId}]"
                                                 id="provider_{providerLanguage.siteLanguage.languageId}"
