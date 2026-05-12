@@ -23,7 +23,7 @@ Full documentation at [pagemachine.github.io/ai-tools](https://pagemachine.githu
 Right-click any image in the File List and choose **Generate A.I. Metadata** to open the generation modal. The extension sends the image to the configured AI server and writes the result back to the file's metadata.
 
 - Generate alt text in any site language
-- Auto-translate to all other site languages in one step (via DeepL or Google Translate)
+- Auto-translate to all other site languages in one step
 - Customize the prompt used for generation (AI Tools > Prompts)
 - Use **Generate All** on a folder to process multiple images at once
 
@@ -40,11 +40,15 @@ Go to **AI Tools > Settings** (admin only) to configure AI servers:
 
 ### Supported languages
 
-AiGude generates descriptions natively in these languages without a translation step:
+AiGude generates descriptions natively in these languages:
 
 English, German, Spanish, French, Italian, Portuguese, Dutch, Japanese, Korean, Arabic, Chinese, Russian, Hindi, Turkish, Hebrew
 
-For other site languages, write the prompt in any of the supported languages (e.g. English or German). The description is generated in the prompt's language and then translated to the target site language using the configured translation provider.
+For other site languages, write the prompt in any of the supported languages. The description is generated in the prompt's language and automatically translated to the target language.
+
+### Translation
+
+DeepL and Google Translate are supported. The active provider is configurable per language under **AI Tools > Settings**.
 
 ### Storage-scoped configuration
 
