@@ -1,5 +1,0 @@
-{
-    "locale": "tr_TR",
-    "description": "Varsayılan İstem",
-    "prompt": "Görüntünün temel içeriğini kısa ve öz bir şekilde tanımlayın. Metni çok kısa bir cümleyle sınırlayın. \"Görüntüde gösteriliyor\" gibi ifadelerden ve tanımlayıcı sıfatlardan kaçının. Yalnızca düz metin olarak yanıt verin, Markdown veya biçimlendirme kullanmayın."
-}

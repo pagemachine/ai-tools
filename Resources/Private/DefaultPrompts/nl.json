@@ -1,5 +1,0 @@
-{
-    "locale": "nl_NL",
-    "description": "Standaardprompt",
-    "prompt": "Beschrijf de essentiële inhoud van de afbeelding kort en bondig. Beperk de tekst tot een zeer korte zin. Vermijd elementen zoals \"De afbeelding toont\" en beschrijvende bijvoeglijke naamwoorden. Antwoord alleen in platte tekst, zonder markdown of opmaak."
-}

@@ -6,6 +6,7 @@ namespace Pagemachine\AItools\Updates;
 
 use Doctrine\DBAL\ParameterType;
 use Pagemachine\AItools\Domain\Repository\PromptRepository;
+use Pagemachine\AItools\Service\NativeLanguageService;
 use TYPO3\CMS\Core\Attribute\UpgradeWizard;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Upgrades\DatabaseUpdatedPrerequisite;
@@ -16,7 +17,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class DefaultPromptUpdateWizard implements UpgradeWizardInterface
 {
     private const TABLE = 'tx_aitools_domain_model_prompt';
-    private const DEFAULT_PROMPTS_DIR = 'EXT:ai_tools/Resources/Private/DefaultPrompts/';
     private const FALLBACK_DESCRIPTION = 'Default prompt';
     private const FALLBACK_PROMPT = 'Describe the essential content of the picture briefly and concisely. Limit the text to a very short sentence. Avoid elements such as "The picture shows" and descriptive adjectives.';
     private const FALLBACK_LOCALE = 'en_US';
@@ -93,39 +93,40 @@ class DefaultPromptUpdateWizard implements UpgradeWizardInterface
         $promptRepository = GeneralUtility::makeInstance(PromptRepository::class);
         $baseLang = strtolower($promptRepository->getBaseLanguageCode());
 
-        $absDir = GeneralUtility::getFileAbsFileName(self::DEFAULT_PROMPTS_DIR);
-        $candidate = $absDir . $baseLang . '.json';
-
-        if (!file_exists($candidate)) {
-            $candidate = $absDir . 'en.json';
+        try {
+            $service = GeneralUtility::makeInstance(NativeLanguageService::class);
+            $langs = $service->get();
+        } catch (\Exception) {
+            $langs = [];
         }
 
-        if (!file_exists($candidate)) {
-            return [
-                'description' => self::FALLBACK_DESCRIPTION,
-                'prompt' => self::FALLBACK_PROMPT,
-                'locale' => self::FALLBACK_LOCALE,
-            ];
+        // Match site base language
+        foreach ($langs as $lang) {
+            if (strtolower($lang['code']) === $baseLang) {
+                return [
+                    'description' => $lang['description'],
+                    'prompt' => $lang['default_prompt'],
+                    'locale' => $lang['locale'],
+                ];
+            }
         }
 
-        $raw = file_get_contents($candidate);
-        if ($raw === false) {
-            return [
-                'description' => self::FALLBACK_DESCRIPTION,
-                'prompt' => self::FALLBACK_PROMPT,
-                'locale' => self::FALLBACK_LOCALE,
-            ];
+        // Fall back to English from API
+        foreach ($langs as $lang) {
+            if (strtolower($lang['code']) === 'en') {
+                return [
+                    'description' => $lang['description'],
+                    'prompt' => $lang['default_prompt'],
+                    'locale' => $lang['locale'],
+                ];
+            }
         }
 
-        $decoded = json_decode($raw, true);
-        if (!is_array($decoded) || !isset($decoded['description'], $decoded['prompt'], $decoded['locale'])) {
-            throw new \RuntimeException('Invalid default prompt JSON: ' . $candidate);
-        }
-
+        // Hard fallback if API is unreachable
         return [
-            'description' => (string)$decoded['description'],
-            'prompt' => (string)$decoded['prompt'],
-            'locale' => (string)$decoded['locale'],
+            'description' => self::FALLBACK_DESCRIPTION,
+            'prompt' => self::FALLBACK_PROMPT,
+            'locale' => self::FALLBACK_LOCALE,
         ];
     }
 }

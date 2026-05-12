@@ -1,5 +1,0 @@
-{
-    "locale": "de_DE",
-    "description": "Standard-Prompt",
-    "prompt": "Beschreibe den wesentlichen Inhalt des Bildes kurz und knapp. Begrenze den Text auf einen sehr kurzen Satz. Vermeide Elemente wie \"Das Bild zeigt\" und beschreibende Adjektive. Antworte ausschließlich in reinem Text, ohne Markdown oder Formatierung."
-}

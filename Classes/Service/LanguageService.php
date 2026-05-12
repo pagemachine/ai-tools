@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pagemachine\AItools\Service;
 
+use Pagemachine\AItools\Service\NativeLanguageService;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -50,6 +51,26 @@ class LanguageService
         }
 
         $config['items'] = array_merge($config['items'] ?? [], $items);
+    }
+
+    /**
+     * Append native-generation languages from the CreditsAPI to a TCA select field.
+     *
+     * Used as itemsProcFunc on the prompt language field.
+     */
+    public function addNativeLanguagesToTca(array &$config): void
+    {
+        try {
+            $existingValues = array_column($config['items'] ?? [], 1);
+            $service = GeneralUtility::makeInstance(NativeLanguageService::class);
+            foreach ($service->get() as $lang) {
+                if (!in_array($lang['locale'], $existingValues, true)) {
+                    $config['items'][] = [$lang['name'], $lang['locale']];
+                }
+            }
+        } catch (\Exception) {
+            // API unreachable — leave field with the static items only
+        }
     }
 
     public function getTranslationProviderPerLanguage($regionFilter = null): array

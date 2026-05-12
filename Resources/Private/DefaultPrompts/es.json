@@ -1,5 +1,0 @@
-{
-    "locale": "es_ES",
-    "description": "Prompt por defecto",
-    "prompt": "Describe el contenido esencial de la imagen de forma breve y concisa. Limita el texto a una frase muy corta. Evita elementos como \"La imagen muestra\" y adjetivos descriptivos. Devuelve solo texto plano, sin markdown ni formato."
-}
