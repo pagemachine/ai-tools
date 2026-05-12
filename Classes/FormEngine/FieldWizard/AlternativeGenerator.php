@@ -29,6 +29,7 @@ class AlternativeGenerator extends AbstractNode
     {
         $typo3Version = new Typo3Version();
         if ($typo3Version->getMajorVersion() < 13) {
+            // @phpstan-ignore staticMethod.notFound (v12 AbstractNode signature)
             parent::__construct($nodeFactory, $data);
         }
 

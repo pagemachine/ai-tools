@@ -41,7 +41,7 @@ class AigudeImageRecognitionService extends AigudeAbstract implements ImageRecog
             $tokens[$placeholder->getIdentifier()] = [
                 "value" => $placeholder->getValue(),
                 "lang" => $lang,
-                "translatable" => (boolean) $langScript,
+                "translatable" => (bool) $langScript,
             ];
         }
 
