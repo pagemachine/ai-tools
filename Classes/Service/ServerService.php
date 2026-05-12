@@ -88,13 +88,20 @@ class ServerService
         }
 
         if (!$serverEntry instanceof Server) {
-            $serviceUid = (integer) $this->settingsService->getSetting($functionality.'_service');
+            $serviceUid = (int) $this->settingsService->getSetting($functionality.'_service');
 
             if (empty($serviceUid)) {
-                throw new \Exception('No default API Connection defined in the settings (' . $functionality . ')');
+                // No default server — try any server with the right functionality
+                $servers = $serverRepository->listAllServers();
+                foreach ($servers as $server) {
+                    if (array_key_exists($functionality, $this->serverConfig[$server->getType()]['functionality'] ?? [])) {
+                        $serverEntry = $server;
+                        break;
+                    }
+                }
+            } else {
+                $serverEntry = $serverRepository->findByUid($serviceUid);
             }
-
-            $serverEntry = $serverRepository->findByUid($serviceUid);
         }
 
         if (!$serverEntry instanceof Server) {

@@ -6,6 +6,7 @@ namespace Pagemachine\AItools\Controller\Backend;
 
 use Pagemachine\AItools\Compatibility\Typo3VersionGate;
 use Pagemachine\AItools\Domain\Repository\PromptRepository;
+use Pagemachine\AItools\Service\SettingsService;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
@@ -13,6 +14,7 @@ use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
@@ -23,6 +25,7 @@ class PromptsController extends ActionController
         private readonly PromptRepository $promptRepository,
         private readonly ModuleTemplateFactory $moduleTemplateFactory,
         private readonly IconFactory $iconFactory,
+        private readonly SettingsService $settingsService,
     ) {
     }
 
@@ -54,9 +57,33 @@ class PromptsController extends ActionController
 
         $requestUri = $this->request->getAttribute('normalizedParams')->getRequestUri();
 
+        $baseLangCode = $this->promptRepository->getBaseLanguageCode();
+        $isBaseLanguageSupported = $this->promptRepository->isAigudeVisionSupportedLanguage($baseLangCode);
+
+        $baseLangTitle = strtoupper($baseLangCode);
+        try {
+            $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
+            $sites = $siteFinder->getAllSites();
+            if (!empty($sites)) {
+                $baseLangTitle = (reset($sites))->getLanguageById(0)->getTitle();
+            }
+        } catch (\Throwable) {
+        }
+
+        $baseProvider = null;
+        if (!$isBaseLanguageSupported) {
+            try {
+                $baseProvider = $this->settingsService->getTranslationProviderForLanguage(0);
+            } catch (\Exception) {
+            }
+        }
+
         $template_variables = [
             'prompts' => $this->promptRepository->listAllPrompts(),
             'returnUrl' => $requestUri,
+            'isBaseLanguageSupported' => $isBaseLanguageSupported,
+            'baseLangTitle' => $baseLangTitle,
+            'baseProvider' => $baseProvider,
         ];
 
         $this->setDocHeader($moduleTemplate, $requestUri);

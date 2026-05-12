@@ -294,16 +294,22 @@ class ImageRecognizeController extends ActionController
                     throw new Exception('Cannot generate metadata: target did not resolve to an image file', 1745356800);
                 }
                 $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt?->getPrompt() ?? '');
+                $textPromptLanguage = $parsedBody['textPromptLanguage'] ?? $queryParams['textPromptLanguage'] ?? '';
+                if ($textPromptLanguage === '') {
+                    $textPromptLanguage = $defaultPrompt?->getLanguage() ?? 'en_US';
+                }
                 $translationProvider = $parsedBody['translationProvider'] ?? $queryParams['translationProvider'] ?? null;
+                $promptLang = strtolower(substr((string) $textPromptLanguage, 0, 2)) ?: 'auto';
                 if ($this->imageMetaDataService->supportsTranslation()) {
-                    $altTextFromImageTranslated = $this->imageMetaDataService->generateImageDescription(
+                    $generated = $this->imageMetaDataService->generateImageDescription(
                         $fileForGeneration,
                         $textPrompt,
                         $targetTwoLetterIsoCode,
                         (int) $target_language,
-                        $translationProvider
+                        $translationProvider,
+                        $promptLang
                     );
-                    $data = ['alternative' => $altTextFromImageTranslated, 'baseAlternative' => $altTextFromImageTranslated];
+                    $data = ['alternative' => $generated, 'baseAlternative' => $generated];
                 } else {
                     $altTextFromImage = $this->imageMetaDataService->generateImageDescription(
                         $fileForGeneration,
@@ -333,16 +339,27 @@ class ImageRecognizeController extends ActionController
 
                 $moduleTemplate->getDocHeaderComponent()->disable();
 
+                $translationLanguageCount = 0;
+                foreach ($siteLanguages as $siteLanguage) {
+                    if ($siteLanguage->getLanguageId() !== (int) $target_language) {
+                        if (!is_null($this->settingsService->getTranslationProviderForLanguage($siteLanguage->getLanguageId()))) {
+                            $translationLanguageCount++;
+                        }
+                    }
+                }
+
                 $template_variables = [
                     'siteLanguages' => $siteLanguages,
+                    'translationLanguageCount' => $translationLanguageCount,
                     'action' => $action,
                     'target' => $target,
                     'fileObjects' => $fileObjects ?? null,
                     'targetLanguage' => (int) $target_language,
                     'modal' => $modal,
                     'textPrompt' => $defaultPrompt?->getPrompt() ?? '',
+                    'textPromptValue' => json_encode(['prompt' => $defaultPrompt?->getPrompt() ?? '', 'language' => $defaultPrompt?->getLanguage() ?? 'en_US']),
                     'allTextPrompts' => array_map(fn(Prompt $prompt) => [
-                        'description' => $prompt->getDescription(),
+                        'description' => ($prompt->isDefault() ? '★ ' : '') . $prompt->getDescription(),
                         'prompt' => json_encode(['prompt' => $prompt->getPrompt(), 'language' => $prompt->getLanguage()]),
                     ], $allPrompts->toArray()),
                 ];
