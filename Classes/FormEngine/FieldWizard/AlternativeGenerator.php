@@ -8,6 +8,8 @@ use Pagemachine\AItools\Compatibility\Typo3VersionGate;
 use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Pagemachine\AItools\Service\SettingsService;
 use TYPO3\CMS\Backend\Form\AbstractNode;
+use TYPO3\CMS\Backend\Form\NodeFactory;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\File;
@@ -23,8 +25,13 @@ class AlternativeGenerator extends AbstractNode
     protected PromptRepository $promptRepository;
     protected SettingsService $settingsService;
 
-    public function __construct()
+    public function __construct(?NodeFactory $nodeFactory = null, ?array $data = null)
     {
+        $typo3Version = new Typo3Version();
+        if ($typo3Version->getMajorVersion() < 13) {
+            parent::__construct($nodeFactory, $data);
+        }
+
         $this->promptRepository = GeneralUtility::makeInstance(PromptRepository::class);
         $this->settingsService = GeneralUtility::makeInstance(SettingsService::class);
     }
@@ -67,7 +74,8 @@ class AlternativeGenerator extends AbstractNode
 
     protected function buildWizardResult(array $result): array
     {
-        $rawFile = $this->data['databaseRow']['file'][0] ?? null;
+        $fileData = $this->data['databaseRow']['file'] ?? null;
+        $rawFile = is_array($fileData) ? ($fileData[0] ?? null) : $fileData;
         $target = is_array($rawFile) ? ($rawFile['uid'] ?? null) : $rawFile;
 
         if (empty($target) || !$this->isActive($target)) {
