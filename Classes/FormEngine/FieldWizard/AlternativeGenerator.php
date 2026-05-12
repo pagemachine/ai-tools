@@ -79,6 +79,9 @@ class AlternativeGenerator extends AbstractNode
         }
 
         $prompt = $this->promptRepository->getDefaultPrompt();
+        if ($prompt === null) {
+            return $result;
+        }
 
         $arguments = [
             'target' => $target,

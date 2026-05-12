@@ -57,7 +57,7 @@ class ServersController extends ActionController
                         'returnUrl' => (string)$requestUri,
                     ]
                 ))
-                ->setTitle($value['name'])
+                ->setTitle('Default server')
                 ->setShowLabelText(true)
                 ->setIcon($this->iconFactory->getIcon('actions-add', Typo3VersionGate::iconSizeSmall()));
 

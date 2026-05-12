@@ -70,9 +70,13 @@ class PromptsController extends ActionController
         } catch (\Throwable) {
         }
 
-        $baseProvider = $isBaseLanguageSupported
-            ? null
-            : $this->settingsService->getTranslationProviderForLanguage(0);
+        $baseProvider = null;
+        if (!$isBaseLanguageSupported) {
+            try {
+                $baseProvider = $this->settingsService->getTranslationProviderForLanguage(0);
+            } catch (\Exception) {
+            }
+        }
 
         $template_variables = [
             'prompts' => $this->promptRepository->listAllPrompts(),

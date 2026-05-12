@@ -68,7 +68,7 @@ return [
         ],
         'default' => [
             'exclude' => true,
-            'label' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.default',
+            'label' => 'LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_server.default',
             'config' => [
                 'type' => 'check',
                 'default' => 0,
