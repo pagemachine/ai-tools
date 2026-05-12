@@ -12,6 +12,10 @@ composer require pagemachine/ai-tools
 
 Also available from the [TYPO3 Extension Repository](https://extensions.typo3.org/extension/ai_tools) and [GitHub releases](https://github.com/pagemachine/ai-tools/releases).
 
+## Documentation
+
+Full documentation at [pagemachine.github.io/ai-tools](https://pagemachine.github.io/ai-tools).
+
 ## Features
 
 ### Alt text generation
@@ -19,13 +23,9 @@ Also available from the [TYPO3 Extension Repository](https://extensions.typo3.or
 Right-click any image in the File List and choose **Generate A.I. Metadata** to open the generation modal. The extension sends the image to the configured AI server and writes the result back to the file's metadata.
 
 - Generate alt text in any site language
-- Auto-translate to all other site languages in one step
+- Auto-translate to all other site languages in one step (via DeepL or Google Translate)
 - Customize the prompt used for generation (AI Tools > Prompts)
 - Use **Generate All** on a folder to process multiple images at once
-
-### Translation
-
-Supported providers: DeepL and Google Translate. The active provider is configurable per server.
 
 ### Prompt management
 
