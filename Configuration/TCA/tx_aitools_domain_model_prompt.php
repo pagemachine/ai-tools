@@ -92,12 +92,25 @@ return [
                 'readOnly' => true,
             ],
         ],
+        'language' => [
+            'exclude' => true,
+            'label' => 'Prompt language',
+            'config' => [
+                'type' => 'select',
+                'renderType' => 'selectSingle',
+                'default' => 'en_US',
+                'items' => [
+                    ['English', 'en_US'],
+                ],
+                'itemsProcFunc' => \Pagemachine\AItools\Service\LanguageService::class . '->addNativeLanguagesToTca',
+            ],
+        ],
     ],
     'types' => [
         '0' => [
             'showitem' => '
                 --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:general,
-                --palette--;;paletteHidden, default, type, description, prompt,
+                --palette--;;paletteHidden, default, type, description, language, prompt,
             ',
         ],
     ],

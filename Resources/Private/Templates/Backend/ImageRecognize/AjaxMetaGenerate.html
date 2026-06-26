@@ -159,10 +159,14 @@
                             href="#"
                             class="btn btn-default btn-pagemachine-ai-tools t3js-alternative-generate-all"
                             data-translate="1"
+                            data-translation-language-count="{translationLanguageCount}"
                         >
                             <core:icon identifier="actions-cpu" size="small" />
                             Generate alternative text for <span class="t3-alternative-generate-all-total-images">{fileObjects -> f:count()}</span> Images and translate into all languages
-                            <aitools:backend.Credits />
+                            <div id="t3-alternative-generate-all-translate-credits"
+                                 class="badge badge-default label label-default"
+                                 style="display: none;">
+                            </div>
                         </button>
                         <br />
                         <progress value="0" max="{fileObjects -> f:count()}" id="progressBar" class="progressBar" style="display: none;"></progress>
@@ -260,7 +264,11 @@
                                             data-translation-hash="{fileObject.file.properties.identifier_hash}" data-translate="1">
                                             <core:icon identifier="actions-cpu" size="small" />
                                             Save and translate into all other languages
-                                            <aitools:backend.Credits />
+                                            <f:if condition="{translationLanguageCount} > 0">
+                                                <span class="badge badge-default label label-default">
+                                                    {translationLanguageCount} Credits
+                                                </span>
+                                            </f:if>
                                         </button>
                                     </div>
                                 </div>

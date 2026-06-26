@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pagemachine\AItools\Controller\Backend;
 
 use Pagemachine\AItools\Compatibility\Typo3VersionGate;
+use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Pagemachine\AItools\Domain\Repository\ServerRepository;
 use Pagemachine\AItools\Service\ServerService;
 use Pagemachine\AItools\Service\SettingsService;
@@ -28,6 +29,7 @@ class ServersController extends ActionController
         private readonly IconFactory $iconFactory,
         private readonly ServerService $serverService,
         private readonly SettingsService $settingsService,
+        private readonly PromptRepository $promptRepository,
     ) {
     }
 
@@ -55,7 +57,7 @@ class ServersController extends ActionController
                         'returnUrl' => (string)$requestUri,
                     ]
                 ))
-                ->setTitle($value['name'])
+                ->setTitle('Default server')
                 ->setShowLabelText(true)
                 ->setIcon($this->iconFactory->getIcon('actions-add', Typo3VersionGate::iconSizeSmall()));
 
@@ -77,7 +79,18 @@ class ServersController extends ActionController
         ];
 
         try {
-            $template_variables['translationProviderPerLanguage'] = $this->settingsService->getTranslationProviders();
+            $providers = $this->settingsService->getTranslationProviders();
+            foreach ($providers as $languageId => &$entry) {
+                $siteLanguage = $entry['siteLanguage'] ?? null;
+                $langCode = '';
+                if ($siteLanguage !== null) {
+                    $langCode = $siteLanguage->getLocale()->getLanguageCode();
+                }
+                $entry['isAigudeVisionSupported'] = $this->promptRepository->isAigudeVisionSupportedLanguage($langCode);
+                $entry['isBase'] = ($languageId === 0);
+            }
+            unset($entry);
+            $template_variables['translationProviderPerLanguage'] = $providers;
         } catch (\Exception $e) {
             $template_variables['translationProviderError'] = $e->getMessage();
         }

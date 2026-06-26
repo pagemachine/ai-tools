@@ -54,6 +54,9 @@
 			<trans-unit id="tx_aitools_domain_model_server.type">
 				<source>Server</source>
 			</trans-unit>
+			<trans-unit id="tx_aitools_domain_model_server.default">
+				<source>Default server</source>
+			</trans-unit>
 			<trans-unit id="tx_aitools_domain_model_server.apikey">
 				<source>API Key</source>
 			</trans-unit>

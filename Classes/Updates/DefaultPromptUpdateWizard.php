@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Pagemachine\AItools\Updates;
 
 use Doctrine\DBAL\ParameterType;
+use Pagemachine\AItools\Domain\Repository\PromptRepository;
+use Pagemachine\AItools\Service\NativeLanguageService;
 use TYPO3\CMS\Core\Attribute\UpgradeWizard;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Upgrades\DatabaseUpdatedPrerequisite;
@@ -15,8 +17,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class DefaultPromptUpdateWizard implements UpgradeWizardInterface
 {
     private const TABLE = 'tx_aitools_domain_model_prompt';
-    private const DEFAULT_DESCRIPTION = 'Default prompt';
-    private const DEFAULT_PROMPT = 'Describe the essential content of the picture briefly and concisely. Limit the text to a very short sentence. Avoid elements such as "The picture shows" and descriptive adjectives.';
+    private const FALLBACK_DESCRIPTION = 'Default prompt';
+    private const FALLBACK_PROMPT = 'Describe the essential content of the picture briefly and concisely. Limit the text to a very short sentence. Avoid elements such as "The picture shows" and descriptive adjectives.';
+    private const FALLBACK_LOCALE = 'en_US';
 
     public function getTitle(): string
     {
@@ -39,16 +42,18 @@ class DefaultPromptUpdateWizard implements UpgradeWizardInterface
             return true;
         }
 
+        $promptData = $this->loadDefaultPromptForBaseLanguage();
+
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable(self::TABLE);
 
         $connection->insert(self::TABLE, [
             'pid' => 0,
-            'description' => self::DEFAULT_DESCRIPTION,
-            'prompt' => self::DEFAULT_PROMPT,
+            'description' => $promptData['description'],
+            'prompt' => $promptData['prompt'],
             'type' => 'img2txt',
             'default' => 0,
-            'language' => 'en_US',
+            'language' => $promptData['locale'],
             'hidden' => 0,
             'system' => 1,
         ]);
@@ -78,5 +83,50 @@ class DefaultPromptUpdateWizard implements UpgradeWizardInterface
             ->fetchOne();
 
         return (int)$count > 0;
+    }
+
+    /**
+     * @return array{description: string, prompt: string, locale: string}
+     */
+    private function loadDefaultPromptForBaseLanguage(): array
+    {
+        $promptRepository = GeneralUtility::makeInstance(PromptRepository::class);
+        $baseLang = strtolower($promptRepository->getBaseLanguageCode());
+
+        try {
+            $service = GeneralUtility::makeInstance(NativeLanguageService::class);
+            $langs = $service->get();
+        } catch (\Exception) {
+            $langs = [];
+        }
+
+        // Match site base language
+        foreach ($langs as $lang) {
+            if (strtolower($lang['code']) === $baseLang) {
+                return [
+                    'description' => $lang['description'],
+                    'prompt' => $lang['default_prompt'],
+                    'locale' => $lang['locale'],
+                ];
+            }
+        }
+
+        // Fall back to English from API
+        foreach ($langs as $lang) {
+            if (strtolower($lang['code']) === 'en') {
+                return [
+                    'description' => $lang['description'],
+                    'prompt' => $lang['default_prompt'],
+                    'locale' => $lang['locale'],
+                ];
+            }
+        }
+
+        // Hard fallback if API is unreachable
+        return [
+            'description' => self::FALLBACK_DESCRIPTION,
+            'prompt' => self::FALLBACK_PROMPT,
+            'locale' => self::FALLBACK_LOCALE,
+        ];
     }
 }

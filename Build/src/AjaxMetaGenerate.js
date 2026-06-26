@@ -34,7 +34,7 @@ $(() => {
     e.preventDefault();
     e.stopPropagation();
 
-    const fileIdentifier = $(this).data('file-identifier');
+    const fileIdentifier = $(this).attr('data-file-identifier');
     const targetLanguage = $(this).data('target-language');
     const translationHash = $(this).data('translation-hash');
     const target = $($(this).data('output-target'));
@@ -84,7 +84,7 @@ $(() => {
     var progressBar = $('.progressBar').first();
 
     const translate = Boolean($(this).data('translate'));
-    const skipExistingDescriptions = document.getElementById('skipExistingDescriptions').checked;
+    const skipExistingDescriptions = document.getElementById('skipExistingDescriptions')?.checked ?? false;
 
     if (!skipExistingDescriptions) {
       const userConfirmed = await showModalConfirmation('This will overwrite existing descriptions. Are you sure you want to continue?');
@@ -219,7 +219,7 @@ async function showModalConfirmation(message) {
 }
 
 function generateAllListCalculate() {
-  const skipExistingDescriptions = document.getElementById('skipExistingDescriptions').checked;
+  const skipExistingDescriptions = document.getElementById('skipExistingDescriptions')?.checked ?? false;
   const filteredImageBlocks = getActiveImages(skipExistingDescriptions);
   $('.t3-alternative-generate-all-total-images').text(filteredImageBlocks.length);
 
@@ -233,14 +233,30 @@ function generateAllListCalculate() {
   }
 
   let element = document.getElementById('t3-alternative-generate-all-total-credits');
-  if (total) {
-    element.innerHTML = total + ' Credits';
-    element.setAttribute('data-credits', total);
-    element.style = '';
-  } else {
-    element.innerHTML = 'No Credits';
-    element.setAttribute('data-credits', 0);
-    element.style = 'display: none;';
+  if (element) {
+    if (total) {
+      element.innerHTML = total + ' Credits';
+      element.setAttribute('data-credits', total);
+      element.style = '';
+    } else {
+      element.innerHTML = 'No Credits';
+      element.setAttribute('data-credits', 0);
+      element.style = 'display: none;';
+    }
+  }
+
+  const translateBtn = document.querySelector('.t3js-alternative-generate-all[data-translate="1"]');
+  const translateCreditElement = document.getElementById('t3-alternative-generate-all-translate-credits');
+  if (translateBtn && translateCreditElement) {
+    const translationLangCount = parseInt(translateBtn.getAttribute('data-translation-language-count') ?? '0');
+    const translateTotal = total + filteredImageBlocks.length * translationLangCount;
+    if (translateTotal) {
+      translateCreditElement.innerHTML = translateTotal + ' Credits';
+      translateCreditElement.style = '';
+    } else {
+      translateCreditElement.innerHTML = 'No Credits';
+      translateCreditElement.style = 'display: none;';
+    }
   }
 }
 

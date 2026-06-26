@@ -26,7 +26,7 @@ class GeneratorButton {
   }
 
   async triggerGeneratorButton(element) {
-    const fileIdentifier = element.data('file-identifier');
+    const fileIdentifier = element.attr('data-file-identifier');
     const targetLanguage = element.data('target-language');
     const target = $(element.data('output-target'));
     const showTarget = element.data('show-target');
@@ -34,6 +34,13 @@ class GeneratorButton {
     let textPrompt = element.data('text-prompt');
     if (element.data('text-prompt-field')) {
       textPrompt = $(element.data('text-prompt-field')).val();
+    }
+    let textPromptLanguage = element.data('text-prompt-language');
+    if (element.data('text-prompt-field')) {
+      const fieldLang = $(element.data('text-prompt-field')).attr('data-text-prompt-language');
+      if (fieldLang) {
+        textPromptLanguage = fieldLang;
+      }
     }
     let translationProvider = element.data('translation-provider');
 
@@ -49,6 +56,7 @@ class GeneratorButton {
         targetLanguage,
         textPrompt,
         translationProvider,
+        textPromptLanguage,
       );
 
       console.log('Prompt generated', results);

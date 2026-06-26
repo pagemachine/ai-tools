@@ -10,6 +10,22 @@
 <f:section name="Content">
     <h1><f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/locallang_db.xlf:tx_aitools_domain_model_prompt.templates" /></h1>
 
+    <f:if condition="{isBaseLanguageSupported}">
+        <f:then>
+            <div class="alert alert-info">
+                ℹ Write prompts in any of the <a href="https://github.com/pagemachine/ai-tools#supported-languages" target="_blank" rel="noopener">15 supported languages</a>.
+                AiGude generates descriptions natively in the prompt language.
+            </div>
+        </f:then>
+        <f:else>
+            <div class="alert alert-warning">
+                ⚠ AiGude does not natively support <strong>{baseLangTitle}</strong>.
+                Write prompts in any of the <a href="https://github.com/pagemachine/ai-tools#supported-languages" target="_blank" rel="noopener">15 supported languages</a> (e.g. English, German).
+                The description will be generated in the prompt language and automatically translated to <strong>{baseLangTitle}</strong><f:if condition="{baseProvider}"> via <strong>{baseProvider}</strong></f:if>.
+            </div>
+        </f:else>
+    </f:if>
+
     <f:render section="table" arguments="{_all}" />
 
 </f:section>
