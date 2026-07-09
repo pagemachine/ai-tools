@@ -326,6 +326,48 @@ class ImageRecognizeController extends ActionController
                     ->withHeader('Content-Type', 'application/json')
                     ->withBody($this->streamFactory->createStream(json_encode($data)));
 
+            case 'generateBatchMetaData':
+                $fileIdentifiers = json_decode((string)($parsedBody['fileIdentifiers'] ?? $queryParams['fileIdentifiers'] ?? '[]'), true, 512, JSON_THROW_ON_ERROR);
+                $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt?->getPrompt() ?? '');
+                $translationProvider = $parsedBody['translationProvider'] ?? $queryParams['translationProvider'] ?? null;
+
+                $imageType = Typo3VersionGate::imageFileType();
+                $files = [];
+                $identifierByIndex = [];
+                foreach ((array) $fileIdentifiers as $fileIdentifier) {
+                    try {
+                        $fileObject = $this->resourceFactory->retrieveFileOrFolderObject((string) $fileIdentifier);
+                    } catch (\Throwable) {
+                        continue;
+                    }
+                    if (!$fileObject instanceof FileInterface || $fileObject->getType() !== $imageType) {
+                        continue;
+                    }
+                    $idx = count($files);
+                    $files[$idx] = $fileObject;
+                    $identifierByIndex[$idx] = $fileIdentifier;
+                }
+
+                $results = $this->imageMetaDataService->generateImageDescriptionBatch(
+                    $files,
+                    $textPrompt,
+                    $targetTwoLetterIsoCode,
+                    (int) $target_language,
+                    $translationProvider
+                );
+
+                $data = [];
+                foreach ($results as $idx => $text) {
+                    $identifier = $identifierByIndex[$idx] ?? null;
+                    if ($identifier !== null) {
+                        $data[$identifier] = ['alternative' => $text];
+                    }
+                }
+
+                return $this->responseFactory->createResponse()
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withBody($this->streamFactory->createStream(json_encode($data, JSON_THROW_ON_ERROR)));
+
             default:
                 if (version_compare(GeneralUtility::makeInstance(VersionNumberUtility::class)->getNumericTypo3Version(), '13.0', '<')) {
                     $moduleTemplate = $this->moduleTemplateFactory->create($request);
