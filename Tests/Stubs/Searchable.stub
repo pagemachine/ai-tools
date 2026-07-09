@@ -1,0 +1,32 @@
+<?php
+
+namespace Elasticsearch {
+    class Client
+    {
+        /**
+         * @param array<mixed> $params
+         * @return array<mixed>
+         */
+        public function search(array $params = []): array {}
+
+        /**
+         * @param array<mixed> $params
+         * @return array<mixed>
+         */
+        public function count(array $params = []): array {}
+    }
+}
+
+namespace PAGEmachine\Searchable {
+    class Connection
+    {
+        public static function getClient(): \Elasticsearch\Client {}
+    }
+}
+
+namespace PAGEmachine\Searchable\Service {
+    class IndexingService
+    {
+        public function indexFull(string $type = ''): void {}
+    }
+}

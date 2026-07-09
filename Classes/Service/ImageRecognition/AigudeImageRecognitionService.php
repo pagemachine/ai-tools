@@ -6,7 +6,9 @@ namespace Pagemachine\AItools\Service\ImageRecognition;
 
 use Pagemachine\AItools\Domain\Model\PlaceholderResult;
 use Pagemachine\AItools\Service\Abstract\AigudeAbstract;
+use Pagemachine\AItools\Service\ContextRetrievalService;
 use TYPO3\CMS\Core\Resource\FileInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class AigudeImageRecognitionService extends AigudeAbstract implements ImageRecognitionServiceInterface
 {
@@ -63,6 +65,15 @@ class AigudeImageRecognitionService extends AigudeAbstract implements ImageRecog
                 'contents' => json_encode($prompt_spec),
             ],
         ];
+
+        $contextService = GeneralUtility::makeInstance(ContextRetrievalService::class);
+        $contextChunks = $contextService->retrieveContextChunks($fileObject);
+        if (!empty($contextChunks)) {
+            $multipartBody[] = [
+                'name'     => 'context_chunks',
+                'contents' => json_encode($contextChunks),
+            ];
+        }
 
         $json = $this->request($url, 'POST', [
             'headers' => [

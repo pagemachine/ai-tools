@@ -37,6 +37,8 @@ return [
             ServersController::class => [
                 'list',
                 'saveSettings',
+                'toggleRag',
+                'reindexElasticsearch',
             ],
         ],
     ],

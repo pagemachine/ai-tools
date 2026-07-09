@@ -54,6 +54,23 @@ class SettingsService
         $this->setExtConfigValue('gdprCompliant', $gdprCompliant);
     }
 
+    /**
+     * Whether RAG (Elasticsearch context enrichment) is enabled. Opt-in: defaults to false.
+     */
+    public function getRagEnabled(): bool
+    {
+        try {
+            return (bool) $this->extensionConfiguration->get('ai_tools', 'ragEnabled');
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    public function setRagEnabled(bool $ragEnabled): void
+    {
+        $this->setExtConfigValue('ragEnabled', $ragEnabled);
+    }
+
     public function getTranslationProviderForLanguage(int $languageId): ?string
     {
         $translationProviders = $this->getTranslationProviders();
@@ -108,7 +125,7 @@ class SettingsService
     {
         $config = $this->extensionConfiguration->get('ai_tools');
         $config[$key] = $value;
-        $config = array_intersect_key($config, array_flip(['gdprCompliant', 'translationProviders']));
+        $config = array_intersect_key($config, array_flip(['gdprCompliant', 'ragEnabled', 'translationProviders']));
         $this->extensionConfiguration->set('ai_tools', $config);
     }
 }
