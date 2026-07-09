@@ -27,6 +27,24 @@
 			<trans-unit id="tx_aitools_settings.noServiceAvailable">
 				<source>No service available for this language</source>
 			</trans-unit>
+			<trans-unit id="tx_aitools_settings.rag.heading">
+				<source>RAG (Context Enrichment)</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_settings.rag.description">
+				<source>Retrieval-Augmented Generation (RAG) enriches image descriptions with context from your site's Elasticsearch index (pagemachine/searchable). When enabled, the extension looks up relevant page and news content based on the image filename and sends it to AiGude alongside the image.</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_settings.rag.enable">
+				<source>Enable RAG (Elasticsearch context enrichment)</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_settings.rag.index">
+				<source>Elasticsearch Index</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_settings.rag.unreachable">
+				<source>Elasticsearch unreachable or empty</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_settings.rag.reindex">
+				<source>Rebuild Elasticsearch Index</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

@@ -61,6 +61,38 @@ class ImageMetaDataService
     }
 
     /**
+     * Generate descriptions for multiple images in a single batch request.
+     *
+     * @param array<int, FileInterface> $fileObjects
+     * @return array<int, string> Generated texts keyed by the input index
+     * @throws \Exception
+     */
+    public function generateImageDescriptionBatch(array $fileObjects, string $textPrompt = '', string $targetLanguage = 'en', int $language = 0, ?string $translationProvider = null): array
+    {
+        if ($fileObjects === []) {
+            return [];
+        }
+
+        $serverClass = $this->serverService->getActiveServerClassByFunctionality('image_recognition', reset($fileObjects));
+
+        $items = [];
+        foreach ($fileObjects as $idx => $fileObject) {
+            $processedImage = $this->getScaledImage($fileObject);
+
+            /** @var File $fileObject */
+            $fileReference = $this->getMetaDataForLanguage($fileObject, $language);
+            $placeholdersResult = $this->placeholderService->resolvePlaceholders($textPrompt, ['file' => $fileObject, 'fileReference' => $fileReference]);
+
+            $items[$idx] = [
+                'file' => $processedImage,
+                'placeholderResult' => $placeholdersResult,
+            ];
+        }
+
+        return $serverClass->sendBatchToApi($items, $targetLanguage, $translationProvider);
+    }
+
+    /**
      * Process the Image recognition request
      * @return string
      * @throws \Exception

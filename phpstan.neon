@@ -7,6 +7,12 @@ parameters:
     - ext_tables.php
     - Classes
 
+  scanFiles:
+    # pagemachine/searchable is an optional (suggested) dependency; scan minimal
+    # stub definitions so static analysis knows the symbols the guarded RAG code
+    # references without requiring the package on every CI leg.
+    - Tests/Stubs/Searchable.stub
+
   excludePaths:
     # Wizard uses TYPO3\CMS\Core\Upgrades\* (v14-only). On v12/v13 the file
     # is never autoloaded since nothing references it; phpstan against v12/v13

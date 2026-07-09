@@ -9,6 +9,8 @@ use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Pagemachine\AItools\Domain\Repository\ServerRepository;
 use Pagemachine\AItools\Service\ServerService;
 use Pagemachine\AItools\Service\SettingsService;
+use PAGEmachine\Searchable\Connection;
+use PAGEmachine\Searchable\Service\IndexingService;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
@@ -72,10 +74,14 @@ class ServersController extends ActionController
 
         $requestUri = $this->request->getAttribute('normalizedParams')->getRequestUri();
 
+        $ragAvailable = class_exists(Connection::class);
         $template_variables = [
             'servers' => $this->serverRepository->listAllServers(),
             'returnUrl' => $requestUri,
             'gdprCompliant' => $this->settingsService->getGdprCompliant(),
+            'ragAvailable' => $ragAvailable,
+            'ragEnabled' => $this->settingsService->getRagEnabled(),
+            'esCounts' => $this->getEsCounts($ragAvailable),
         ];
 
         try {
@@ -109,6 +115,65 @@ class ServersController extends ActionController
         $this->addFlashMessage('Settings have been saved.', 'Settings saved', ContextualFeedbackSeverity::OK);
 
         return $this->redirect('list');
+    }
+
+    public function toggleRagAction(bool $ragEnabled = false): ResponseInterface
+    {
+        $this->settingsService->setRagEnabled($ragEnabled);
+
+        $this->addFlashMessage(
+            $ragEnabled ? 'RAG enabled' : 'RAG disabled',
+            'Settings saved',
+            ContextualFeedbackSeverity::OK
+        );
+
+        return $this->redirect('list');
+    }
+
+    public function reindexElasticsearchAction(): ResponseInterface
+    {
+        if (!class_exists(IndexingService::class)) {
+            $this->addFlashMessage(
+                'pagemachine/searchable is not installed.',
+                'Reindex',
+                ContextualFeedbackSeverity::ERROR
+            );
+            return $this->redirect('list');
+        }
+
+        try {
+            GeneralUtility::makeInstance(IndexingService::class)->indexFull();
+            $this->addFlashMessage('Elasticsearch index rebuilt successfully.', 'Reindex', ContextualFeedbackSeverity::OK);
+        } catch (\Throwable $e) {
+            $this->addFlashMessage('Reindex failed: ' . $e->getMessage(), 'Reindex', ContextualFeedbackSeverity::ERROR);
+        }
+
+        return $this->redirect('list');
+    }
+
+    /**
+     * Live document counts for the RAG index panel. Fail-soft: nulls when ES is unreachable.
+     *
+     * @return array<string, int|null>
+     */
+    private function getEsCounts(bool $ragAvailable): array
+    {
+        $counts = ['pages' => null, 'news' => null];
+        if (!$ragAvailable) {
+            return $counts;
+        }
+
+        try {
+            $client = Connection::getClient();
+            foreach (['pages', 'news'] as $key) {
+                $result = $client->count(['index' => 'typo3_' . $key]);
+                $counts[$key] = isset($result['count']) ? (int) $result['count'] : null;
+            }
+        } catch (\Throwable) {
+            // ES unreachable or index missing - leave nulls
+        }
+
+        return $counts;
     }
 
     protected function getLanguageService(): LanguageService

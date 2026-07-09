@@ -27,6 +27,13 @@
                     <f:render section="translationProvider" arguments="{_all}" />
                 </f:else>
             </f:if>
+
+            <f:if condition="{ragAvailable}">
+                <h1>
+                    <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.rag.heading" />
+                </h1>
+                <f:render section="ragSettings" arguments="{_all}" />
+            </f:if>
         </f:then>
         <f:else>
             <f:render section="initialization" arguments="{_all}" />
@@ -279,6 +286,52 @@
             </div>
         </div>
     </f:form>
+</f:section>
+
+<f:section name="ragSettings">
+    <div class="card">
+        <div class="card-body">
+            <p class="text-muted small mb-3">
+                <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.rag.description" />
+            </p>
+
+            <f:form action="toggleRag" method="post">
+                <div class="mb-3 form-check form-switch">
+                    <f:form.checkbox class="form-check-input" id="ragEnabled" name="ragEnabled" value="1"
+                        checked="{ragEnabled}" additionalAttributes="{onChange: 'this.form.submit()'}" />
+                    <label class="form-check-label" for="ragEnabled">
+                        <f:translate
+                            key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.rag.enable" />
+                    </label>
+                </div>
+            </f:form>
+
+            <div class="mb-3">
+                <strong>
+                    <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.rag.index" />
+                </strong><br />
+                <f:if condition="{esCounts.pages}">
+                    <f:then>
+                        Pages: <strong>{esCounts.pages}</strong> &middot;
+                        News: <strong>{esCounts.news}</strong>
+                    </f:then>
+                    <f:else>
+                        <span class="text-danger">
+                            <core:icon identifier="actions-exclamation-triangle-alt" />
+                            <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.rag.unreachable" />
+                        </span>
+                    </f:else>
+                </f:if>
+            </div>
+
+            <f:form action="reindexElasticsearch" method="post">
+                <button type="submit" class="btn btn-default">
+                    <core:icon identifier="actions-refresh" />
+                    <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.rag.reindex" />
+                </button>
+            </f:form>
+        </div>
+    </div>
 </f:section>
 
 </html>
