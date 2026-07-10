@@ -220,7 +220,7 @@
 
                 <div class="mb-3 form-check form-switch">
                     <f:form.checkbox class="form-check-input" id="gdprCompliant" name="gdprCompliant" value="1"
-                        checked="{gdprCompliant}" additionalAttributes="{onChange: 'this.form.submit()'}" />
+                        checked="{gdprCompliant}" />
                     <label class="form-check-label" for="gdprCompliant">
                         <f:translate
                             key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.gdprCompliant" />
@@ -252,8 +252,7 @@
                                             <f:form.select class="form-select"
                                                 name="providers[{providerLanguage.siteLanguage.languageId}]"
                                                 id="provider_{providerLanguage.siteLanguage.languageId}"
-                                                value="{providerLanguage.active}"
-                                                additionalAttributes="{onChange: 'this.form.submit()'}">
+                                                value="{providerLanguage.active}">
                                                 <f:for each="{providerLanguage.providers}" as="provider" iteration="i">
                                                     <f:form.select.option value="{provider.provider}">
                                                         <f:translate
@@ -298,12 +297,15 @@
             <f:form action="toggleRag" method="post">
                 <div class="mb-3 form-check form-switch">
                     <f:form.checkbox class="form-check-input" id="ragEnabled" name="ragEnabled" value="1"
-                        checked="{ragEnabled}" additionalAttributes="{onChange: 'this.form.submit()'}" />
+                        checked="{ragEnabled}" />
                     <label class="form-check-label" for="ragEnabled">
                         <f:translate
                             key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.rag.enable" />
                     </label>
                 </div>
+                <f:form.submit
+                    value="{f:translate(key: 'LLL:EXT:core/Resources/Private/Language/locallang_common.xlf:save')}"
+                    class="btn btn-default" />
             </f:form>
 
             <div class="mb-3">
