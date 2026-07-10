@@ -46,7 +46,12 @@ class SettingsService
      */
     public function getGdprCompliant(): bool
     {
-        return (bool) $this->extensionConfiguration->get('ai_tools', 'gdprCompliant');
+        try {
+            // ext_conf values can arrive as strings ("false"/"0"); (bool) "false" is true, so coerce properly.
+            return filter_var($this->extensionConfiguration->get('ai_tools', 'gdprCompliant'), FILTER_VALIDATE_BOOLEAN);
+        } catch (\Throwable) {
+            return false;
+        }
     }
 
     public function setGdprCompliant(bool $gdprCompliant): void
@@ -60,7 +65,8 @@ class SettingsService
     public function getRagEnabled(): bool
     {
         try {
-            return (bool) $this->extensionConfiguration->get('ai_tools', 'ragEnabled');
+            // ext_conf values can arrive as strings ("false"/"0"); (bool) "false" is true, so coerce properly.
+            return filter_var($this->extensionConfiguration->get('ai_tools', 'ragEnabled'), FILTER_VALIDATE_BOOLEAN);
         } catch (\Throwable) {
             return false;
         }
