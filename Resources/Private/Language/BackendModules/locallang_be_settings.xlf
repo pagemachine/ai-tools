@@ -42,6 +42,9 @@
 			<trans-unit id="tx_aitools_settings.rag.unreachable">
 				<source>Elasticsearch unreachable or empty</source>
 			</trans-unit>
+			<trans-unit id="tx_aitools_settings.rag.documents">
+				<source>Indexed documents</source>
+			</trans-unit>
 			<trans-unit id="tx_aitools_settings.rag.reindex">
 				<source>Rebuild Elasticsearch Index</source>
 			</trans-unit>

@@ -39,13 +39,22 @@ class ContextRetrievalService
         try {
             $client = Connection::getClient();
             $result = $client->search([
-                'index' => 'typo3_pages,typo3_news',
+                // Search every searchable index; index names are project-specific
+                // (typo3_pages/typo3_news on some, german_website_publications on others).
+                'index' => '_all',
                 'body' => [
                     'query' => [
                         'multi_match' => [
                             'fields' => ['*'],
                             'query' => $searchTerms,
                         ],
+                    ],
+                    // Highlighting returns the matched snippet from whatever fields matched,
+                    // so context extraction does not depend on a specific document schema.
+                    'highlight' => [
+                        'fields' => ['*' => (object) []],
+                        'fragment_size' => 200,
+                        'number_of_fragments' => 3,
                     ],
                     'size' => $limit,
                 ],
@@ -78,6 +87,9 @@ class ContextRetrievalService
     /**
      * Extract text chunks from Elasticsearch response.
      *
+     * Uses highlight fragments (schema-agnostic) with a fallback to the document
+     * title, so it works regardless of how a project's searchable index is shaped.
+     *
      * @param array<mixed> $esResponse
      * @return string[]
      */
@@ -87,37 +99,26 @@ class ContextRetrievalService
         $hits = $esResponse['hits']['hits'] ?? [];
 
         foreach ($hits as $hit) {
-            $source = $hit['_source'] ?? [];
             $parts = [];
 
-            if (!empty($source['title'])) {
-                $parts[] = $source['title'];
-            }
-
-            // Content from tt_content sub-documents (pages index)
-            if (!empty($source['content']) && is_array($source['content'])) {
-                foreach ($source['content'] as $contentElement) {
-                    if (!empty($contentElement['bodytext'])) {
-                        $text = strip_tags((string) $contentElement['bodytext']);
-                        $text = trim((string) preg_replace('/\s+/', ' ', $text));
-                        if (strlen($text) > 50) {
-                            $parts[] = mb_substr($text, 0, 600);
-                        }
+            // Highlight fragments: the matched snippet from whichever fields matched.
+            foreach (($hit['highlight'] ?? []) as $fieldFragments) {
+                foreach ($fieldFragments as $fragment) {
+                    // Highlighting wraps matches in <em>; strip all tags to keep plain text.
+                    $text = trim((string) preg_replace('/\s+/', ' ', strip_tags((string) $fragment)));
+                    if ($text !== '') {
+                        $parts[] = $text;
                     }
                 }
             }
 
-            // News bodytext / teaser
-            if (!empty($source['bodytext'])) {
-                $text = strip_tags((string) $source['bodytext']);
-                $parts[] = mb_substr(trim((string) preg_replace('/\s+/', ' ', $text)), 0, 600);
-            }
-            if (!empty($source['teaser'])) {
-                $parts[] = strip_tags((string) $source['teaser']);
+            // Fallback: document title when nothing was highlighted.
+            if (empty($parts) && !empty($hit['_source']['title'])) {
+                $parts[] = (string) $hit['_source']['title'];
             }
 
             if (!empty($parts)) {
-                $chunks[] = implode('. ', $parts);
+                $chunks[] = implode('. ', array_values(array_unique($parts)));
             }
         }
 

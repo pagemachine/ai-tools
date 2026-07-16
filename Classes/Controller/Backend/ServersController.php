@@ -152,25 +152,24 @@ class ServersController extends ActionController
     }
 
     /**
-     * Live document counts for the RAG index panel. Fail-soft: nulls when ES is unreachable.
+     * Total indexed document count for the RAG index panel. Fail-soft: null when ES is
+     * unreachable. Counts all searchable indices since index names are project-specific.
      *
      * @return array<string, int|null>
      */
     private function getEsCounts(bool $ragAvailable): array
     {
-        $counts = ['pages' => null, 'news' => null];
+        $counts = ['total' => null];
         if (!$ragAvailable) {
             return $counts;
         }
 
         try {
             $client = Connection::getClient();
-            foreach (['pages', 'news'] as $key) {
-                $result = $client->count(['index' => 'typo3_' . $key]);
-                $counts[$key] = isset($result['count']) ? (int) $result['count'] : null;
-            }
+            $result = $client->count(['index' => '_all']);
+            $counts['total'] = isset($result['count']) ? (int) $result['count'] : null;
         } catch (\Throwable) {
-            // ES unreachable or index missing - leave nulls
+            // ES unreachable or no index yet - leave null
         }
 
         return $counts;

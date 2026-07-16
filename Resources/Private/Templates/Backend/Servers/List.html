@@ -312,10 +312,10 @@
                 <strong>
                     <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.rag.index" />
                 </strong><br />
-                <f:if condition="{esCounts.pages}">
+                <f:if condition="{esCounts.total}">
                     <f:then>
-                        Pages: <strong>{esCounts.pages}</strong> &middot;
-                        News: <strong>{esCounts.news}</strong>
+                        <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.rag.documents" />:
+                        <strong>{esCounts.total}</strong>
                     </f:then>
                     <f:else>
                         <span class="text-danger">
