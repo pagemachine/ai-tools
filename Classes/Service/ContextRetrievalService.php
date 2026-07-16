@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Pagemachine\AItools\Service;
 
 use PAGEmachine\Searchable\Connection;
+use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
@@ -17,6 +19,11 @@ class ContextRetrievalService
      * Total character cap for the merged proximity context chunk.
      */
     private const CONTEXT_MAX_LENGTH = 800;
+
+    private function getLogger(): LoggerInterface
+    {
+        return GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class);
+    }
 
     /**
      * Retrieve relevant text chunks from the searchable Elasticsearch index.
@@ -42,10 +49,19 @@ class ContextRetrievalService
 
         $chunks = $this->retrieveByUsage($fileObject);
         if (!empty($chunks)) {
+            $this->getLogger()->debug('RAG context via page placement (proximity)', [
+                'file' => $fileObject->getName(),
+                'chunk' => $chunks[0],
+            ]);
             return $chunks;
         }
 
-        return $this->retrieveByFilename($fileObject, $limit);
+        $chunks = $this->retrieveByFilename($fileObject, $limit);
+        $this->getLogger()->debug('RAG context via filename search (fallback)', [
+            'file' => $fileObject->getName(),
+            'chunks' => $chunks,
+        ]);
+        return $chunks;
     }
 
     /**
@@ -56,6 +72,10 @@ class ContextRetrievalService
     private function retrieveByUsage(FileInterface $fileObject): array
     {
         $usages = $this->locateUsages($fileObject);
+        $this->getLogger()->debug('RAG usage lookup (sys_file_reference)', [
+            'file' => $fileObject->getName(),
+            'usages' => $usages,
+        ]);
         if ($usages === []) {
             return [];
         }
@@ -102,11 +122,26 @@ class ContextRetrievalService
                     'size' => 5,
                 ],
             ]);
-        } catch (\Exception) {
+        } catch (\Exception $exception) {
+            $this->getLogger()->debug('RAG usage search failed', ['exception' => $exception->getMessage()]);
             return [];
         }
 
-        return $this->extractUsageChunks($result, $ceUids);
+        $this->getLogger()->debug('RAG usage search hits', [
+            'total' => $result['hits']['total']['value'] ?? 0,
+            'ids' => array_map(
+                fn(array $hit): string => ($hit['_index'] ?? '?') . '/' . ($hit['_id'] ?? '?'),
+                $result['hits']['hits'] ?? []
+            ),
+        ]);
+
+        // The filename often disambiguates which of several referenced images is shown
+        // (e.g. three speaker portraits on one news record) - pass it along as a hint.
+        return $this->extractUsageChunks(
+            $result,
+            $ceUids,
+            $this->tokenizeFilename($fileObject->getNameWithoutExtension())
+        );
     }
 
     /**
@@ -149,9 +184,10 @@ class ContextRetrievalService
      *
      * @param array<mixed> $esResponse
      * @param int[] $ceUids CE uids the image is attached to (for narrowing)
+     * @param string $filenameTerms Tokenized filename, prepended as a disambiguation hint
      * @return string[]
      */
-    private function extractUsageChunks(array $esResponse, array $ceUids): array
+    private function extractUsageChunks(array $esResponse, array $ceUids, string $filenameTerms = ''): array
     {
         $titles = [];
         $bodies = [];
@@ -211,7 +247,8 @@ class ContextRetrievalService
 
         // Richest single body wins; titles from every usage are merged in front.
         usort($bodies, fn(string $a, string $b): int => strlen($b) <=> strlen($a));
-        $chunk = implode('. ', array_unique(array_filter([...$titles, $bodies[0] ?? ''])));
+        $hint = $filenameTerms !== '' ? 'Image filename: ' . $filenameTerms : '';
+        $chunk = implode('. ', array_unique(array_filter([$hint, ...$titles, $bodies[0] ?? ''])));
 
         return [mb_substr($chunk, 0, self::CONTEXT_MAX_LENGTH)];
     }
