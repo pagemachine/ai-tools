@@ -5,13 +5,24 @@ declare(strict_types=1);
 namespace Pagemachine\AItools\Service;
 
 use PAGEmachine\Searchable\Connection;
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileInterface;
+use TYPO3\CMS\Core\Resource\ProcessedFile;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ContextRetrievalService
 {
     /**
+     * Total character cap for the merged proximity context chunk.
+     */
+    private const CONTEXT_MAX_LENGTH = 800;
+
+    /**
      * Retrieve relevant text chunks from the searchable Elasticsearch index.
+     *
+     * Primary path: proximity — find the records the image is actually placed on
+     * (via sys_file_reference) and use their indexed text. Fallback: filename search.
      *
      * @param FileInterface $fileObject The image file
      * @param int $limit Max chunks to return
@@ -29,6 +40,189 @@ class ContextRetrievalService
             return [];
         }
 
+        $chunks = $this->retrieveByUsage($fileObject);
+        if (!empty($chunks)) {
+            return $chunks;
+        }
+
+        return $this->retrieveByFilename($fileObject, $limit);
+    }
+
+    /**
+     * Proximity context: the text of the pages/records the image is placed on.
+     *
+     * @return string[]
+     */
+    private function retrieveByUsage(FileInterface $fileObject): array
+    {
+        $usages = $this->locateUsages($fileObject);
+        if ($usages === []) {
+            return [];
+        }
+
+        // Build one query matching the searchable documents of the located records.
+        // tt_content usages: the page document embeds per-CE content[] sub-documents,
+        // so content.uid == CE uid pinpoints the exact page (CE uids are instance-unique).
+        $ceUids = [];
+        $should = [];
+        foreach ($usages as $usage) {
+            $recordUid = (int) $usage['uid_foreign'];
+            switch ($usage['tablenames']) {
+                case 'tt_content':
+                    $ceUids[] = $recordUid;
+                    break;
+                case 'pages':
+                    $should[] = ['bool' => ['must' => [
+                        ['term' => ['uid' => $recordUid]],
+                        ['exists' => ['field' => 'content']],
+                    ]]];
+                    break;
+                default:
+                    // News and other records: match by uid, require a text-bearing field
+                    // to avoid uid collisions with unrelated indices.
+                    $should[] = ['bool' => [
+                        'must' => [['term' => ['uid' => $recordUid]]],
+                        'should' => [
+                            ['exists' => ['field' => 'teaser']],
+                            ['exists' => ['field' => 'bodytext']],
+                        ],
+                        'minimum_should_match' => 1,
+                    ]];
+            }
+        }
+        if ($ceUids !== []) {
+            $should[] = ['terms' => ['content.uid' => $ceUids]];
+        }
+
+        try {
+            $result = Connection::getClient()->search([
+                'index' => '_all',
+                'body' => [
+                    'query' => ['bool' => ['should' => $should, 'minimum_should_match' => 1]],
+                    'size' => 5,
+                ],
+            ]);
+        } catch (\Exception) {
+            return [];
+        }
+
+        return $this->extractUsageChunks($result, $ceUids);
+    }
+
+    /**
+     * Find where the image is used: sys_file_reference maps the file to the exact
+     * records (tt_content / pages / news / ...) referencing it.
+     *
+     * @return array<int, array{tablenames: string, uid_foreign: int|string}>
+     */
+    private function locateUsages(FileInterface $fileObject): array
+    {
+        if ($fileObject instanceof ProcessedFile) {
+            $fileObject = $fileObject->getOriginalFile();
+        }
+        if (!$fileObject instanceof File) {
+            return [];
+        }
+
+        try {
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+                ->getQueryBuilderForTable('sys_file_reference');
+            return $queryBuilder
+                ->select('tablenames', 'uid_foreign')
+                ->from('sys_file_reference')
+                ->where(
+                    $queryBuilder->expr()->eq(
+                        'uid_local',
+                        $queryBuilder->createNamedParameter($fileObject->getUid(), \TYPO3\CMS\Core\Database\Connection::PARAM_INT)
+                    )
+                )
+                ->executeQuery()
+                ->fetchAllAssociative();
+        } catch (\Exception) {
+            return [];
+        }
+    }
+
+    /**
+     * Build the context from located documents: all titles (cheap, high-signal)
+     * plus the single richest body text, capped, to keep the prompt focused.
+     *
+     * @param array<mixed> $esResponse
+     * @param int[] $ceUids CE uids the image is attached to (for narrowing)
+     * @return string[]
+     */
+    private function extractUsageChunks(array $esResponse, array $ceUids): array
+    {
+        $titles = [];
+        $bodies = [];
+
+        foreach (($esResponse['hits']['hits'] ?? []) as $hit) {
+            $source = $hit['_source'] ?? [];
+            if (!empty($source['title'])) {
+                $titles[] = trim((string) $source['title']);
+            }
+
+            $parts = [];
+            $content = is_array($source['content'] ?? null) ? array_values($source['content']) : [];
+            if ($content !== []) {
+                // Narrow to the CE the image sits in (± direct neighbors); the
+                // content[] array is in page sorting order.
+                $matchedIndexes = [];
+                foreach ($content as $index => $element) {
+                    if (in_array((int) ($element['uid'] ?? 0), $ceUids, true)) {
+                        $matchedIndexes[] = $index;
+                    }
+                }
+                // Image placed on the page itself (not a CE): use the leading elements.
+                if ($matchedIndexes === []) {
+                    $matchedIndexes = [0];
+                }
+                $indexes = [];
+                foreach ($matchedIndexes as $index) {
+                    $indexes[] = $index - 1;
+                    $indexes[] = $index;
+                    $indexes[] = $index + 1;
+                }
+                foreach (array_unique($indexes) as $index) {
+                    foreach (['header', 'subheader', 'bodytext'] as $field) {
+                        if (!empty($content[$index][$field])) {
+                            $parts[] = (string) $content[$index][$field];
+                        }
+                    }
+                }
+            } else {
+                // News and other flat documents.
+                foreach (['teaser', 'bodytext', 'abstract'] as $field) {
+                    if (!empty($source[$field])) {
+                        $parts[] = (string) $source[$field];
+                    }
+                }
+            }
+
+            $body = trim((string) preg_replace('/\s+/', ' ', strip_tags(implode('. ', $parts))));
+            if ($body !== '') {
+                $bodies[] = $body;
+            }
+        }
+
+        if ($titles === [] && $bodies === []) {
+            return [];
+        }
+
+        // Richest single body wins; titles from every usage are merged in front.
+        usort($bodies, fn(string $a, string $b): int => strlen($b) <=> strlen($a));
+        $chunk = implode('. ', array_unique(array_filter([...$titles, $bodies[0] ?? ''])));
+
+        return [mb_substr($chunk, 0, self::CONTEXT_MAX_LENGTH)];
+    }
+
+    /**
+     * Fallback: filename-token search across all indices.
+     *
+     * @return string[]
+     */
+    private function retrieveByFilename(FileInterface $fileObject, int $limit): array
+    {
         $filename = $fileObject->getNameWithoutExtension();
         $searchTerms = $this->tokenizeFilename($filename);
 
