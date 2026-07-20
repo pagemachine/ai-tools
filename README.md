@@ -50,6 +50,12 @@ For other site languages, write the prompt in any of the supported languages. Th
 
 DeepL and Google Translate are supported. The active provider is configurable per language under **AI Tools > Settings**.
 
+### RAG (context enrichment)
+
+Optional. When [`pagemachine/searchable`](https://github.com/pagemachine/searchable) (Elasticsearch) is installed and RAG is enabled under **AI Tools > Settings**, alt-text generation is enriched with context from the page the image is actually placed on (via `sys_file_reference`), falling back to a filename search for unplaced images. Without searchable, or with RAG disabled, generation behaves exactly as before.
+
+searchable 7 (TYPO3 13.4+/14.3+) setup notes: register your indexer config in an extension that depends on searchable (searchable's own `ext_localconf.php` resets `EXTCONF['searchable']`); run `index:setup` once on a fresh install before the first rebuild; use `NoPreviewRenderer` on the pages indexer for sites without frontend TypoScript.
+
 ### Storage-scoped configuration
 
 Useful for multi-site setups where each site has its own storage and API budget. Each file storage can be configured independently under **System > File Storages > AI Tools tab**:
