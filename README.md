@@ -44,7 +44,12 @@ AiGude generates descriptions natively in these languages:
 
 English, German, Spanish, French, Italian, Portuguese, Dutch, Japanese, Korean, Arabic, Chinese, Russian, Hindi, Turkish, Hebrew
 
-For other site languages, write the prompt in any of the supported languages. The description is generated in the prompt's language and automatically translated to the target language.
+The description is generated in the language your prompt is written in, and translated to the target language only if the prompt language and the target language are different:
+
+- **Prompt in the target language** — generated natively, no translation step. Example: prompt written in German, target German → German description directly.
+- **Prompt in a different language** — generated, then translated. Example: prompt written in English, target German → generated in English, then translated to German.
+
+For a site language that is not natively supported, write the prompt in any of the supported languages; the result is translated to the target.
 
 ### Translation
 
