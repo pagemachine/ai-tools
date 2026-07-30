@@ -1,7 +1,7 @@
 # cat=basic/enable/050; type=boolean; label=Only show EU-based providers (GDPR compliant)
 gdprCompliant = true
 
-# cat=basic/enable/055; type=boolean; label=Enable RAG: Elasticsearch context enrichment for image descriptions (requires pagemachine/searchable)
+# cat=basic/enable/055; type=boolean; label=Enable RAG: enrich image descriptions with context from the page the image is placed on
 ragEnabled = false
 
 # cat=basic/enable/060; type=string; label=Select default translation provider

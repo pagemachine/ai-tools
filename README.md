@@ -57,9 +57,7 @@ DeepL and Google Translate are supported. The active provider is configurable pe
 
 ### RAG (context enrichment)
 
-Optional. When [`pagemachine/searchable`](https://github.com/pagemachine/searchable) (Elasticsearch) is installed and RAG is enabled under **AI Tools > Settings**, alt-text generation is enriched with context from the page the image is actually placed on (via `sys_file_reference`), falling back to a filename search for unplaced images. Without searchable, or with RAG disabled, generation behaves exactly as before.
-
-searchable 7 (TYPO3 13.4+/14.3+) setup notes: register your indexer config in an extension that depends on searchable (searchable's own `ext_localconf.php` resets `EXTCONF['searchable']`); run `index:setup` once on a fresh install before the first rebuild; use `NoPreviewRenderer` on the pages indexer for sites without frontend TypoScript.
+Optional, off by default. When enabled under **AI Tools > Settings**, alt-text generation is enriched with context from the page the image is actually placed on, resolved via `sys_file_reference` and read directly from the database. Descriptions can then name the actual people, events and organizations shown instead of guessing from pixels alone. Images that are not placed anywhere are described from the image alone. No external search service or indexing step is required.
 
 ### Storage-scoped configuration
 
