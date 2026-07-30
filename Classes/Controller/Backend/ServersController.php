@@ -9,8 +9,6 @@ use Pagemachine\AItools\Domain\Repository\PromptRepository;
 use Pagemachine\AItools\Domain\Repository\ServerRepository;
 use Pagemachine\AItools\Service\ServerService;
 use Pagemachine\AItools\Service\SettingsService;
-use PAGEmachine\Searchable\Connection;
-use PAGEmachine\Searchable\Service\IndexingService;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
@@ -74,14 +72,11 @@ class ServersController extends ActionController
 
         $requestUri = $this->request->getAttribute('normalizedParams')->getRequestUri();
 
-        $ragAvailable = class_exists(Connection::class);
         $template_variables = [
             'servers' => $this->serverRepository->listAllServers(),
             'returnUrl' => $requestUri,
             'gdprCompliant' => $this->settingsService->getGdprCompliant(),
-            'ragAvailable' => $ragAvailable,
             'ragEnabled' => $this->settingsService->getRagEnabled(),
-            'esCounts' => $this->getEsCounts($ragAvailable),
         ];
 
         try {
@@ -128,51 +123,6 @@ class ServersController extends ActionController
         );
 
         return $this->redirect('list');
-    }
-
-    public function reindexElasticsearchAction(): ResponseInterface
-    {
-        if (!class_exists(IndexingService::class)) {
-            $this->addFlashMessage(
-                'pagemachine/searchable is not installed.',
-                'Reindex',
-                ContextualFeedbackSeverity::ERROR
-            );
-            return $this->redirect('list');
-        }
-
-        try {
-            GeneralUtility::makeInstance(IndexingService::class)->indexFull();
-            $this->addFlashMessage('Elasticsearch index rebuilt successfully.', 'Reindex', ContextualFeedbackSeverity::OK);
-        } catch (\Throwable $e) {
-            $this->addFlashMessage('Reindex failed: ' . $e->getMessage(), 'Reindex', ContextualFeedbackSeverity::ERROR);
-        }
-
-        return $this->redirect('list');
-    }
-
-    /**
-     * Total indexed document count for the RAG index panel. Fail-soft: null when ES is
-     * unreachable. Counts all searchable indices since index names are project-specific.
-     *
-     * @return array<string, int|null>
-     */
-    private function getEsCounts(bool $ragAvailable): array
-    {
-        $counts = ['total' => null];
-        if (!$ragAvailable) {
-            return $counts;
-        }
-
-        try {
-            $client = Connection::getClient();
-            $result = $client->count(['index' => '_all']);
-            $counts['total'] = isset($result['count']) ? (int) $result['count'] : null;
-        } catch (\Throwable) {
-            // ES unreachable or no index yet - leave null
-        }
-
-        return $counts;
     }
 
     protected function getLanguageService(): LanguageService

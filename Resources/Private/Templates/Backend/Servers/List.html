@@ -28,12 +28,10 @@
                 </f:else>
             </f:if>
 
-            <f:if condition="{ragAvailable}">
-                <h1>
-                    <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.rag.heading" />
-                </h1>
-                <f:render section="ragSettings" arguments="{_all}" />
-            </f:if>
+            <h1>
+                <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.rag.heading" />
+            </h1>
+            <f:render section="ragSettings" arguments="{_all}" />
         </f:then>
         <f:else>
             <f:render section="initialization" arguments="{_all}" />
@@ -306,31 +304,6 @@
                 <f:form.submit
                     value="{f:translate(key: 'LLL:EXT:core/Resources/Private/Language/locallang_common.xlf:save')}"
                     class="btn btn-primary" style="background-color: #e966d4; border-color: #e960d3;" />
-            </f:form>
-
-            <div class="mb-3">
-                <strong>
-                    <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.rag.index" />
-                </strong><br />
-                <f:if condition="{esCounts.total}">
-                    <f:then>
-                        <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.rag.documents" />:
-                        <strong>{esCounts.total}</strong>
-                    </f:then>
-                    <f:else>
-                        <span class="text-danger">
-                            <core:icon identifier="actions-exclamation-triangle-alt" />
-                            <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.rag.unreachable" />
-                        </span>
-                    </f:else>
-                </f:if>
-            </div>
-
-            <f:form action="reindexElasticsearch" method="post">
-                <button type="submit" class="btn btn-default">
-                    <core:icon identifier="actions-refresh" />
-                    <f:translate key="LLL:EXT:ai_tools/Resources/Private/Language/BackendModules/locallang_be_settings.xlf:tx_aitools_settings.rag.reindex" />
-                </button>
             </f:form>
         </div>
     </div>

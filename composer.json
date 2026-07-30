@@ -45,9 +45,6 @@
         "squizlabs/php_codesniffer": "^4.0",
         "ssch/typo3-rector": "^2.6 || ^3.0"
     },
-    "suggest": {
-        "pagemachine/searchable": "Enables RAG context enrichment for image descriptions (Elasticsearch). Requires an Elasticsearch 7.x server."
-    },
     "autoload": {
         "psr-4": {
             "Pagemachine\\AItools\\": "Classes"

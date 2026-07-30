@@ -38,7 +38,6 @@ return [
                 'list',
                 'saveSettings',
                 'toggleRag',
-                'reindexElasticsearch',
             ],
         ],
     ],
