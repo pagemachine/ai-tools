@@ -246,14 +246,19 @@ class ContextRetrievalService
             }
 
             if ($targetUids === []) {
-                // Attached to the page itself: use the leading elements.
-                $selected = array_slice($pageRows, 0, self::MAX_PAGE_ELEMENTS);
+                // Attached to the page itself: use the leading elements that carry text.
+                $textRows = array_values(array_filter($pageRows, $this->hasText(...)));
+                $selected = array_slice($textRows, 0, self::MAX_PAGE_ELEMENTS);
             } else {
-                // Restrict to the columns holding the image, then take each
-                // matched element plus its direct neighbours in sorting order.
+                // Restrict to the columns holding the image, then take each matched
+                // element plus its direct neighbours in sorting order. Matched
+                // elements stay in the list even without text, since they anchor the
+                // window; contentless neighbours are dropped so the window lands on
+                // elements that actually contribute.
                 $columnRows = array_values(array_filter(
                     $pageRows,
                     fn(array $row): bool => isset($targetColPos[(int) $row['colPos']])
+                        && (in_array((int) $row['uid'], $targetUids, true) || $this->hasText($row))
                 ));
                 $indexes = [];
                 foreach ($columnRows as $index => $row) {
@@ -287,6 +292,20 @@ class ContextRetrievalService
         }
 
         return $bodies;
+    }
+
+    /**
+     * Whether a content element row contributes any text.
+     *
+     * Elements without text still occupy a slot in the selection budget, so
+     * pages leading with purely structural elements would otherwise yield
+     * title-only context.
+     *
+     * @param array<string, mixed> $row
+     */
+    private function hasText(array $row): bool
+    {
+        return !empty($row['header']) || !empty($row['subheader']) || !empty($row['bodytext']);
     }
 
     /**
