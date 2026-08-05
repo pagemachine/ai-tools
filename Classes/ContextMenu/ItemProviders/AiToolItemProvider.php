@@ -32,7 +32,7 @@ class AiToolItemProvider extends AbstractProvider
     protected $itemsConfiguration = [
         'generateAIMetadata' => [
             'type' => 'item',
-            'label' => 'Generate A.I. Metadata', // you can use "LLL:" syntax here
+            'label' => 'Generate AI metadata', // you can use "LLL:" syntax here
             'iconIdentifier' => 'actions-document-info',
             'callbackAction' => 'generateAIMetadata', //name of the function in the JS file
         ],

@@ -76,6 +76,7 @@ class ServersController extends ActionController
             'servers' => $this->serverRepository->listAllServers(),
             'returnUrl' => $requestUri,
             'gdprCompliant' => $this->settingsService->getGdprCompliant(),
+            'ragEnabled' => $this->settingsService->getRagEnabled(),
         ];
 
         try {
@@ -107,6 +108,19 @@ class ServersController extends ActionController
         $this->settingsService->setTranslationProviders($providers);
 
         $this->addFlashMessage('Settings have been saved.', 'Settings saved', ContextualFeedbackSeverity::OK);
+
+        return $this->redirect('list');
+    }
+
+    public function toggleRagAction(bool $ragEnabled = false): ResponseInterface
+    {
+        $this->settingsService->setRagEnabled($ragEnabled);
+
+        $this->addFlashMessage(
+            $ragEnabled ? 'RAG enabled' : 'RAG disabled',
+            'Settings saved',
+            ContextualFeedbackSeverity::OK
+        );
 
         return $this->redirect('list');
     }

@@ -46,12 +46,27 @@ class SettingsService
      */
     public function getGdprCompliant(): bool
     {
-        return (bool) $this->extensionConfiguration->get('ai_tools', 'gdprCompliant');
+        // ext_conf values can arrive as strings ("false"/"0"); (bool) "false" is true, so coerce properly.
+        return filter_var($this->extensionConfiguration->get('ai_tools', 'gdprCompliant'), FILTER_VALIDATE_BOOLEAN);
     }
 
     public function setGdprCompliant(bool $gdprCompliant): void
     {
         $this->setExtConfigValue('gdprCompliant', $gdprCompliant);
+    }
+
+    /**
+     * Whether RAG (context enrichment) is enabled. Opt-in: defaults to false.
+     */
+    public function getRagEnabled(): bool
+    {
+        // ext_conf values can arrive as strings ("false"/"0"); (bool) "false" is true, so coerce properly.
+        return filter_var($this->extensionConfiguration->get('ai_tools', 'ragEnabled'), FILTER_VALIDATE_BOOLEAN);
+    }
+
+    public function setRagEnabled(bool $ragEnabled): void
+    {
+        $this->setExtConfigValue('ragEnabled', $ragEnabled);
     }
 
     public function getTranslationProviderForLanguage(int $languageId): ?string
@@ -108,7 +123,7 @@ class SettingsService
     {
         $config = $this->extensionConfiguration->get('ai_tools');
         $config[$key] = $value;
-        $config = array_intersect_key($config, array_flip(['gdprCompliant', 'translationProviders']));
+        $config = array_intersect_key($config, array_flip(['gdprCompliant', 'ragEnabled', 'translationProviders']));
         $this->extensionConfiguration->set('ai_tools', $config);
     }
 }

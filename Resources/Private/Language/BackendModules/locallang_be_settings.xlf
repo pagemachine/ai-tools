@@ -27,6 +27,15 @@
 			<trans-unit id="tx_aitools_settings.noServiceAvailable">
 				<source>No service available for this language</source>
 			</trans-unit>
+			<trans-unit id="tx_aitools_settings.rag.heading">
+				<source>RAG (Context Enrichment)</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_settings.rag.description">
+				<source>Context enrichment finds where each image is placed on your site and sends the surrounding page or news content to AiGude alongside the image, so descriptions can name the actual people, events and organizations shown. Content is read directly from the database, so no indexing step is required. Images that are not placed anywhere are described from the image alone.</source>
+			</trans-unit>
+			<trans-unit id="tx_aitools_settings.rag.enable">
+				<source>Enable context enrichment</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>
