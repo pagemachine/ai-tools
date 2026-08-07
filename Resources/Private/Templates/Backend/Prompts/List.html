@@ -19,7 +19,7 @@
         </f:then>
         <f:else>
             <div class="alert alert-warning">
-                ⚠ AiGude does not natively support <strong>{baseLangTitle}</strong>.
+                <core:icon identifier="actions-exclamation-triangle-alt" size="small" /> AiGude does not natively support <strong>{baseLangTitle}</strong>.
                 Write prompts in any of the <a href="https://github.com/pagemachine/ai-tools#supported-languages" target="_blank" rel="noopener">15 supported languages</a> (e.g. English, German).
                 The description will be generated in the prompt language and automatically translated to <strong>{baseLangTitle}</strong><f:if condition="{baseProvider}"> via <strong>{baseProvider}</strong></f:if>.
             </div>
@@ -50,7 +50,7 @@
                     <tr>
                         <td style="white-space: nowrap;">
                             <f:if condition="{prompt.default}">
-                                <core:icon identifier="actions-star" size="small" />
+                                <core:icon identifier="tx-aitools-star" size="small" />
                             </f:if>
                             <be:link.editRecord returnUrl="{returnUrl}" table="tx_aitools_domain_model_prompt" uid="{prompt.uid}"
                                 title="{f:translate(key: 'LLL:EXT:core/Resources/Private/Language/locallang_mod_web_list.xlf:edit')}">

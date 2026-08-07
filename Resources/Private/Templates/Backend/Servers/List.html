@@ -62,7 +62,7 @@
                     <tr>
                         <td style="white-space: nowrap;">
                             <f:if condition="{server.default}">
-                                🏠
+                                <core:icon identifier="tx-aitools-star" size="small" />
                             </f:if>
                             {server.server -> f:format.crop(maxCharacters:50)}
                         </td>
@@ -240,7 +240,7 @@
                         <f:if condition="{providerLanguage.isBase} && {providerLanguage.isAigudeVisionSupported}">
                             <f:then>
                                 <div class="form-control" style="background:#eafbe7;border-color:#7ec67a;color:#2e6b2e;">
-                                    🤖 Generated natively by AiGude
+                                    <core:icon identifier="actions-check" size="small" /> Generated natively by AiGude
                                 </div>
                             </f:then>
                             <f:else>
