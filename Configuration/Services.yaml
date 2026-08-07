@@ -6,3 +6,11 @@ services:
 
   Pagemachine\AItools\:
     resource: '../Classes/*'
+
+  # Registered via tag rather than the AsEventListener attribute, which does not
+  # exist on TYPO3 12.4.
+  Pagemachine\AItools\EventListener\SeedDefaultPromptListener:
+    tags:
+      - name: event.listener
+        identifier: 'ai-tools/seed-default-prompt'
+        event: TYPO3\CMS\Core\Package\Event\PackagesMayHaveChangedEvent
