@@ -19,6 +19,10 @@ return [
         'path' => '/aitoolsimages/metagen',
         'target' => ImageRecognizeController::class . '::ajaxMetaGenerateAction',
     ],
+    'aitools_ai_tools_images_batch' => [
+        'path' => '/aitoolsimages/metagen-batch',
+        'target' => ImageRecognizeController::class . '::ajaxMetaGenerateAction',
+    ],
     'aitools_ai_tools_credits' => [
         'path' => '/aitools/credits',
         'target' => CreditsController::class . '::ajaxCreditsAction',

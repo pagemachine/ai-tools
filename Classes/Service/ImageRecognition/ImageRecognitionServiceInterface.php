@@ -20,6 +20,14 @@ interface ImageRecognitionServiceInterface
     public function sendFileToApi(FileInterface $fileObject, PlaceholderResult $placeholderResult, string $targetLanguage = 'en', ?string $translationProvider = null, string $promptLang = 'auto'): string;
 
     /**
+     * Sends multiple files to the image recognition API in a single batch request.
+     *
+     * @param array<int, array{file: FileInterface, placeholderResult: PlaceholderResult}> $items
+     * @return array<int, string> Generated texts keyed by the input index
+     */
+    public function sendBatchToApi(array $items, string $targetLanguage = 'en', ?string $translationProvider = null, string $promptLang = 'auto'): array;
+
+    /**
      * Returns the price for the action
      *
      * @return string

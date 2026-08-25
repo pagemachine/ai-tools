@@ -1,5 +1,6 @@
 const URLS = {
   images: TYPO3.settings.ajaxUrls['aitools_ai_tools_images'],
+  images_batch: TYPO3.settings.ajaxUrls['aitools_ai_tools_images_batch'],
   credits: TYPO3.settings.ajaxUrls['aitools_ai_tools_credits'],
 };
 
@@ -46,6 +47,30 @@ export async function callAjaxMetaGenerateAction(fileIdentifier, targetLanguage,
       throw 'Error: empty response';
     }).catch(error => {
       top.TYPO3.Notification.error('Error', '(Meta) Error: ' + error, 5);
+      throw error;
+    });
+}
+
+export async function callAjaxBatchGenerateAction(fileIdentifiers, targetLanguage, textPrompt, translationProvider, textPromptLanguage) {
+  const params = {
+    action: 'generateBatchMetaData',
+    fileIdentifiers: JSON.stringify(fileIdentifiers),
+    "target-language": targetLanguage,
+    textPrompt: textPrompt,
+    translationProvider: translationProvider,
+    textPromptLanguage: textPromptLanguage || '',
+  };
+
+  top.TYPO3.Notification.info('Generating Metadata', `Generating ${fileIdentifiers.length} images...`, 5);
+  return ajaxCall(params, URLS.images_batch)
+    .then(response => {
+      if (response) {
+        top.TYPO3.Notification.success('Generated Metadata', `Generated ${Object.keys(response).length} descriptions`, 5);
+        return response;
+      }
+      throw 'Error: empty response';
+    }).catch(error => {
+      top.TYPO3.Notification.error('Error', '(Batch) Error: ' + error, 5);
       throw error;
     });
 }

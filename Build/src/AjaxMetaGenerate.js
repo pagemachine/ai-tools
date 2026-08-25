@@ -3,7 +3,7 @@ import Modal from '@typo3/backend/modal';
 import Severity from '@typo3/backend/severity';
 import { MessageUtility }  from '@typo3/backend/utility/message-utility';
 import GeneratorButton from './utils/GeneratorButton.js';
-import { callAjaxSaveMetaDataAction } from './utils/RemoteCalls.js';
+import { callAjaxSaveMetaDataAction, callAjaxBatchGenerateAction } from './utils/RemoteCalls.js';
 
 $(() => {
   $('.textPromptSelect').on('change', function() {
@@ -111,40 +111,79 @@ $(() => {
       $(this).prop('disabled', true).text('Cancelling...');
     });
 
-    for (let imageEntry of filteredImageBlocks) {
+    const BATCH_SIZE = 10;
+
+    // Collect metadata for all images. Use .attr('data-file-identifier') not .data():
+    // jQuery auto-parses a combined identifier like "1:/path/file.jpg" into an object.
+    const imageData = filteredImageBlocks.map(imageEntry => {
+      const button = $(imageEntry).find('.t3js-alternative-generator-trigger').first();
+      const output = $(button.data('output-target'));
+      const promptField = button.data('text-prompt-field');
+      return {
+        element: imageEntry,
+        fileIdentifier: button.attr('data-file-identifier'),
+        targetLanguage: button.data('target-language'),
+        textPrompt: promptField
+          ? $(promptField).val()
+          : button.data('text-prompt'),
+        textPromptLanguage: (promptField ? $(promptField).attr('data-text-prompt-language') : null)
+          || button.data('text-prompt-language'),
+        translationProvider: button.data('translation-provider'),
+        output: output,
+        save: $(imageEntry).find('.t3js-alternative-save-trigger[data-translate="0"]').first(),
+        saveTranslate: $(imageEntry).find('.t3js-alternative-save-trigger[data-translate="1"]').first(),
+      };
+    });
+
+    // Chunk into batches (server caps at 10 images per request).
+    const batches = [];
+    for (let i = 0; i < imageData.length; i += BATCH_SIZE) {
+      batches.push(imageData.slice(i, i + BATCH_SIZE));
+    }
+
+    for (const batch of batches) {
       if (aborted) break;
 
       try {
-        const button = $(imageEntry).find('.t3js-alternative-generator-trigger').first();
-        const save = $(imageEntry).find('.t3js-alternative-save-trigger[data-translate="0"]').first();
-        const saveTranslate = $(imageEntry).find('.t3js-alternative-save-trigger[data-translate="1"]').first();
+        const fileIdentifiers = batch.map(d => d.fileIdentifier);
+        const results = await callAjaxBatchGenerateAction(
+          fileIdentifiers,
+          batch[0].targetLanguage,
+          batch[0].textPrompt,
+          batch[0].translationProvider,
+          batch[0].textPromptLanguage,
+        );
 
-        const results = await generator.triggerGeneratorButton(button);
+        // Distribute results back to each image field and save.
+        for (const item of batch) {
+          const result = results[item.fileIdentifier];
+          if (result && result.alternative) {
+            item.output.val(result.alternative);
+            item.output.trigger('change');
+            $(item.element).data('alternative', result.alternative);
+            $(item.element).css('border', '1px solid green');
 
-        $(imageEntry).data('alternative', results.alternative);
-
-        if (translate) {
-          if (!saveTranslate.length) {
-            console.error('No saveTranslate button found');
-            return;
+            if (translate) {
+              if (item.saveTranslate.length) {
+                item.saveTranslate.trigger('click');
+              }
+            } else {
+              if (item.save.length) {
+                item.save.trigger('click');
+              }
+            }
+          } else {
+            $(item.element).css('border', '1px solid red');
           }
-          saveTranslate.trigger('click');
-        } else {
-          if (!save.length) {
-            console.error('No save button found');
-            return;
-          }
-          save.trigger('click');
         }
-
-        $(imageEntry).css('border', '1px solid green');
-
       } catch (error) {
-        console.error('Error while generating metadata', error);
-        $(imageEntry).css('border', '1px solid red');
+        console.error('Batch error', error);
+        for (const item of batch) {
+          $(item.element).css('border', '1px solid red');
+        }
       }
 
-      progressBar.val(progressBar.val() + 1);
+      progressBar.val(progressBar.val() + batch.length);
     }
 
     $cancelBtn.remove();

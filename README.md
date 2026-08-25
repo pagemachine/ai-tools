@@ -25,7 +25,7 @@ Right-click any image in the File List and choose **Generate A.I. Metadata** to 
 - Generate alt text in any site language
 - Auto-translate to all other site languages in one step
 - Customize the prompt used for generation (AI Tools > Prompts)
-- Use **Generate All** on a folder to process multiple images at once
+- Use **Generate All** on a folder to process multiple images at once, sent to the AI server in groups for faster completion
 
 ### Prompt management
 
