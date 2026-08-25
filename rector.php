@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
-use Rector\PHPUnit\Set\PHPUnitSetList;
 use Ssch\TYPO3Rector\Set\Typo3SetList;
 
 return RectorConfig::configure()
@@ -18,9 +17,6 @@ return RectorConfig::configure()
     )
     ->withPhpSets()
     ->withSets([
-        PHPUnitSetList::PHPUNIT_100,
         Typo3SetList::TYPO3_11,
     ])
-    ->withSkip([
-
-    ]);
+;
