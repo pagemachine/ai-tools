@@ -16,9 +16,6 @@ return RectorConfig::configure()
         removeUnusedImports: true,
     )
     ->withPhpSets()
-    ->withComposerBased(
-        phpunit: true,
-    )
     ->withSets([
         Typo3SetList::TYPO3_11,
     ])
