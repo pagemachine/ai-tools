@@ -329,7 +329,12 @@ class ImageRecognizeController extends ActionController
             case 'generateBatchMetaData':
                 $fileIdentifiers = json_decode((string)($parsedBody['fileIdentifiers'] ?? $queryParams['fileIdentifiers'] ?? '[]'), true, 512, JSON_THROW_ON_ERROR);
                 $textPrompt = $parsedBody['textPrompt'] ?? $queryParams['textPrompt'] ?: ($defaultPrompt?->getPrompt() ?? '');
+                $textPromptLanguage = $parsedBody['textPromptLanguage'] ?? $queryParams['textPromptLanguage'] ?? '';
+                if ($textPromptLanguage === '') {
+                    $textPromptLanguage = $defaultPrompt?->getLanguage() ?? 'en_US';
+                }
                 $translationProvider = $parsedBody['translationProvider'] ?? $queryParams['translationProvider'] ?? null;
+                $promptLang = strtolower(substr((string) $textPromptLanguage, 0, 2)) ?: 'auto';
 
                 $imageType = Typo3VersionGate::imageFileType();
                 $files = [];
@@ -353,7 +358,8 @@ class ImageRecognizeController extends ActionController
                     $textPrompt,
                     $targetTwoLetterIsoCode,
                     (int) $target_language,
-                    $translationProvider
+                    $translationProvider,
+                    $promptLang
                 );
 
                 $data = [];

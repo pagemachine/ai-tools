@@ -118,13 +118,16 @@ $(() => {
     const imageData = filteredImageBlocks.map(imageEntry => {
       const button = $(imageEntry).find('.t3js-alternative-generator-trigger').first();
       const output = $(button.data('output-target'));
+      const promptField = button.data('text-prompt-field');
       return {
         element: imageEntry,
         fileIdentifier: button.attr('data-file-identifier'),
         targetLanguage: button.data('target-language'),
-        textPrompt: button.data('text-prompt-field')
-          ? $(button.data('text-prompt-field')).val()
+        textPrompt: promptField
+          ? $(promptField).val()
           : button.data('text-prompt'),
+        textPromptLanguage: (promptField ? $(promptField).attr('data-text-prompt-language') : null)
+          || button.data('text-prompt-language'),
         translationProvider: button.data('translation-provider'),
         output: output,
         save: $(imageEntry).find('.t3js-alternative-save-trigger[data-translate="0"]').first(),
@@ -148,6 +151,7 @@ $(() => {
           batch[0].targetLanguage,
           batch[0].textPrompt,
           batch[0].translationProvider,
+          batch[0].textPromptLanguage,
         );
 
         // Distribute results back to each image field and save.

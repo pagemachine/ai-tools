@@ -51,13 +51,14 @@ export async function callAjaxMetaGenerateAction(fileIdentifier, targetLanguage,
     });
 }
 
-export async function callAjaxBatchGenerateAction(fileIdentifiers, targetLanguage, textPrompt, translationProvider) {
+export async function callAjaxBatchGenerateAction(fileIdentifiers, targetLanguage, textPrompt, translationProvider, textPromptLanguage) {
   const params = {
     action: 'generateBatchMetaData',
     fileIdentifiers: JSON.stringify(fileIdentifiers),
     "target-language": targetLanguage,
     textPrompt: textPrompt,
     translationProvider: translationProvider,
+    textPromptLanguage: textPromptLanguage || '',
   };
 
   top.TYPO3.Notification.info('Generating Metadata', `Generating ${fileIdentifiers.length} images...`, 5);

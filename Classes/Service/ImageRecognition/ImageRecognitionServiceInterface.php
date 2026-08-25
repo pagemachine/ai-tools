@@ -25,7 +25,7 @@ interface ImageRecognitionServiceInterface
      * @param array<int, array{file: FileInterface, placeholderResult: PlaceholderResult}> $items
      * @return array<int, string> Generated texts keyed by the input index
      */
-    public function sendBatchToApi(array $items, string $targetLanguage = 'en', ?string $translationProvider = null): array;
+    public function sendBatchToApi(array $items, string $targetLanguage = 'en', ?string $translationProvider = null, string $promptLang = 'auto'): array;
 
     /**
      * Returns the price for the action

@@ -67,7 +67,7 @@ class ImageMetaDataService
      * @return array<int, string> Generated texts keyed by the input index
      * @throws \Exception
      */
-    public function generateImageDescriptionBatch(array $fileObjects, string $textPrompt = '', string $targetLanguage = 'en', int $language = 0, ?string $translationProvider = null): array
+    public function generateImageDescriptionBatch(array $fileObjects, string $textPrompt = '', string $targetLanguage = 'en', int $language = 0, ?string $translationProvider = null, string $promptLang = 'auto'): array
     {
         if ($fileObjects === []) {
             return [];
@@ -89,7 +89,7 @@ class ImageMetaDataService
             ];
         }
 
-        return $serverClass->sendBatchToApi($items, $targetLanguage, $translationProvider);
+        return $serverClass->sendBatchToApi($items, $targetLanguage, $translationProvider, $promptLang);
     }
 
     /**
